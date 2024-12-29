@@ -1,16 +1,40 @@
 #!/usr/bin/sh
 
-sudo pacman -S neofetch
-sudo pacman -S git
-sudo pacman -S man-db
-sudo pacman -S stow
-sudo pacman -S btop
-sudo pacman -Sy neovim
+install_if_not_found() {
+local COMMAND="$1"
+
+if [ -z "$2" ]; then
+	local PACKAGE="$COMMAND"
+else
+	local PACKAGE="$2"
+fi
+
+if which "$COMMAND" >/dev/null 2>&1; then
+	echo "$COMMAND already installed"
+else
+sudo pacman -S "$PACKAGE"
+fi
+}
+
+install_if_not_found neofetch
+install_if_not_found git
+install_if_not_found man man-db
+install_if_not_found stow
+install_if_not_found btop
+install_if_not_found neovim
+install_if_not_found k9s
+install_if_not_found psql postgresql
+
+fc-list | grep "JetBrainsMono" >/dev/null 2>&1;
+if [ $? -eq 0 ]; then
+	echo "JetBrainsMonoNerdFont alrady installed"
+else
 sudo pacman -S ttf-jetbrains-mono-nerd
 fc-cache -fv
+fi
+
 #sudo pacman -S zsh
 #sudo chsh -s /usr/bin/zsh
-sudo pacman -S k9s
 
 # kaf
 if which kaf >/dev/null 2>&1; then
