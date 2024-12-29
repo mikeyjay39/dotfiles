@@ -25,6 +25,18 @@ install_if_not_found neovim
 install_if_not_found k9s
 install_if_not_found psql postgresql
 
+if which docker >/dev/null 2>&1; then
+	echo docker already installed
+else
+install_if_not_found docker
+sudo systemctl start docker.service
+sudo systemctl enable docker.service
+sudo usermod -aG docker $USER
+newgrp docker
+fi
+
+install_if_not_found docker-compose
+
 fc-list | grep "JetBrainsMono" >/dev/null 2>&1;
 if [ $? -eq 0 ]; then
 	echo "JetBrainsMonoNerdFont alrady installed"
