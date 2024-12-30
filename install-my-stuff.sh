@@ -24,6 +24,9 @@ install_if_not_found btop
 install_if_not_found nvim neovim
 install_if_not_found k9s
 install_if_not_found psql postgresql
+install_if_not_found xclip
+install_if_not_found ghostty
+install_if_not_found zellij
 
 if which docker >/dev/null 2>&1; then
 	echo docker already installed

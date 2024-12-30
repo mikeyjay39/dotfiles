@@ -1,0 +1,6 @@
+font-family = JetBrainsMono NF Regular
+theme = tokyonight
+background-opacity = 0.96
+font-size = 10
+keybind = ctrl+shift+up=scroll_page_up
+keybind = ctrl+shift+down=scroll_page_down
