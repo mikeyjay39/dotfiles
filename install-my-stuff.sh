@@ -21,7 +21,7 @@ install_if_not_found git
 install_if_not_found man man-db
 install_if_not_found stow
 install_if_not_found btop
-install_if_not_found neovim
+install_if_not_found nvim neovim
 install_if_not_found k9s
 install_if_not_found psql postgresql
 
