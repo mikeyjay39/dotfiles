@@ -16,7 +16,7 @@ sudo pacman -S "$PACKAGE"
 fi
 }
 
-install_if_not_found neofetch
+install_if_not_found fastfetch
 install_if_not_found git
 install_if_not_found man man-db
 install_if_not_found stow
