@@ -5,4 +5,4 @@ background-blur-radius = 20
 font-size = 18
 keybind = ctrl+shift+up=scroll_page_up
 keybind = ctrl+shift+down=scroll_page_down
-command = zellij
+#command = zellij

@@ -62,5 +62,13 @@ sudo mv /home/mikeyjay/bin/kaf /usr/bin/kaf
 rmdir /home/mikeyjay/bin
 fi
 
+# git-autocompletion
+if [ -f ~/.git-completion.bash ]; then
+	echo git-completion already installed
+else
+sudo curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash -o /usr/share/git/completion/git-completion.bash
+ln -s /usr/share/git/completion/git-completion.bash ~/.git-completion.bash
+fi
+
 
 stow -d ~/dotfiles -t ~ .
