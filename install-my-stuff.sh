@@ -27,6 +27,7 @@ install_if_not_found nvim neovim
 install_if_not_found k9s
 install_if_not_found psql postgresql
 install_if_not_found xclip
+install_if_not_found unzip
 install_if_not_found ghostty
 install_if_not_found zellij
 
