@@ -378,11 +378,11 @@ require("lazy").setup({
 		dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
 		opts = {},
 	},
-	{
-		"mxsdev/nvim-dap-vscode-js",
-		requires = { "mfussenegger/nvim-dap" },
-		opts = {},
-	},
+	-- {
+	-- 	"mxsdev/nvim-dap-vscode-js",
+	-- 	requires = { "mfussenegger/nvim-dap" },
+	-- 	opts = {},
+	-- },
 	{
 		"nvim-neotest/neotest",
 		dependencies = {
