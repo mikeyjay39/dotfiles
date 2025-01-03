@@ -30,6 +30,10 @@ install_if_not_found xclip
 install_if_not_found unzip
 install_if_not_found ghostty
 install_if_not_found zellij
+# for nvim telescope
+install_if_not_found rg ripgrep
+# for nvim telescope. sharkdp/dp
+install_if_not_found fd
 
 if which docker >/dev/null 2>&1; then
 	echo docker already installed
