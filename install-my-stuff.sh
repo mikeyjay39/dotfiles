@@ -17,7 +17,7 @@ fi
 }
 
 install_if_not_found which
-install_iff_not_found cc base-devel
+install_if_not_found cc base-devel
 install_if_not_found fastfetch
 install_if_not_found git
 install_if_not_found man man-db
@@ -30,6 +30,7 @@ install_if_not_found xclip
 install_if_not_found unzip
 install_if_not_found ghostty
 install_if_not_found zellij
+install_if_not_found gh github-cli
 # for nvim telescope
 install_if_not_found rg ripgrep
 # for nvim telescope. sharkdp/dp
