@@ -1,8 +1,9 @@
-font-family = JetBrainsMono NF Regular
-theme = tokyonight
-background-opacity = 0.96
+font-family = JetBrainsMono Nerd Font
+#theme = tokyonight-day
+theme = tokyonight_night
+background-opacity = 0.90
 background-blur-radius = 20
 font-size = 18
 keybind = ctrl+shift+up=scroll_page_up
 keybind = ctrl+shift+down=scroll_page_down
-#command = zellij
+command = /usr/bin/bash
