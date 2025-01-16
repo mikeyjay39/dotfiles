@@ -899,6 +899,8 @@ require("lazy").setup({
 			--  - settings (table): Override the default settings passed when initializing the server.
 			--        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
 			local servers = {
+				graphql = {},
+				jsonls = {},
 				-- clangd = {},
 				-- gopls = {},
 				-- pyright = {},
@@ -1129,6 +1131,19 @@ require("lazy").setup({
 	-- 		})
 	-- 		vim.cmd("colorscheme catppuccin")
 	-- 	end,
+	-- },
+	-- {
+	-- 	"EdenEast/nightfox.nvim",
+	-- 	priority = 1000, -- Make sure to load this before all the other start plugins.
+	-- 	config = function()
+	-- 		vim.cmd("colorscheme nightfox")
+	-- 	end,
+	-- 	options = {
+	-- 		transparent = true,
+	-- 		colorblind = {
+	-- 			enable = true,
+	-- 		},
+	-- 	},
 	-- },
 	{ -- You can easily change to a different colorscheme.
 		-- Change the name of the colorscheme plugin below, and then

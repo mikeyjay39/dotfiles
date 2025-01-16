@@ -32,6 +32,7 @@ install_if_not_found unzip
 install_if_not_found ghostty
 install_if_not_found zellij
 install_if_not_found gh github-cli
+install_if_not_found starship
 # for nvim telescope
 install_if_not_found rg ripgrep
 # for nvim telescope. sharkdp/dp

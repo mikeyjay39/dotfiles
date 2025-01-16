@@ -164,3 +164,5 @@ fi
 unset env
 
 fastfetch
+
+eval "$(starship init bash)"
