@@ -13,6 +13,11 @@ if [ -n "$BASH_VERSION" ]; then
     if [ -z "${BASH_SOURCE[0]}" -o "${BASH_SOURCE[0]}" != "$BASH_SOURCE" ]; then
         source ~/.bashrc
     fi
+
+    # Source .bash_profile if present
+  if [ -f ~/.bash_profile ]; then
+      source ~/.bash_profile
+  fi
 fi
 
 alias ls='ls --color=auto'

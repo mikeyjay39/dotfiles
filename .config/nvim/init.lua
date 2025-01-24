@@ -667,7 +667,11 @@ require("lazy").setup({
 						},
 					},
 				},
-				pickers = {},
+				-- pickers = {
+				-- 	find_files = {
+				-- 		theme = "dropdown",
+				-- 	},
+				-- },
 				extensions = {
 					["ui-select"] = {
 						require("telescope.themes").get_dropdown(),
@@ -1120,56 +1124,6 @@ require("lazy").setup({
 			})
 		end,
 	},
-	-- {
-	-- 	"catppuccin/nvim",
-	-- 	name = "catppuccin",
-	-- 	priority = 1000,
-	-- 	config = function()
-	-- 		require("catppuccin").setup({
-	-- 			flavour = "latte", -- Set the variant to 'latte'
-	-- 			transparent_background = true, -- Enable transparency
-	-- 		})
-	-- 		vim.cmd("colorscheme catppuccin")
-	-- 	end,
-	-- },
-	-- {
-	-- 	"EdenEast/nightfox.nvim",
-	-- 	priority = 1000, -- Make sure to load this before all the other start plugins.
-	-- 	config = function()
-	-- 		vim.cmd("colorscheme nightfox")
-	-- 	end,
-	-- 	options = {
-	-- 		transparent = true,
-	-- 		colorblind = {
-	-- 			enable = true,
-	-- 		},
-	-- 	},
-	-- },
-	{ -- You can easily change to a different colorscheme.
-		-- Change the name of the colorscheme plugin below, and then
-		-- change the command in the config to whatever the name of that colorscheme is.
-		--
-		-- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-		"folke/tokyonight.nvim",
-		priority = 1000, -- Make sure to load this before all the other start plugins.
-		init = function()
-			-- Load the colorscheme here.
-			-- Like many other themes, this one has different styles, and you could load
-			-- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-			vim.cmd.colorscheme("tokyonight-night")
-			-- vim.cmd.colorscheme("tokyonight-day")
-
-			-- You can configure highlights by doing something like:
-			vim.cmd.hi("Comment gui=none")
-		end,
-		opts = {
-			transparent = true,
-			styles = {
-				sidebars = "transparent",
-				floats = "transparent",
-			},
-		},
-	},
 
 	-- Highlight todo, notes, etc in comments
 	{
@@ -1269,6 +1223,7 @@ require("lazy").setup({
 	require("kickstart.plugins.autopairs"),
 	require("kickstart.plugins.neo-tree"),
 	require("kickstart.plugins.gitsigns"), -- adds gitsigns recommend keymaps
+	require("custom.plugins.colorschemes"),
 
 	-- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
 	--    This is the easiest way to modularize your config.
