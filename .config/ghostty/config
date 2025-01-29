@@ -1,11 +1,12 @@
 font-family = JetBrainsMono Nerd Font
-#theme = tokyonight-day
-theme = tokyonight_night
+# theme = tokyonight-day
+# theme = tokyonight_night
 #theme = nightfox
 #theme = OneHalfDark
 #theme = OneHalfLight
 #theme = Atom
 # theme = AtomOneLight
+theme = Github
 background-opacity = 0.90
 background-blur-radius = 20
 font-size = 18
