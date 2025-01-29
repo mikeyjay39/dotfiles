@@ -508,6 +508,10 @@ require("lazy").setup({
 		end,
 	},
 	{
+		"theHamsta/nvim-dap-virtual-text",
+		opts = {},
+	},
+	{
 		"andythigpen/nvim-coverage",
 		requires = { "nvim-lua/plenary.nvim" },
 		config = function()
@@ -667,11 +671,11 @@ require("lazy").setup({
 						},
 					},
 				},
-				-- pickers = {
-				-- 	find_files = {
-				-- 		theme = "dropdown",
-				-- 	},
-				-- },
+				pickers = {
+					find_files = {
+						theme = "dropdown",
+					},
+				},
 				extensions = {
 					["ui-select"] = {
 						require("telescope.themes").get_dropdown(),

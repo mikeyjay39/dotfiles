@@ -95,4 +95,17 @@ return {
 	-- 		vim.cmd("colorscheme onedark")
 	-- 	end,
 	-- },
+	-- {
+	-- 	-- ATOM LIGHT
+	-- 	"navarasu/onedark.nvim",
+	-- 	priority = 1000, -- Ensure it loads first
+	--
+	-- 	config = function()
+	-- 		require("onedark").setup({
+	-- 			style = "light", -- Default theme style. Choose between 'dark', 'darker', 'cool', 'deep', 'warm', 'warmer' and 'light'
+	-- 			transparent = true, -- show/hide background
+	-- 		})
+	-- 		require("onedark").load()
+	-- 	end,
+	-- },
 }

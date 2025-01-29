@@ -5,6 +5,7 @@ theme = tokyonight_night
 #theme = OneHalfDark
 #theme = OneHalfLight
 #theme = Atom
+# theme = AtomOneLight
 background-opacity = 0.90
 background-blur-radius = 20
 font-size = 18
