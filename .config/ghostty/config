@@ -1,13 +1,14 @@
 font-family = JetBrainsMono Nerd Font
+theme = tokyonight_night
+# theme = AtomOneLight
+# cursor-color = 6689fa
 # theme = tokyonight-day
-# theme = tokyonight_night
 #theme = nightfox
 #theme = OneHalfDark
-#theme = OneHalfLight
+# theme = OneHalfLight
 #theme = Atom
-# theme = AtomOneLight
-theme = Github
-background-opacity = 0.90
+# theme = Github
+background-opacity = 0.80
 background-blur-radius = 20
 font-size = 18
 keybind = ctrl+shift+up=scroll_page_up
@@ -16,4 +17,5 @@ keybind = alt+up=goto_split:top
 keybind = alt+left=goto_split:left
 keybind = alt+down=goto_split:bottom
 keybind = alt+right=goto_split:right
+keybind = ctrl+alt+j=write_scrollback_file:open
 command = /usr/bin/bash
