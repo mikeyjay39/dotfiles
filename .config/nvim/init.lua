@@ -378,11 +378,21 @@ require("lazy").setup({
 		dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
 		opts = {},
 	},
-	-- {
-	-- 	"mxsdev/nvim-dap-vscode-js",
-	-- 	requires = { "mfussenegger/nvim-dap" },
-	-- 	opts = {},
-	-- },
+	{
+		"nvim-java/nvim-java",
+		dependencies = {
+			"nvim-java/lua-async-await",
+			"neovim/nvim-lspconfig",
+			"mfussenegger/nvim-dap",
+			"nvim-telescope/telescope.nvim",
+			"williamboman/mason.nvim",
+			"williamboman/mason-lspconfig.nvim",
+		},
+		ft = "java",
+		config = function()
+			require("java").setup()
+		end,
+	},
 	{
 		"nvim-neotest/neotest",
 		dependencies = {
@@ -970,6 +980,7 @@ require("lazy").setup({
 			require("mason-lspconfig").setup({
 				handlers = {
 					function(server_name)
+						require("lspconfig").jdtls.setup({})
 						local server = servers[server_name] or {}
 						-- This handles overriding only values explicitly passed
 						-- by the server configuration above. Useful when disabling
@@ -1205,6 +1216,8 @@ require("lazy").setup({
 				"query",
 				"vim",
 				"vimdoc",
+				"java",
+				"typescript",
 			},
 			-- Autoinstall languages that are not installed
 			auto_install = true,
