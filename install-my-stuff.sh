@@ -37,6 +37,7 @@ install_if_not_found starship
 install_if_not_found rg ripgrep
 # for nvim telescope. sharkdp/dp
 install_if_not_found fd
+install_if_not_found fzf
 
 if which docker >/dev/null 2>&1; then
 	echo docker already installed
