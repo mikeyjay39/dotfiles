@@ -379,25 +379,71 @@ require("lazy").setup({
 		opts = {},
 	},
 	{
-		"nvim-java/nvim-java",
+		"mfussenegger/nvim-jdtls",
 		dependencies = {
-			"nvim-java/lua-async-await",
-			"neovim/nvim-lspconfig",
 			"mfussenegger/nvim-dap",
-			"nvim-telescope/telescope.nvim",
-			"williamboman/mason.nvim",
-			"williamboman/mason-lspconfig.nvim",
 		},
+	},
+	-- {
+	-- 	"nvim-java/nvim-java",
+	-- 	dependencies = {
+	-- 		"nvim-java/lua-async-await",
+	-- 		"neovim/nvim-lspconfig",
+	-- 		"mfussenegger/nvim-dap",
+	-- 		"nvim-telescope/telescope.nvim",
+	-- 		"williamboman/mason.nvim",
+	-- 		"williamboman/mason-lspconfig.nvim",
+	-- 	},
+	-- 	ft = "java",
+	-- 	config = function()
+	-- 		require("java").setup({
+	-- 			jdtls = {
+	-- 				cmd = { "jdtls" },
+	-- 				root_dir = function()
+	-- 					return require("lspconfig.util").root_pattern("pom.xml", "build.gradle", ".git")(
+	-- 						vim.fn.getcwd()
+	-- 					)
+	-- 				end,
+	-- 			},
+	-- 			dap = {
+	-- 				adapters = {
+	-- 					java = {
+	-- 						type = "server",
+	-- 						host = "127.0.0.1",
+	-- 						port = 5005,
+	-- 					},
+	-- 				},
+	-- 				configurations = {
+	-- 					java = {
+	-- 						{
+	-- 							type = "java",
+	-- 							request = "attach",
+	-- 							name = "Attach to Java Debugger",
+	-- 							hostName = "127.0.0.1",
+	-- 							port = 5005,
+	-- 						},
+	-- 					},
+	-- 				},
+	-- 			},
+	-- 		})
+	-- 	end,
+	-- },
+	{
+		"rcasia/neotest-java",
 		ft = "java",
-		config = function()
-			require("java").setup()
-		end,
+		dependencies = {
+			"mfussenegger/nvim-jdtls",
+			"mfussenegger/nvim-dap", -- for the debugger
+			"rcarriga/nvim-dap-ui", -- recommended
+			"theHamsta/nvim-dap-virtual-text", -- recommended
+		},
 	},
 	{
 		"nvim-neotest/neotest",
 		dependencies = {
 			"nvim-neotest/nvim-nio",
 			"nvim-neotest/neotest-jest",
+			"rcasia/neotest-java",
 			"nvim-lua/plenary.nvim",
 			"antoinemadec/FixCursorHold.nvim",
 			"nvim-treesitter/nvim-treesitter",
@@ -435,37 +481,6 @@ require("lazy").setup({
 				end,
 				desc = "Run With Coverage On File (Neotest)",
 			},
-			-- {
-			-- 	"<leader>tC",
-			-- 	function()
-			-- 		require("neotest").run.run({
-			-- 			jestCommand = "/home/mikeyjay/omskit/node_modules/jest/bin/jest.js --coverage",
-			-- 			suite = false,
-			-- 		})
-			-- 	end,
-			-- 	desc = "Run Nearest With Coverage (Neotest)",
-			-- },
-			-- {
-			-- 	"<leader>tC",
-			-- 	function()
-			-- 		require("neotest").run.run({
-			-- 			extra_args = {
-			-- 				"--coverage=true",
-			-- 				"--config=/home/mikeyjay/omskit/jest.config.js",
-			-- 				"--",
-			-- 			},
-			-- 			suite = false,
-			-- 		})
-			-- 	end,
-			-- 	desc = "Run Nearest With Coverage (Neotest)",
-			-- },
-			-- {
-			-- 	"<leader>tl",
-			-- 	function()
-			-- 		require("neotest").run.run_last()
-			-- 	end,
-			-- 	desc = "Run Last (Neotest)",
-			-- },
 			{
 				"<leader>ts",
 				function()
@@ -503,23 +518,15 @@ require("lazy").setup({
 			},
 		},
 		config = function()
-			require("neotest").setup({
-				adapters = {
-					require("neotest-jest")({
-						jestCommand = "./node_modules/jest/bin/jest.js",
-						jestConfigFile = "/home/mikeyjay/omskit/jest.config.js",
-						env = { CI = true },
-						cwd = function(path)
-							return vim.fn.getcwd()
-						end,
-					}),
-				},
-			})
+			require("custom.neotest").setup()
 		end,
 	},
 	{
 		"theHamsta/nvim-dap-virtual-text",
 		opts = {},
+	},
+	{
+		"nvim-lua/plenary.nvim",
 	},
 	{
 		"andythigpen/nvim-coverage",
@@ -770,6 +777,7 @@ require("lazy").setup({
 			{ "williamboman/mason.nvim", config = true }, -- NOTE: Must be loaded before dependants
 			"williamboman/mason-lspconfig.nvim",
 			"WhoIsSethDaniel/mason-tool-installer.nvim",
+			-- "nvim-java/nvim-java",
 
 			-- Useful status updates for LSP.
 			-- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
@@ -988,6 +996,14 @@ require("lazy").setup({
 						server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
 						require("lspconfig")[server_name].setup(server)
 					end,
+					-- jdtls = function()
+					-- 	require("java").setup({
+					-- 		-- Your custom jdtls settings goes here
+					-- 	})
+					-- 	require("lspconfig").jdtls.setup({
+					-- 		-- Your custom nvim-java configuration goes here
+					-- 	})
+					-- end,
 				},
 			})
 		end,

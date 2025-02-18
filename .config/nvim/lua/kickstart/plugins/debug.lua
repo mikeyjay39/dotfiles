@@ -73,6 +73,7 @@ return {
 				-- "delve",
 				-- "node2",
 				"pwa-node",
+				"java",
 				"neotest,",
 			},
 		})
