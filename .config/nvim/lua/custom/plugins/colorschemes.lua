@@ -116,21 +116,21 @@ return {
 	-- 		vim.api.nvim_set_hl(0, "Visual", { bg = "#7eb6e1" }) -- Change color here
 	-- 	end,
 	-- },
-	-- {
-	-- 	-- ATOM LIGHT
-	-- 	"navarasu/onedark.nvim",
-	-- 	priority = 1000, -- Ensure it loads first
-	--
-	-- 	config = function()
-	-- 		require("onedark").setup({
-	-- 			style = "light", -- Default theme style. Choose between 'dark', 'darker', 'cool', 'deep', 'warm', 'warmer' and 'light'
-	-- 			transparent = true, -- show/hide background
-	-- 			highlights = {
-	-- 				CursorLine = { bg = "#d9d2e9" },
-	-- 				Visual = { bg = "#7eb6e1" },
-	-- 			},
-	-- 		})
-	-- 		require("onedark").load()
-	-- 	end,
-	-- },
+	{
+		-- ATOM LIGHT
+		"navarasu/onedark.nvim",
+		priority = 1000, -- Ensure it loads first
+
+		config = function()
+			require("onedark").setup({
+				style = "light", -- Default theme style. Choose between 'dark', 'darker', 'cool', 'deep', 'warm', 'warmer' and 'light'
+				transparent = true, -- show/hide background
+				highlights = {
+					CursorLine = { bg = "#d9d2e9" },
+					Visual = { bg = "#7eb6e1" },
+				},
+			})
+			-- require("onedark").load()
+		end,
+	},
 }
