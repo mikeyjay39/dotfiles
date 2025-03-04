@@ -95,27 +95,27 @@ return {
 	-- 		vim.cmd("colorscheme onedark")
 	-- 	end,
 	-- },
-	-- {
-	-- 	"projekt0n/github-nvim-theme",
-	-- 	name = "github-theme",
-	-- 	lazy = false, -- make sure we load this during startup if it is your main colorscheme
-	-- 	priority = 1000, -- make sure to load this before all the other start plugins
-	-- 	config = function()
-	-- 		require("github-theme").setup({
-	-- 			options = {
-	-- 				transparent = true,
-	-- 			},
-	-- 			-- palettes = {
-	-- 			-- 	all = {
-	-- 			-- 		Visual = { bg = "#000000", guibg = "#000000", sel1 = "#000000" }, -- Change to your preferred selection color
-	-- 			-- 	},
-	-- 			-- },
-	-- 		})
-	-- 		vim.cmd("colorscheme github_light_colorblind")
-	-- 		vim.api.nvim_set_hl(0, "CursorLine", { bg = "#d9d2e9" }) -- Change color here
-	-- 		vim.api.nvim_set_hl(0, "Visual", { bg = "#7eb6e1" }) -- Change color here
-	-- 	end,
-	-- },
+	{
+		"projekt0n/github-nvim-theme",
+		name = "github-theme",
+		lazy = false, -- make sure we load this during startup if it is your main colorscheme
+		priority = 1000, -- make sure to load this before all the other start plugins
+		config = function()
+			require("github-theme").setup({
+				options = {
+					transparent = true,
+				},
+				-- palettes = {
+				-- 	all = {
+				-- 		Visual = { bg = "#000000", guibg = "#000000", sel1 = "#000000" }, -- Change to your preferred selection color
+				-- 	},
+				-- },
+			})
+			-- vim.cmd("colorscheme github_light_colorblind")
+			vim.api.nvim_set_hl(0, "CursorLine", { bg = "#d9d2e9" }) -- Change color here
+			vim.api.nvim_set_hl(0, "Visual", { bg = "#7eb6e1" }) -- Change color here
+		end,
+	},
 	{
 		-- ATOM LIGHT
 		"navarasu/onedark.nvim",
