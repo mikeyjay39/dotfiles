@@ -215,13 +215,6 @@ vim.keymap.set("n", "<C-l>", "<C-w><C-l>", { desc = "Move focus to the right win
 vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Move focus to the lower window" })
 vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper window" })
 
--- Jester Keymaps
--- Bind Jester's debug function to a key, e.g., <leader>d
--- vim.api.nvim_set_keymap("n", "<F9>", ":lua require('jester').debug()<CR>", { noremap = true, silent = true })
--- vim.api.nvim_set_keymap("n", "<F10>", ":lua require('jester').run()<CR>", { noremap = true, silent = true })
--- vim.api.nvim_set_keymap("n", "<F21>", ":lua require('jester').debug_last()<CR>", { noremap = true, silent = true })
--- vim.api.nvim_set_keymap("n", "<F22>", ":lua require('jester').run_last()<CR>", { noremap = true, silent = true })
-
 -- nvim-coverage bindings
 vim.api.nvim_create_user_command("CoverageLoad", function()
 	require("coverage").load()
@@ -390,24 +383,6 @@ require("lazy").setup({
 	},
 	{
 		"nvim-lua/plenary.nvim",
-	},
-	{
-		"andythigpen/nvim-coverage",
-		requires = { "nvim-lua/plenary.nvim" },
-		config = function()
-			require("coverage").setup({
-				highlights = {
-					covered = { fg = "LightGreen" }, -- supports style, fg, bg, sp (see :h highlight-gui)
-					uncovered = { fg = "DarkRed" },
-					partial = { fg = "Blue" },
-				},
-				lang = {
-					typescript = {
-						coverage_file = "coverage/coverage-final.json",
-					},
-				},
-			})
-		end,
 	},
 	{
 		"nvim-telescope/telescope-dap.nvim",

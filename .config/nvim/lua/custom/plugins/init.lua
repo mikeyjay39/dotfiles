@@ -4,9 +4,10 @@
 -- See the kickstart.nvim README for more information
 return {
 	require("custom.plugins.colorschemes"),
-	require("custom.plugins.smear-cursor"),
-	require("custom.plugins.smooth-cursor"),
+	require("custom.plugins.copilot"),
 	require("custom.plugins.neotest"),
 	require("custom.plugins.noice"),
-	require("custom.plugins.copilot"),
+	require("custom.plugins.nvim-coverage"),
+	require("custom.plugins.smear-cursor"),
+	require("custom.plugins.smooth-cursor"),
 }
