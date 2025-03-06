@@ -6,6 +6,7 @@ return {
 	require("custom.plugins.colorschemes"),
 	require("custom.plugins.smear-cursor"),
 	require("custom.plugins.smooth-cursor"),
+	require("custom.plugins.neotest"),
 	require("custom.plugins.noice"),
 	require("custom.plugins.copilot"),
 }
