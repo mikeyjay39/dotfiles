@@ -384,50 +384,6 @@ require("lazy").setup({
 			"mfussenegger/nvim-dap",
 		},
 	},
-	-- {
-	-- 	"nvim-java/nvim-java",
-	-- 	dependencies = {
-	-- 		"nvim-java/lua-async-await",
-	-- 		"neovim/nvim-lspconfig",
-	-- 		"mfussenegger/nvim-dap",
-	-- 		"nvim-telescope/telescope.nvim",
-	-- 		"williamboman/mason.nvim",
-	-- 		"williamboman/mason-lspconfig.nvim",
-	-- 	},
-	-- 	ft = "java",
-	-- 	config = function()
-	-- 		require("java").setup({
-	-- 			jdtls = {
-	-- 				cmd = { "jdtls" },
-	-- 				root_dir = function()
-	-- 					return require("lspconfig.util").root_pattern("pom.xml", "build.gradle", ".git")(
-	-- 						vim.fn.getcwd()
-	-- 					)
-	-- 				end,
-	-- 			},
-	-- 			dap = {
-	-- 				adapters = {
-	-- 					java = {
-	-- 						type = "server",
-	-- 						host = "127.0.0.1",
-	-- 						port = 5005,
-	-- 					},
-	-- 				},
-	-- 				configurations = {
-	-- 					java = {
-	-- 						{
-	-- 							type = "java",
-	-- 							request = "attach",
-	-- 							name = "Attach to Java Debugger",
-	-- 							hostName = "127.0.0.1",
-	-- 							port = 5005,
-	-- 						},
-	-- 					},
-	-- 				},
-	-- 			},
-	-- 		})
-	-- 	end,
-	-- },
 	{
 		"rcasia/neotest-java",
 		ft = "java",
