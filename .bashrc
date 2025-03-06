@@ -116,6 +116,8 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 export XDG_CONFIG_HOME=~/.config
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk
+export PATH=$JAVA_HOME/bin:$PATH
 
 alias ecr-aws-setup="aws ecr get-login-password --region us-east-2 | docker login --password-stdin --username AWS 426132183075.dkr.ecr.us-east-2.amazonaws.com"
 
@@ -129,8 +131,8 @@ alias btig-uat-cluster="aws eks update-kubeconfig --name btig-uat --region us-ea
 alias demo-cluster="aws eks update-kubeconfig --name demo --region us-east-1"
 alias fix-int-cluster="aws eks update-kubeconfig --name fix-int --region us-east-1"
 alias fix-uat=cluster="aws eks update-kubeconfig --name fix-uat --region us-east-1"
-alias tilt-up="tilt up -- --username mjeszenka --environment local-dev-mjeszenka --reset-nx-cache"
-alias tilt-down="tilt down --delete-namespaces -- --username mjeszenka --environment local-dev-mjeszenka"
+alias tilt-up="cd ~/omskit/ && tilt up -- --username ${USER}"
+alias tilt-down="cd ~/omskit/ && tilt down --delete-namespaces -- --username ${USER}"
 
 # git repo name in bash
 force_color_prompt=yes
