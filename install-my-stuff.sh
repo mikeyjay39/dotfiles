@@ -30,7 +30,6 @@ install_if_not_found psql postgresql
 install_if_not_found xclip
 install_if_not_found unzip
 install_if_not_found ghostty
-install_if_not_found zellij
 install_if_not_found gh github-cli
 install_if_not_found starship
 # for nvim telescope
@@ -59,9 +58,6 @@ sudo pacman -S ttf-jetbrains-mono-nerd
 fc-cache -fv
 fi
 
-#sudo pacman -S zsh
-#sudo chsh -s /usr/bin/zsh
-
 # kaf
 if which kaf >/dev/null 2>&1; then
 	echo kaf already installed
@@ -79,5 +75,13 @@ sudo curl https://raw.githubusercontent.com/git/git/master/contrib/completion/gi
 ln -s /usr/share/git/completion/git-completion.bash ~/.git-completion.bash
 fi
 
+# java
+pacman -Qi openjdk21-src >/dev/null 2>&1;
+if [ $? -ne 0]; then
+	echo openjdk21-src already installed
+else
+sudo pacman -Syu openjdk21-src
+sudo archlinux-java set java-21-openjdk
+fi
 
 stow -d ~/dotfiles -t ~ .
