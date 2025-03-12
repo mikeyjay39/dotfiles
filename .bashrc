@@ -119,21 +119,6 @@ export XDG_CONFIG_HOME=~/.config
 export JAVA_HOME=/usr/lib/jvm/java-21-openjdk
 export PATH=$JAVA_HOME/bin:$PATH
 
-alias ecr-aws-setup="aws ecr get-login-password --region us-east-2 | docker login --password-stdin --username AWS 426132183075.dkr.ecr.us-east-2.amazonaws.com"
-
-export CLUSTER_REGION=us-east-2
-export AWS_PROFILE=root
-alias ssologin="aws sso login --sso-session valstro"
-alias int-cluster="aws eks update-kubeconfig --name integration --region us-east-2"
-alias dev-cluster="aws eks update-kubeconfig --name dev --region us-east-2"
-alias uat-cluster="aws eks update-kubeconfig --name uat --region us-east-1"
-alias btig-uat-cluster="aws eks update-kubeconfig --name btig-uat --region us-east-1"
-alias demo-cluster="aws eks update-kubeconfig --name demo --region us-east-1"
-alias fix-int-cluster="aws eks update-kubeconfig --name fix-int --region us-east-1"
-alias fix-uat=cluster="aws eks update-kubeconfig --name fix-uat --region us-east-1"
-alias tilt-up="cd ~/omskit/ && tilt up -- --username ${USER}"
-alias tilt-down="cd ~/omskit/ && tilt down --delete-namespaces -- --username ${USER}"
-
 # git repo name in bash
 force_color_prompt=yes
 color_prompt=yes
