@@ -12,7 +12,7 @@ fi
 if which "$COMMAND" >/dev/null 2>&1; then
 	echo "$COMMAND already installed"
 else
-sudo pacman -S "$PACKAGE"
+sudo pacman -Syu "$PACKAGE"
 fi
 }
 
@@ -30,7 +30,12 @@ install_if_not_found psql postgresql
 install_if_not_found xclip
 install_if_not_found unzip
 install_if_not_found ghostty
+
+# github cli tool
 install_if_not_found gh github-cli
+# gh tui
+gh extension install dlvhdr/gh-dash
+
 install_if_not_found starship
 # for nvim telescope
 install_if_not_found rg ripgrep
@@ -54,7 +59,7 @@ fc-list | grep "JetBrainsMono" >/dev/null 2>&1;
 if [ $? -eq 0 ]; then
 	echo "JetBrainsMonoNerdFont alrady installed"
 else
-sudo pacman -S ttf-jetbrains-mono-nerd
+sudo pacman -Syu ttf-jetbrains-mono-nerd
 fc-cache -fv
 fi
 
@@ -63,8 +68,8 @@ if which kaf >/dev/null 2>&1; then
 	echo kaf already installed
 else
 curl https://raw.githubusercontent.com/birdayz/kaf/master/godownloader.sh | BINDIR=$HOME/bin bash
-sudo mv /home/mikeyjay/bin/kaf /usr/bin/kaf
-rmdir /home/mikeyjay/bin
+sudo mv ${HOME}/bin/kaf /usr/bin/kaf
+rmdir ${HOME}/bin
 fi
 
 # git-autocompletion
