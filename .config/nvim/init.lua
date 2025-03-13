@@ -380,6 +380,10 @@ require("lazy").setup({
 			spec = {
 				{ "<leader>c", group = "[C]ode", mode = { "n", "x" } },
 				{ "<leader>d", group = "[D]ocument" },
+				{ "<leader>g", group = "[G]it diffview", icon = { icon = "" } },
+				{ "<leader>l", group = "[L]SP" },
+				{ "<leader>p", group = "[P]roject" },
+				{ "<leader>q", group = "[Q]uickfix" },
 				{ "<leader>r", group = "[R]ename" },
 				{ "<leader>s", group = "[S]earch" },
 				{ "<leader>w", group = "[W]orkspace" },

@@ -67,3 +67,9 @@ vim.api.nvim_set_keymap(
 	":CoverageSummary<CR>",
 	{ noremap = true, silent = true }
 )
+
+-- diffview bindings
+
+vim.keymap.set("n", "<leader>go", ":DiffviewOpen <CR>", { desc = "[G]it diffview[O]pen" })
+vim.keymap.set("n", "<leader>gc", ":DiffviewClose <CR>", { desc = "[G]it diffview[C]lose" })
+vim.keymap.set("n", "<leader>gh", ":DiffviewFileHistory %<CR>", { desc = "[G]it diffview[H]istory" })
