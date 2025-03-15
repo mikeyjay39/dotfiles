@@ -13,6 +13,11 @@ M.setup = function()
 					return vim.fn.getcwd()
 				end,
 			}),
+			require("neotest-java")({
+				{
+					jdtls = require("jdtls"),
+				},
+			}),
 		},
 	})
 end
