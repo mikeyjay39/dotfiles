@@ -116,29 +116,29 @@ return {
 		--dap.listeners.before.event_terminated["dapui_config"] = dapui.close
 		--dap.listeners.before.event_exited["dapui_config"] = dapui.close
 
-		dap.adapters.java = {
-			type = "server",
-			host = "127.0.0.1",
-			port = 5005,
-		}
-
-		dap.configurations.java = {
-			{
-				type = "java",
-				name = "Debug (Attach) - Remote",
-				request = "attach",
-				hostName = "127.0.0.1",
-				port = 5005,
-			},
-			{
-				type = "java",
-				name = "Debug (Launch) - Project",
-				request = "launch",
-				mainClass = "${file}",
-				cwd = vim.fn.getcwd(),
-				stopOnEntry = false,
-			},
-		}
+		-- dap.adapters.java = {
+		-- 	type = "server",
+		-- 	host = "127.0.0.1",
+		-- 	port = 5005,
+		-- }
+		--
+		-- dap.configurations.java = {
+		-- 	{
+		-- 		type = "java",
+		-- 		name = "Debug (Attach) - Remote",
+		-- 		request = "attach",
+		-- 		hostName = "127.0.0.1",
+		-- 		port = 5005,
+		-- 	},
+		-- 	{
+		-- 		type = "java",
+		-- 		name = "Debug (Launch) - Project",
+		-- 		request = "launch",
+		-- 		mainClass = "${file}",
+		-- 		cwd = vim.fn.getcwd(),
+		-- 		stopOnEntry = false,
+		-- 	},
+		-- }
 
 		require("dap").adapters["pwa-node"] = {
 			type = "server",

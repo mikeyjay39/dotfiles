@@ -307,7 +307,41 @@ require("lazy").setup({
 		"mfussenegger/nvim-jdtls",
 		dependencies = {
 			"mfussenegger/nvim-dap",
+			"microsoft/java-debug",
+			"microsoft/vscode-java-test",
 		},
+		config = function()
+			local config = {
+				cmd = { require("mason-registry").get_package("jdtls"):get_install_path() .. "/bin/jdtls" },
+				-- root_dir = vim.fs.dirname(vim.fs.find({ "gradlew", ".git", "mvnw" }, { upward = true })[1]),
+				root_dir = vim.fn.getcwd(),
+			}
+			local function find_jars(pattern)
+				local files = vim.fn.glob(vim.fn.expand(pattern), true, true)
+				if type(files) == "string" and files ~= "" then
+					return { files }
+				elseif type(files) == "table" then
+					return files
+				end
+				return {}
+			end
+
+			local java_debug_plugin = find_jars(
+				"~/.local/share/nvim/lazy/java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin-*.jar"
+			)
+			local test_bundles =
+				vim.fn.globpath("~/.local/share/nvim/lazy/vscode-java-test/server", "*.jar", true, true)
+
+			local bundles = {}
+			vim.list_extend(bundles, java_debug_plugin)
+			vim.list_extend(bundles, test_bundles)
+
+			config.init_options = {
+				bundles = bundles,
+			}
+			-- print(vim.print(config.bundles))
+			require("jdtls").start_or_attach(config)
+		end,
 	},
 	{
 		"theHamsta/nvim-dap-virtual-text",
