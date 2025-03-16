@@ -15,7 +15,7 @@ M.setup = function()
 			}),
 			require("neotest-java")({
 				{
-					-- jdtls = require("jdtls"),
+					jdtls = require("jdtls"),
 				},
 			}),
 		},
