@@ -432,6 +432,7 @@ require("lazy").setup({
 				{ "<leader>d", group = "[D]ocument" },
 				{ "<leader>g", group = "[G]it diffview", icon = { icon = "" } },
 				{ "<leader>l", group = "[L]SP" },
+				{ "<leader>L", group = "[L]LM", icon = { icon = "" } },
 				{ "<leader>p", group = "[P]roject" },
 				{ "<leader>q", group = "[Q]uickfix" },
 				{ "<leader>r", group = "[R]ename" },
@@ -769,6 +770,13 @@ require("lazy").setup({
 				graphql = {},
 				jsonls = {},
 				jdtls = {},
+				sqlls = {
+					capabilities = capabilities,
+					filetypes = { "sql" },
+					root_dir = function(_)
+						return vim.loop.cwd()
+					end,
+				},
 				-- clangd = {},
 				-- gopls = {},
 				-- pyright = {},

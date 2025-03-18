@@ -73,3 +73,7 @@ vim.api.nvim_set_keymap(
 vim.keymap.set("n", "<leader>go", ":DiffviewOpen <CR>", { desc = "[G]it diffview[O]pen" })
 vim.keymap.set("n", "<leader>gc", ":DiffviewClose <CR>", { desc = "[G]it diffview[C]lose" })
 vim.keymap.set("n", "<leader>gh", ":DiffviewFileHistory %<CR>", { desc = "[G]it diffview[H]istory" })
+
+-- copilot bindings
+vim.keymap.set("n", "<leader>Lo", ":CopilotChat<CR>", { desc = "[L]LM [O]pen" })
+vim.keymap.set("n", "<leader>Lr", ":CopilotChatReset<CR>", { desc = "[L]LM CopilotChat[R]eset" })
