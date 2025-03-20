@@ -378,7 +378,8 @@ require("lazy").setup({
 
 			-- Document existing key chains
 			spec = {
-				{ "<leader>c", group = "[C]ode", mode = { "n", "x" } },
+				{ "<leader>a", group = "[A]vante", mode = { "n", "v" }, icon = { icon = "🤖" } },
+				{ "<leader>c", group = "[C]ode", mode = { "n", "x" }, icon = { icon = "</>" } },
 				{ "<leader>d", group = "[D]ocument" },
 				{ "<leader>g", group = "[G]it diffview", icon = { icon = "" } },
 				{ "<leader>l", group = "[L]SP" },
@@ -386,7 +387,7 @@ require("lazy").setup({
 				{ "<leader>p", group = "[P]roject" },
 				{ "<leader>q", group = "[Q]uickfix" },
 				{ "<leader>r", group = "[R]ename" },
-				{ "<leader>s", group = "[S]earch" },
+				{ "<leader>s", group = "[S]earch", icon = { icon = "🔍" } },
 				{ "<leader>w", group = "[W]orkspace" },
 				{ "<leader>T", group = "[T]oggle" },
 				{ "<leader>h", group = "Git [H]unk", mode = { "n", "v" } },
