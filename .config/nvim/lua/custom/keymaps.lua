@@ -77,3 +77,9 @@ vim.keymap.set("n", "<leader>gh", ":DiffviewFileHistory %<CR>", { desc = "[G]it 
 -- copilot bindings
 vim.keymap.set("n", "<leader>Lo", ":CopilotChatOpen<CR>", { desc = "[L]LM [O]pen" })
 vim.keymap.set("n", "<leader>Lr", ":CopilotChatReset<CR>", { desc = "[L]LM CopilotChat[R]eset" })
+
+-- noice bindings
+vim.keymap.set("n", "<leader>nd", ":NoiceDismiss<CR>", { desc = "[N]oice [D]ismiss" })
+vim.keymap.set("n", "<leader>nh", ":NoiceHistory<CR>", { desc = "[N]oice [H]istory" })
+vim.keymap.set("n", "<leader>nt", ":NoiceTelescope<CR>", { desc = "[N]oice [T]elescope" })
+vim.keymap.set("n", "<leader>ne", ":NoiceErrors<CR>", { desc = "[N]oice [E]rrors" })

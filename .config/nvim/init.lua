@@ -384,6 +384,7 @@ require("lazy").setup({
 				{ "<leader>g", group = "[G]it diffview", icon = { icon = "" } },
 				{ "<leader>l", group = "[L]SP" },
 				{ "<leader>L", group = "[L]LM", icon = { icon = "" } },
+				{ "<leader>n", group = "[N]oice", icon = { icon = "📨" } },
 				{ "<leader>p", group = "[P]roject" },
 				{ "<leader>q", group = "[Q]uickfix" },
 				{ "<leader>r", group = "[R]ename" },
