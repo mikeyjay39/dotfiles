@@ -18,7 +18,7 @@ return {
 			"antoinemadec/FixCursorHold.nvim",
 			"nvim-treesitter/nvim-treesitter",
 			"rcasia/neotest-java",
-			"marilari88/neotest-vitest",
+			-- "marilari88/neotest-vitest",
 		},
 		keys = {
 			{ "<leader>t", "", desc = "+test" },
