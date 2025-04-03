@@ -71,6 +71,7 @@ vim.api.nvim_set_keymap(
 -- diffview bindings
 
 vim.keymap.set("n", "<leader>go", ":DiffviewOpen <CR>", { desc = "[G]it diffview[O]pen" })
+vim.keymap.set("n", "<leader>gm", ":DiffviewOpen origin/main <CR>", { desc = "[G]it diffview [M]ain" })
 vim.keymap.set("n", "<leader>gc", ":DiffviewClose <CR>", { desc = "[G]it diffview[C]lose" })
 vim.keymap.set("n", "<leader>gh", ":DiffviewFileHistory %<CR>", { desc = "[G]it diffview[H]istory" })
 
