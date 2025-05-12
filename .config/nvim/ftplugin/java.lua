@@ -1,5 +1,5 @@
 local config = {
-	cmd = { require("mason-registry").get_package("jdtls"):get_install_path() .. "/bin/jdtls" },
+	cmd = { "~/.local/share/nvim/mason/packages/jdtls/bin/jdtls" },
 	root_dir = vim.fs.dirname(vim.fs.find({ "pom.xml", "gradlew", ".git", "mvnw" }, { upward = true })[1]),
 	-- root_dir = vim.fn.getcwd(),
 }
@@ -31,4 +31,4 @@ config.init_options = {
 }
 -- print("Final Root Dir:", config.root_dir)
 -- NOTE: uncomment this to turn on
--- require("jdtls").start_or_attach(config)
+require("jdtls").start_or_attach(config)
