@@ -89,4 +89,16 @@ sudo pacman -Syu openjdk21-src
 sudo archlinux-java set java-21-openjdk
 fi
 
+# yay
+if which yay >/dev/null 2>&1; then
+	echo yay already installed
+else
+sudo pacman -S --needed base-devel git
+git clone https://aur.archlinux.org/yay.git
+cd yay
+makepkg -si
+cd ..
+rm -rf yay
+fi
+
 stow -d ~/dotfiles -t ~ .
