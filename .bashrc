@@ -158,3 +158,6 @@ unset env
 fastfetch
 
 eval "$(starship init bash)"
+
+# Created by `pipx` on 2025-05-25 01:13:53
+export PATH="$PATH:/home/mikeyjay/.local/bin"
