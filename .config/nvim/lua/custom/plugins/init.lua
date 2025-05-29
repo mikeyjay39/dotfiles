@@ -3,9 +3,9 @@
 --
 -- See the kickstart.nvim README for more information
 return {
+	require("custom.plugins.copilot"),
 	require("custom.plugins.avante"),
 	require("custom.plugins.colorschemes"),
-	require("custom.plugins.copilot"),
 	require("custom.plugins.diffview"),
 	require("custom.plugins.neotest"),
 	require("custom.plugins.noice"),
