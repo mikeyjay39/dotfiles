@@ -118,6 +118,7 @@ export NVM_DIR="$HOME/.nvm"
 export XDG_CONFIG_HOME=~/.config
 export JAVA_HOME=/usr/lib/jvm/java-21-openjdk
 export PATH=$JAVA_HOME/bin:$PATH
+export EDITOR=nvim
 
 # git repo name in bash
 force_color_prompt=yes
