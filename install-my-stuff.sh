@@ -102,6 +102,13 @@ cd ..
 rm -rf yay
 fi
 
+# informant
+if which informant >/dev/null 2>&1; then
+	echo informant already installed
+else
+	yay -S informant
+fi
+
 # nvm
 if which node >/dev/null 2>&1; then
 	echo node already installed
