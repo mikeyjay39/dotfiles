@@ -7,6 +7,7 @@ return {
 	require("custom.plugins.colorschemes"),
 	require("custom.plugins.copilot"),
 	require("custom.plugins.diffview"),
+	require("custom.plugins.fzf-lua"),
 	require("custom.plugins.neotest"),
 	require("custom.plugins.noice"),
 	require("custom.plugins.nvim-coverage"),

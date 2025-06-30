@@ -84,3 +84,31 @@ vim.keymap.set("n", "<leader>nd", ":NoiceDismiss<CR>", { desc = "[N]oice [D]ismi
 vim.keymap.set("n", "<leader>nh", ":NoiceHistory<CR>", { desc = "[N]oice [H]istory" })
 vim.keymap.set("n", "<leader>nt", ":NoiceTelescope<CR>", { desc = "[N]oice [T]elescope" })
 vim.keymap.set("n", "<leader>ne", ":NoiceErrors<CR>", { desc = "[N]oice [E]rrors" })
+
+-- fzf lua bindings
+vim.api.nvim_set_keymap("n", "<F4>", ":FzfLua dap_commands<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<F5>", ":FzfLua dap_configurations<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<F6>", ":FzfLua dap_frames<CR>", { noremap = true, silent = true })
+vim.keymap.set("n", "<leader>sh", ":FzfLua help_tags<CR>", { desc = "[S]earch [H]elp" })
+vim.keymap.set("n", "<leader>sk", ":FzfLua keymaps<CR>", { desc = "[S]earch [K]eymaps" })
+vim.keymap.set("n", "<leader>sf", ":FzfLua files<CR>", { desc = "[S]earch [F]iles" })
+vim.keymap.set("n", "<leader>ss", ":FzfLua builtin<CR>", { desc = "[S]earch [S]elect Telescope" })
+vim.keymap.set("n", "<leader>sw", ":FzfLua grep_cword<CR>", { desc = "[S]earch current [W]ord" })
+vim.keymap.set("n", "<leader>sg", ":FzfLua live_grep_glob<CR>", { desc = "[S]earch by [G]rep" })
+vim.keymap.set("n", "<leader>sd", ":FzfLua diagnostics_document<CR>", { desc = "[S]earch [D]iagnostics" })
+vim.keymap.set("n", "<leader>sc", ":FzfLua colorschemes<CR>", { desc = "[S]earch [C]olorschemes" })
+vim.keymap.set("n", "<leader>sr", ":FzfLua resume<CR>", { desc = "[S]earch [R]esume" })
+vim.keymap.set("n", "<leader>s.", ":FzfLua oldfiles<CR>", { desc = '[S]earch Recent Files ("." for repeat)' })
+vim.keymap.set("n", "<leader><leader>", ":FzfLua buffers<CR>", { desc = "[ ] Find existing buffers" })
+
+vim.keymap.set(
+	"n",
+	"<leader>sn",
+	":FzfLua files cwd=vim.fn.stdpath('config')<CR>",
+	{ desc = "[S]earch [N]eovim files" }
+)
+
+vim.keymap.set("n", "gd", ":FzfLua lsp_definitions<CR>", { desc = "[G]oto [D]efinition" })
+vim.keymap.set("n", "gr", ":FzfLua lsp_references<CR>", { desc = "[G]oto [R]eferences" })
+vim.keymap.set("n", "ds", ":FzfLua lsp_document_symbols<CR>", { desc = "[D]ocument [S]ymbols" })
+vim.keymap.set("n", "ws", ":FzfLua lsp_live_workspace_symbols<CR>", { desc = "[W]orkplace [S]ymbols" })
