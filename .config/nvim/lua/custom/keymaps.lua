@@ -112,3 +112,10 @@ vim.keymap.set("n", "gd", ":FzfLua lsp_definitions<CR>", { desc = "[G]oto [D]efi
 vim.keymap.set("n", "gr", ":FzfLua lsp_references<CR>", { desc = "[G]oto [R]eferences" })
 vim.keymap.set("n", "ds", ":FzfLua lsp_document_symbols<CR>", { desc = "[D]ocument [S]ymbols" })
 vim.keymap.set("n", "ws", ":FzfLua lsp_live_workspace_symbols<CR>", { desc = "[W]orkplace [S]ymbols" })
+
+-- custom
+-- Insert timestamp in the current buffer
+vim.keymap.set("n", "<leader>ct", function()
+	local timestamp = os.date("%Y-%m-%d %H:%M:%S")
+	vim.api.nvim_put({ timestamp }, "c", true, true)
+end, { desc = "[C] [T]timestamp" })

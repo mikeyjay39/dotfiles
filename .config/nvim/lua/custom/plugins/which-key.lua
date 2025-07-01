@@ -72,6 +72,7 @@ return {
 				{ "<leader>T", group = "[T]oggle" },
 				{ "<leader>h", group = "Git [H]unk", mode = { "n", "v" } },
 				{ "<leader>C", group = "[C]Code Coverage" },
+				{ "<leader>ct", group = "[C] [T]imestamp", icon = { icon = "🕒" } },
 			},
 		},
 	},
