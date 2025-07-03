@@ -104,7 +104,7 @@ vim.keymap.set("n", "<leader><leader>", ":FzfLua buffers<CR>", { desc = "[ ] Fin
 vim.keymap.set(
 	"n",
 	"<leader>sn",
-	":FzfLua files cwd=vim.fn.stdpath('config')<CR>",
+	":FzfLua files cwd=" .. vim.fn.stdpath("config") .. "<CR>",
 	{ desc = "[S]earch [N]eovim files" }
 )
 
