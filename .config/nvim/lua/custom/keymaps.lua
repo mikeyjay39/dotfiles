@@ -119,3 +119,17 @@ vim.keymap.set("n", "<leader>ct", function()
 	local timestamp = os.date("%Y-%m-%d %H:%M:%S")
 	vim.api.nvim_put({ timestamp }, "c", true, true)
 end, { desc = "[C] [T]timestamp" })
+
+vim.keymap.set("n", "<leader>ec", function()
+	vim.api.nvim_put({ "✔" }, "c", true, true)
+end, { desc = "[E]moji [C]heckmark" })
+
+-- keymap that toggles between tokyonight and onedark themes
+vim.keymap.set("n", "<leader>Tt", function()
+	local current_theme = vim.g.colors_name
+	if current_theme == "tokyonight-day" then
+		vim.cmd("colorscheme onedark")
+	else
+		vim.cmd("colorscheme tokyonight")
+	end
+end, { desc = "[T]oggle [T]heme" })
