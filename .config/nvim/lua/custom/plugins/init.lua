@@ -13,5 +13,6 @@ return {
 	require("custom.plugins.nvim-coverage"),
 	require("custom.plugins.smear-cursor"),
 	require("custom.plugins.smooth-cursor"),
+	require("custom.plugins.todo-comments"),
 	require("custom.plugins.which-key"),
 }
