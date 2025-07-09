@@ -94,7 +94,13 @@ vim.keymap.set("n", "<leader>sk", ":FzfLua keymaps<CR>", { desc = "[S]earch [K]e
 vim.keymap.set("n", "<leader>sf", ":FzfLua files<CR>", { desc = "[S]earch [F]iles" })
 vim.keymap.set("n", "<leader>ss", ":FzfLua builtin<CR>", { desc = "[S]earch [S]elect Telescope" })
 vim.keymap.set("n", "<leader>sw", ":FzfLua grep_cword<CR>", { desc = "[S]earch current [W]ord" })
-vim.keymap.set("n", "<leader>sg", ":FzfLua live_grep_glob<CR>", { desc = "[S]earch by [G]rep" })
+vim.keymap.set(
+	"n",
+	"<leader>sg",
+	":lua require('fzf-lua').live_grep_glob({ cmd = 'rg --line-number --column --color=always --hidden'})<CR>",
+	{ desc = "[S]earch by [G]rep" }
+)
+-- vim.keymap.set("n", "<leader>sg", ":FzfLua live_grep_glob<CR>", { desc = "[S]earch by [G]rep" })
 vim.keymap.set("n", "<leader>sd", ":FzfLua diagnostics_document<CR>", { desc = "[S]earch [D]iagnostics" })
 vim.keymap.set("n", "<leader>sc", ":FzfLua colorschemes<CR>", { desc = "[S]earch [C]olorschemes" })
 vim.keymap.set("n", "<leader>sr", ":FzfLua resume<CR>", { desc = "[S]earch [R]esume" })
