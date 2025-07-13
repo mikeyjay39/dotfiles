@@ -229,13 +229,13 @@
       "key": "│{#blue}┌──────────────┬{$1}┐{#keys}│\u001b[36D",
       "format": "{#blue} IP Address "
     },
-    {
-      "type": "publicip",
-      "keyIcon": "",
-      "key": "│{#blue}│ {icon}  IP Global │{$4}│{#keys}│{$2}",
-      "ipv6": false,
-      "format": "{ip}  {#2}[{location}]"
-    },
+    // {
+    //   "type": "publicip",
+    //   "keyIcon": "",
+    //   "key": "│{#blue}│ {icon}  IP Global │{$4}│{#keys}│{$2}",
+    //   "ipv6": false,
+    //   "format": "{ip}  {#2}[{location}]"
+    // },
     {
       "type": "localip",
       "keyIcon": "",
