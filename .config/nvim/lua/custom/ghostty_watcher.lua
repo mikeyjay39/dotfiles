@@ -49,7 +49,7 @@ local watcher
 
 local function start_watcher()
 	if not watcher then
-			watcher = uv.new_fs_poll()
+		watcher = uv.new_fs_poll()
 	end
 
 	watcher:start(theme_file_path, 1000, function(err, prev, curr)
@@ -70,7 +70,7 @@ local function start_watcher()
 	end)
 
 	-- Ensure the watcher persists for subsequent changes
-	vim.notify("Watcher remains active for additional changes...", vim.log.levels.INFO)
+	-- vim.notify("Watcher remains active for additional changes...", vim.log.levels.INFO)
 
 	-- Stop the watcher on Neovim exit
 	vim.api.nvim_create_autocmd("VimLeavePre", {
