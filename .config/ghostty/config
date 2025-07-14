@@ -1,7 +1,7 @@
 font-family = JetBrainsMono Nerd Font
-theme = tokyonight_night
+theme = AtomOneLight
 # theme = AtomOneLight
-# cursor-color = 6689fa
+cursor-color = 6689fa
 # theme = tokyonight-day
 #theme = nightfox
 #theme = OneHalfDark
