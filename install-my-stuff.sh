@@ -128,7 +128,7 @@ else
 fi
 
 # codelldb - for rust debugging
-install_with_aur_if_not_found(codelldb, codelldb-bin)
+install_with_aur_if_not_found codelldb codelldb-bin
 
 # nvm
 if which node >/dev/null 2>&1; then
