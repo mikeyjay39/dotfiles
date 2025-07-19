@@ -10,20 +10,10 @@ local config = {
 			symbols = {
 				includesourcemethoddeclaratiokns = true,
 			},
-			project = {
-				-- TODO: Remove this
-				-- referencedLibraries = {
-				-- 	"/home/mikeyjay/TKT-14675-java-logs-tracing/.m2/repository/io/opentelemetry/opentelemetry-api/1.32.0/opentelemetry-api-1.32.0-sources.jar",
-				-- },
-			},
 		},
 	},
 }
 
--- Ensure the JDK sources are available
--- local jdk_sources = "/usr/lib/jvm/java-21-openjdk/lib/src.zip" -- Update this path to your JDK's src.zip
--- config.settings.java.project.referencedLibraries = config.settings.java.project.referencedLibraries or {}
--- table.insert(config.settings.java.project.referencedLibraries, jdk_sources)
 local function find_jars(pattern)
 	local files = vim.fn.glob(vim.fn.expand(pattern), true, true)
 	if type(files) == "string" and files ~= "" then
