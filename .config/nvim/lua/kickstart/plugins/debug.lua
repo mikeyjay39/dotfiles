@@ -156,13 +156,8 @@ return {
 			-- 	},
 			-- }
 			dap.adapters.codelldb = {
-				type = "server",
-				port = "${port}",
-				host = "localhost",
-				executable = {
-					command = "codelldb",
-					args = { "--port", "${port}" },
-				},
+				type = "executable",
+				command = "codelldb",
 			}
 			dap.configurations.rust = {
 				{
