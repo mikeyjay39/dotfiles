@@ -39,6 +39,7 @@ M.setup = function()
 					jdtls = require("jdtls"),
 				},
 			}),
+			require("neotest-rust")({}),
 			-- NOTE: this project has open issues regarding setting the path of the vitest setup file. This may not
 			-- be too usable until they fix it.
 			--

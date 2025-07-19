@@ -18,6 +18,7 @@ return {
 			"antoinemadec/FixCursorHold.nvim",
 			"nvim-treesitter/nvim-treesitter",
 			"rcasia/neotest-java",
+			"rouge8/neotest-rust",
 			-- "marilari88/neotest-vitest",
 		},
 		keys = {
