@@ -12,8 +12,26 @@ fi
 if which "$COMMAND" >/dev/null 2>&1; then
 	echo "$COMMAND already installed"
 else
-sudo pacman -Syu "$PACKAGE"
+sudo pacman -S "$PACKAGE"
 fi
+}
+
+# arg 1 is name of command, arg 2 is package name
+install_with_aur_if_not_found() {
+local COMMAND="$1"
+
+if [ -z "$2" ]; then
+	local PACKAGE="$COMMAND"
+else
+	local PACKAGE="$2"
+fi
+
+if which "$COMMAND" >/dev/null 2>&1; then
+	echo "$COMMAND already installed"
+else
+sudo yay -S "$PACKAGE"
+fi
+
 }
 
 install_if_not_found which
@@ -108,6 +126,9 @@ if which informant >/dev/null 2>&1; then
 else
 	yay -S informant
 fi
+
+# codelldb - for rust debugging
+install_with_aur_if_not_found(codelldb, codelldb-bin)
 
 # nvm
 if which node >/dev/null 2>&1; then
