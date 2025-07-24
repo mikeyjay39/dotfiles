@@ -25,11 +25,13 @@ local function find_jars(pattern)
 end
 
 -- NOTE: need to run ./mwnw clean install for this
+-- https://github.com/microsoft/java-debug
 -- TODO: automate it in this setup
 local java_debug_plugin =
 	find_jars("/home/mikeyjay/java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin-*.jar")
 
 -- NOTE: need to run npm install && npm run build-plugin
+-- https://github.com/microsoft/vscode-java-test
 -- TODO: automate the command in the note above
 local test_bundles = vim.fn.globpath("/home/mikeyjay/vscode-java-test/server", "*.jar", true, true)
 
