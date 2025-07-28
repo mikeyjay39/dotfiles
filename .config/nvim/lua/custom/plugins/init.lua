@@ -12,6 +12,7 @@ return {
 	require("custom.plugins.neotest"),
 	require("custom.plugins.noice"),
 	require("custom.plugins.nvim-coverage"),
+	require("custom.plugins.rustaceanvim"),
 	require("custom.plugins.smear-cursor"),
 	require("custom.plugins.smooth-cursor"),
 	require("custom.plugins.todo-comments"),
