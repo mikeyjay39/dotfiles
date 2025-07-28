@@ -644,7 +644,7 @@ require("lazy").setup({
 			local servers = {
 				graphql = {},
 				jsonls = {},
-				jdtls = {},
+				-- jdtls = {},
 				sqlls = {
 					capabilities = capabilities,
 					filetypes = { "sql" },

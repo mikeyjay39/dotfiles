@@ -37,6 +37,7 @@ M.setup = function()
 			require("neotest-java")({
 				{
 					jdtls = require("jdtls"),
+					debug = true,
 				},
 			}),
 			require("neotest-rust")({}),
