@@ -121,6 +121,9 @@ cd ..
 rm -rf yay
 fi
 
+# jdtls
+if install_with_aur_if_not_found jdtls
+
 # informant
 if which informant >/dev/null 2>&1; then
 	echo informant already installed
