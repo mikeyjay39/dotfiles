@@ -9,6 +9,7 @@ return {
 	require("custom.plugins.diffview"),
 	require("custom.plugins.fzf-lua"),
 	require("custom.plugins.leetcode"),
+	require("custom.plugins.mcphub"),
 	require("custom.plugins.neotest"),
 	require("custom.plugins.noice"),
 	require("custom.plugins.nvim-coverage"),

@@ -15,11 +15,21 @@ return {
 			-- 	max_completion_tokens = 8192, -- Increase this to include reasoning tokens (for reasoning models)
 			-- 	--reasoning_effort = "medium", -- low|medium|high, only used for reasoning models
 			-- },
+			system_prompt = function()
+				local hub = require("mcphub").get_hub_instance()
+				return hub and hub:get_active_servers_prompt() or ""
+			end,
+			custom_tools = function()
+				return {
+					require("mcphub.extensions.avante").mcp_tool(),
+				}
+			end,
 		},
 		-- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
 		build = "make",
 		-- build = "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false" -- for windows
 		dependencies = {
+			"ravitemer/mcphub.nvim",
 			"nvim-treesitter/nvim-treesitter",
 			"stevearc/dressing.nvim",
 			"nvim-lua/plenary.nvim",
