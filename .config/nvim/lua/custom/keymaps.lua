@@ -97,7 +97,7 @@ vim.keymap.set("n", "<leader>sw", ":FzfLua grep_cword<CR>", { desc = "[S]earch c
 vim.keymap.set(
 	"n",
 	"<leader>sg",
-	":lua require('fzf-lua').live_grep_glob({ cmd = 'rg --line-number --column --color=always --hidden'})<CR>",
+	":lua require('fzf-lua').live_grep({ cmd = 'rg --line-number --column --color=always --hidden'})<CR>",
 	{ desc = "[S]earch by [G]rep" }
 )
 -- vim.keymap.set("n", "<leader>sg", ":FzfLua live_grep_glob<CR>", { desc = "[S]earch by [G]rep" })
