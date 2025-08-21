@@ -48,9 +48,11 @@ sed -i "s/^theme = .*/theme = $NEW_THEME/" "$CONFIG_FILE"
 if [[ $NEW_THEME == "$THEME_ONE" ]]; then
   sed -i '/^\s*skin:/s/:.*/: transparent/' "$K9S_CONFIG_FILE"
   sed -i 's/cursor-color/# cursor-color/' "$CONFIG_FILE"
+  sed -i 's/# background = #0C0C0C/background = #0C0C0C/' "$CONFIG_FILE"
 else
   sed -i '/^\s*skin:/s/:.*/: catppuccin-latte-transparent/' "$K9S_CONFIG_FILE"
   sed -i 's/# cursor-color/cursor-color/' "$CONFIG_FILE"
+  sed -i 's/background = #0C0C0C/# background = #0C0C0C/' "$CONFIG_FILE"
 fi
 
 echo "Theme toggled to: $NEW_THEME. Presee Ctrl+Shift+, to apply the changes."
