@@ -29,7 +29,7 @@ fi
 if which "$COMMAND" >/dev/null 2>&1; then
 	echo "$COMMAND already installed"
 else
-sudo yay -S "$PACKAGE"
+ yay -S "$PACKAGE"
 fi
 
 }
@@ -79,7 +79,7 @@ fc-list | grep "JetBrainsMono" >/dev/null 2>&1;
 if [ $? -eq 0 ]; then
 	echo "JetBrainsMonoNerdFont alrady installed"
 else
-sudo pacman -Syu ttf-jetbrains-mono-nerd
+sudo pacman -S ttf-jetbrains-mono-nerd
 fc-cache -fv
 fi
 
@@ -102,10 +102,10 @@ fi
 
 # java
 pacman -Qi openjdk21-src >/dev/null 2>&1;
-if [ $? -ne 0]; then
+if [ $? -ne 0 ]; then
 	echo openjdk21-src already installed
 else
-sudo pacman -Syu openjdk21-src
+sudo pacman -S openjdk21-src
 sudo archlinux-java set java-21-openjdk
 fi
 
@@ -122,7 +122,7 @@ rm -rf yay
 fi
 
 # jdtls
-if install_with_aur_if_not_found jdtls
+install_with_aur_if_not_found jdtls
 
 # informant
 if which informant >/dev/null 2>&1; then
@@ -133,6 +133,8 @@ fi
 
 # codelldb - for rust debugging
 install_with_aur_if_not_found codelldb codelldb-bin
+
+stow -d ~/dotfiles -t ~ . --adopt
 
 # nvm
 if which node >/dev/null 2>&1; then
@@ -155,4 +157,3 @@ else
     npm -v # Should print "10.9.2".
 fi
 
-stow -d ~/dotfiles -t ~ .
