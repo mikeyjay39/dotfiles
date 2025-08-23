@@ -3,3 +3,4 @@
 	name = Mikey Jay
 [core]
 	editor = vim
+	sshCommand = ssh -i ~/.ssh/id_ed25519
