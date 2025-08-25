@@ -13,7 +13,8 @@
     "cpu",
     "memory",
     "disk",
-    "temperature"
+    "temperature",
+    "custom/weather"
   ],
   "modules-center": [
     "hyprland/workspaces"
@@ -60,10 +61,17 @@
   "temperature": {
     "format": "{temperatureC}°C {icon}",
     "tooltip": true,
-    "tooltip-format": "Temperatura actual: {temperatureC}°C\nCrítico si > 80°C",
+    "tooltip-format": "CPU temperature: {temperatureC}°C\nCrítico si > 80°C",
     "format-icons": [
       ""
     ]
+  },
+  "custom/weather": {
+    "format": "{} Szeged ",
+    "interval": 600,
+    "exec": "curl -s 'wttr.in/Szeged?format=%t' | sed 's/+//g'",
+    "tooltip": true,
+    "tooltip-format": "Szeged temperature"
   },
   /* === Modules Center === */
   "hyprland/workspaces": {

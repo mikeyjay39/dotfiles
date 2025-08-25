@@ -21,6 +21,7 @@ window#waybar.hidden {
 #memory,
 #disk,
 #temperature,
+#custom-weather,
 #idle_inhibitor,
 #pulseaudio,
 #pulseaudio_slider,
@@ -86,6 +87,13 @@ window#waybar.hidden {
 #temperature {
   background: #ff9e64; /* Orange */
   color: #1a1b26;
+}
+
+#custom-weather {
+  background: #7aa2f7; /* Tokyonight blue */
+  color: #1a1b26;
+  padding: 0 10px;
+  border-radius: 8px;
 }
 
 /* Modules center */
