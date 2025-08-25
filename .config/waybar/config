@@ -31,7 +31,8 @@
   "custom/archicon": {
     "format": "",
     "on-click": "wofi --show drun",
-    "tooltip": false
+    "tooltip": true,
+    "tooltip-format": "App launcher"
   },
   "clock": {
     "timezone": "Europe/Budapest",
@@ -44,17 +45,17 @@
   "cpu": {
     "format": "{usage}% ",
     "tooltip": true,
-    "tooltip-format": "Uso de CPU: {usage}%\nNúcleos: {cores}"
+    "tooltip-format": "CPU usage: {usage}%\nCores: {cores}"
   },
   "memory": {
     "format": "{}% 󰍛",
     "tooltip": true,
-    "tooltip-format": "RAM en uso: {used} / {total} ({percentage}%)"
+    "tooltip-format": "RAM usage: {used} / {total} ({percentage}%)"
   },
   "disk": {
     "format": "{percentage_free}% ",
     "tooltip": true,
-    "tooltip-format": "Espacio libre: {free} / {total} ({percentage_free}%)"
+    "tooltip-format": "Free space: {free} / {total} ({percentage_free}%)"
   },
   "temperature": {
     "format": "{temperatureC}°C {icon}",
@@ -103,6 +104,7 @@
     "on-click": "pavucontrol"
   },
   "pulseaudio": {
+    "on-click": "pavucontrol",
     "format": "{volume}% {icon}",
     "format-muted": " {format_source}",
     "format-icons": {
@@ -129,7 +131,8 @@
   },
   "custom/lock": {
   "format": "",
-  "tooltip": "Lock screen",
+  "tooltip": true,
+  "tooltip-format": "Lock screen",
   "on-click": "hyprlock"
   }
 }
