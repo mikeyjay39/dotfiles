@@ -9,7 +9,7 @@ else
 	local PACKAGE="$2"
 fi
 
-if which "$COMMAND" >/dev/null 2>&1; then
+if pacman -Q "$COMMAND" >/dev/null 2>&1; then
 	echo "$COMMAND already installed"
 else
 	echo "Installing $PACKAGE"
@@ -38,8 +38,8 @@ fi
 
 
 install_if_not_found wireplumber
-install_if_not_found nmcli networkmanager
-install_if_not_found nm-applet network-manager-applet
+install_if_not_found networkmanager
+install_if_not_found network-manager-applet
 sudo systemctl enable NetworkManager.service --now
-
+install_if_not_found xdg-desktop-portal-hyprland
 
