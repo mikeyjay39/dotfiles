@@ -1,0 +1,188 @@
+/* -- Global rules -- */
+* {
+  border: none;
+  font-family: "JetbrainsMono Nerd Font";
+  font-size: 15px;
+  min-height: 10px;
+}
+
+window#waybar {
+  background: rgba(26, 27, 38, 0.6); /* semi-transparent Tokyonight bg */
+}
+
+window#waybar.hidden {
+  opacity: 0.2;
+}
+
+/* - General rules for visible modules -- */
+#custom-archicon,
+#clock,
+#cpu,
+#memory,
+#disk,
+#temperature,
+#idle_inhibitor,
+#pulseaudio,
+#pulseaudio_slider,
+#network,
+#custom-lock,
+#language {
+  color: #c0caf5; /* Tokyonight fg */
+  margin-top: 6px;
+  margin-bottom: 6px;
+  padding-left: 10px;
+  padding-right: 10px;
+  transition: none;
+}
+
+/* Separation to the left */
+#custom-archicon,
+#cpu,
+#idle_inhibitor {
+  margin-left: 5px;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+/* Separation to the right */
+#clock,
+#temperature,
+#language {
+  margin-right: 5px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+/* -- Specific styles -- */
+
+/* Modules left */
+#custom-archicon {
+  font-size: 20px;
+  color: #7aa2f7; /* Blue */
+  background: #1a1b26; /* Dark background */
+  padding-right: 17px;
+}
+
+#clock {
+  background: #9ece6a; /* Green */
+  color: #1a1b26;
+}
+
+#cpu {
+  background: #7dcfff; /* Cyan */
+  color: #1a1b26;
+}
+
+#memory {
+  background: #bb9af7; /* Magenta */
+  color: #1a1b26;
+}
+
+#disk {
+  background: #e0af68; /* Yellow */
+  color: #1a1b26;
+}
+
+#temperature {
+  background: #ff9e64; /* Orange */
+  color: #1a1b26;
+}
+
+/* Modules center */
+#workspaces {
+  background: rgba(26, 27, 38, 0.7);
+  border-radius: 10px;
+  margin: 6px 5px;
+  padding: 0px 6px;
+}
+
+#workspaces button {
+  color: #c0caf5; /* Foreground */
+  background: transparent;
+  padding: 4px 4px;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+#workspaces button.occupied {
+  color: #9ece6a; /* Green */
+}
+
+#workspaces button.active {
+  color: #7aa2f7; /* Blue */
+  text-shadow: 0 0 4px #7dcfff; /* Cyan glow */
+}
+
+#workspaces button:hover {
+  color: #bb9af7; /* Magenta on hover */
+}
+
+/* Modules right */
+#taskbar {
+  background: transparent;
+  border-radius: 10px;
+  padding: 0px 5px;
+  margin: 6px 5px;
+}
+
+#taskbar button {
+  padding: 0px 5px;
+  margin: 0px 3px;
+  border-radius: 6px;
+  transition: background 0.3s ease;
+}
+
+#taskbar button.active {
+  background: rgba(122, 162, 247, 0.2); /* Blue tint */
+}
+
+#taskbar button:hover {
+  background: rgba(122, 162, 247, 0.3); /* stronger hover */
+}
+
+#idle_inhibitor {
+  background: #7dcfff; /* Cyan */
+  color: #1a1b26;
+  padding-right: 15px;
+}
+
+#pulseaudio {
+  background: #bb9af7; /* Magenta */
+  color: #1a1b26;
+}
+
+#pulseaudio_slider {
+  background: #f7768e; /* Red */
+  color: #1a1b26;
+}
+
+#network {
+  background: #7aa2f7; /* Blue */
+  color: #1a1b26;
+  padding-right: 13px;
+}
+
+#language {
+  background: #9ece6a; /* Green */
+  color: #1a1b26;
+  padding-right: 15px;
+}
+
+#custom-lock {
+  color: #c0caf5; /* Foreground */
+  padding-right: 13px;
+  font-size: 16px;
+  min-width: 32px;
+}
+
+#custom-lock:hover {
+  color: #ffffff; /* bright white on hover */
+  font-size: 20px;
+}
+
+/* === Optional animation === */
+@keyframes blink {
+  to {
+    background-color: #f7768e; /* Red */
+    color: #c0caf5;
+  }
+}
