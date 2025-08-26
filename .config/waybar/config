@@ -138,9 +138,9 @@
     "format-en": "ENG"
   },
   "custom/lock": {
-  "format": "",
+"format": "⏻",
   "tooltip": true,
-  "tooltip-format": "Lock screen",
-  "on-click": "hyprlock"
+  "tooltip-format": "Power options",
+  "on-click": "wofi --show dmenu -p 'Power:' -L 5 <<< ' Lock | hyprlock\n Sleep | systemctl suspend\n󰈆 Logout | hyprctl dispatch exit\n Reboot | systemctl reboot\n Shutdown | systemctl poweroff' | cut -d'|' -f2 | bash"
   }
 }
