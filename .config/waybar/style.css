@@ -26,7 +26,7 @@ window#waybar.hidden {
 #pulseaudio,
 #pulseaudio_slider,
 #network,
-#custom-lock,
+#custom-powermenu,
 #language {
   color: #c0caf5; /* Tokyonight fg */
   margin-top: 6px;
@@ -175,14 +175,14 @@ window#waybar.hidden {
   padding-right: 15px;
 }
 
-#custom-lock {
+#custom-powermenu {
   color: #c0caf5; /* Foreground */
   padding-right: 13px;
   font-size: 16px;
   min-width: 32px;
 }
 
-#custom-lock:hover {
+#custom-powermenu:hover {
   color: #ffffff; /* bright white on hover */
   font-size: 20px;
 }

@@ -26,7 +26,7 @@
     "pulseaudio",
     "network",
     "hyprland/language",
-    "custom/lock"
+    "custom/powermenu"
   ],
   /* === Modules Left === */
   "custom/archicon": {
@@ -137,10 +137,10 @@
     "format-es": "ESP",
     "format-en": "ENG"
   },
-  "custom/lock": {
-"format": "⏻",
-  "tooltip": true,
-  "tooltip-format": "Power options",
-  "on-click": "wofi --show dmenu -p 'Power:' -L 5 <<< ' Lock | hyprlock\n Sleep | systemctl suspend\n󰈆 Logout | hyprctl dispatch exit\n Reboot | systemctl reboot\n Shutdown | systemctl poweroff' | cut -d'|' -f2 | bash"
+  "custom/powermenu": {
+    "format": "⏻",
+    "tooltip": true,
+    "tooltip-format": "Power options",
+    "on-click": "wofi --show dmenu -p 'Power:' -L 5 <<< ' Lock | hyprlock\n Sleep | systemctl suspend\n󰈆 Logout | hyprctl dispatch exit\n Reboot | systemctl reboot\n Shutdown | systemctl poweroff' | cut -d'|' -f2 | bash"
   }
 }
