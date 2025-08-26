@@ -108,18 +108,18 @@ export JAVA_HOME=/usr/lib/jvm/java-21-openjdk
 export PATH=$JAVA_HOME/bin:$PATH
 export EDITOR=nvim
 
-# set ssh key for git
-if [ -f ~/.ssh/id_ed25519 ]; then
-    # load ssh key if not loaded
-    # check if ssh key is loaded
-    ssh-add -l | grep "id_ed25519" >/dev/null
-    if [ $? -ne 0 ]; then
-		echo "Loading SSH key..."
-		eval "$(ssh-agent -s)" >/dev/null
-		ssh-add ~/.ssh/id_ed25519 >/dev/null
-	fi  
-fi
-# end setup ssh key for git
+# # set ssh key for git
+# if [ -f ~/.ssh/id_ed25519 ]; then
+#     # load ssh key if not loaded
+#     # check if ssh key is loaded
+#     ssh-add -l | grep "id_ed25519" >/dev/null
+#     if [ $? -ne 0 ]; then
+# 		echo "Loading SSH key..."
+# 		eval "$(ssh-agent -s)" >/dev/null
+# 		ssh-add ~/.ssh/id_ed25519 >/dev/null
+# 	fi  
+# fi
+# # end setup ssh key for git
 
 # git repo name in bash
 force_color_prompt=yes
