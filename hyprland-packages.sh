@@ -43,3 +43,6 @@ install_if_not_found network-manager-applet
 sudo systemctl enable NetworkManager.service --now
 install_if_not_found xdg-desktop-portal-hyprland
 install_if_not_found swww
+install_if_not_found blueman
+sudo systemctl enable --now bluetooth
+install_if_not_found mako
