@@ -1,0 +1,12 @@
+[Unit]
+Description=Set PipeWire default volume at startup
+After=pipewire.service wireplumber.service
+Requires=wireplumber.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/wpctl set-volume @DEFAULT_AUDIO_SINK@ 40%
+
+[Install]
+WantedBy=default.target
+
