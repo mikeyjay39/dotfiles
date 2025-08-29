@@ -46,3 +46,17 @@ install_if_not_found swww
 install_if_not_found blueman
 sudo systemctl enable --now bluetooth
 install_if_not_found mako
+
+# printers
+install_if_not_found system-config-printer
+# below is the driver for HP printers, uncomment if you have an HP printer
+# install_if_not_found hplip
+install_if_not_found avahi
+install_if_not_found nss-mdns
+install_if_not_found cups
+install_if_not_found cups-filters
+install_if_not_found cups-browsed
+sudo systemctl enable --now avahi-daemon.service
+sudo systemctl enable --now org.cups.cupsd.service
+sudo systemctl enable --now cups.service
+# end printers
