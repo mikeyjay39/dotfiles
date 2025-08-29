@@ -49,7 +49,7 @@ install_if_not_found xclip
 install_if_not_found unzip
 install_if_not_found ghostty
 install_if_not_round npm
-install_if_not_found cargo
+install_if_not_found rustup
 
 # github cli tool
 install_if_not_found gh github-cli
