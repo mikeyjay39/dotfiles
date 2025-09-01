@@ -144,4 +144,4 @@ eval "$(starship init bash)"
 source ~/.my_functions.sh
 
 # Created by `pipx` on 2025-05-25 01:13:53
-export PATH="$PATH:/home/mikeyjay/.local/bin"
+export PATH="$PATH:/home/mikeyjay/.local/bin:$HOME/.cargo/bin"

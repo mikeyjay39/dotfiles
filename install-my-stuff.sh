@@ -50,6 +50,7 @@ install_if_not_found unzip
 install_if_not_found ghostty
 install_if_not_round npm
 install_if_not_found rustup
+rustup component add rust-analyzer
 
 # github cli tool
 install_if_not_found gh github-cli
@@ -63,6 +64,8 @@ install_if_not_found rg ripgrep
 install_if_not_found fd
 install_if_not_found fzf
 instanll_if_not_found rustup
+install_if_not_found rust-analyzer
+
 
 if which docker >/dev/null 2>&1; then
 	echo docker already installed
