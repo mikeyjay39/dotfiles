@@ -57,6 +57,7 @@ install_if_not_found cups
 install_if_not_found cups-filters
 install_if_not_found cups-browsed
 sudo systemctl enable --now avahi-daemon.service
-sudo systemctl enable --now org.cups.cupsd.service
 sudo systemctl enable --now cups.service
 # end printers
+
+install_with_aur_if_not_found timeshift-autosnap
