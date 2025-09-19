@@ -26,9 +26,9 @@ end
 -- Function to set the Neovim colorscheme based on the theme
 local function set_colorscheme(theme)
 	-- Map specific theme names to their corresponding colorscheme values
-	if theme == "AtomOneLight" then
+	if theme == "Atom" then
 		theme = "onedark"
-	elseif theme == "tokyonight-night" then
+	elseif theme == "TokyoNight" then
 		theme = "tokyonight"
 	end
 

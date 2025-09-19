@@ -23,8 +23,8 @@ CONFIG_FILE="${HOME}/.config/ghostty/config"
 K9S_CONFIG_FILE="${HOME}/.config/k9s/config.yaml"
 
 # Define the themes to toggle between
-THEME_ONE="tokyonight_night"
-THEME_TWO="AtomOneLight"
+THEME_ONE="TokyoNight Night"
+THEME_TWO="Atom One Light"
 
 # Check if the configuration file exists
 if [[ ! -f "$CONFIG_FILE" ]]; then
