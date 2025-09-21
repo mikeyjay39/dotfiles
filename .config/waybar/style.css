@@ -65,32 +65,32 @@ window#waybar.hidden {
 }
 
 #clock {
-  background: #9ece6a; /* Green */
+  background: linear-gradient(180deg, #7dcfff 0%, #7aa2f7 100%); /* Tokyonight gradient */
   color: #1a1b26;
 }
 
 #cpu {
-  background: #7dcfff; /* Cyan */
+  background: linear-gradient(180deg, #7aa2f7 0%, #7dcfff 100%); /* Tokyonight gradient */
   color: #1a1b26;
 }
 
 #memory {
-  background: #bb9af7; /* Magenta */
+  background: linear-gradient(180deg, #9ece6a 0%, #7aa2f7 100%); /* Tokyonight gradient */
   color: #1a1b26;
 }
 
 #disk {
-  background: #e0af68; /* Yellow */
+  background: linear-gradient(180deg, #ff9e64 0%, #7aa2f7 100%); /* Tokyonight gradient */
   color: #1a1b26;
 }
 
 #temperature {
-  background: #ff9e64; /* Orange */
+  background: linear-gradient(180deg, #F0F0F0 0%, #A0A0A0 100%); /* More extreme silver gradient */
   color: #1a1b26;
 }
 
 #custom-weather {
-  background: #7aa2f7; /* Tokyonight blue */
+  background: linear-gradient(180deg, #7dcfff 0%, #9ece6a 100%); /* Tokyonight gradient */
   color: #1a1b26;
   padding: 0 10px;
   border-radius: 8px;
@@ -148,31 +148,36 @@ window#waybar.hidden {
 }
 
 #idle_inhibitor {
-  background: #7dcfff; /* Cyan */
+  background: linear-gradient(180deg, #bb9af7 0%, #7aa2f7 100%); /* Tokyonight gradient */
   color: #1a1b26;
   padding-right: 15px;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.5); /* Subtle shadow */
 }
 
 #pulseaudio {
-  background: #bb9af7; /* Magenta */
+  background: linear-gradient(180deg, #7aa2f7 0%, #7dcfff 100%); /* Tokyonight gradient */
   color: #1a1b26;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.5); /* Subtle shadow */
 }
 
 #pulseaudio_slider {
-  background: #f7768e; /* Red */
+  background: linear-gradient(180deg, #E8E8E8 0%, #8C8C8C 100%); /* Different silver gradient */
   color: #1a1b26;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.5); /* Subtle shadow */
 }
 
 #network {
-  background: #7aa2f7; /* Blue */
+  background: linear-gradient(180deg, #7dcfff 0%, #bb9af7 100%); /* Tokyonight gradient */
   color: #1a1b26;
   padding-right: 13px;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.5); /* Subtle shadow */
 }
 
 #language {
-  background: #9ece6a; /* Green */
+  background: linear-gradient(180deg, #7aa2f7 0%, #7dcfff 100%); /* Tokyonight gradient */
   color: #1a1b26;
   padding-right: 15px;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.5); /* Subtle shadow */
 }
 
 #custom-powermenu {
