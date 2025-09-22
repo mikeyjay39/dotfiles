@@ -46,6 +46,8 @@ install_if_not_found swww
 install_if_not_found blueman
 sudo systemctl enable --now bluetooth
 install_if_not_found mako
+# clipboard for Neovim to work on Wayland
+install_if_not_found wl-clipboard
 
 # printers
 install_if_not_found system-config-printer
