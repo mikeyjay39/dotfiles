@@ -68,11 +68,11 @@
     ]
   },
   "custom/weather": {
-    "format": "{} Szeged ",
+    "format": "{0}",
     "interval": 600,
-    "exec": "curl -s 'wttr.in/Szeged?format=%t' | sed 's/+//g'",
+    "exec": "curl -s 'wttr.in/Szeged?format=%l:+%t+%c'; curl -s 'wttr.in/Szeged?format=%C&m'",
     "tooltip": true,
-    "tooltip-format": "Szeged temperature"
+    "tooltip-format": "{0}",
   },
   /* === Modules Center === */
   "hyprland/workspaces": {
