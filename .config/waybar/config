@@ -26,9 +26,11 @@
     "pulseaudio_slider",
     "pulseaudio",
     "network",
+    "battery",
     "hyprland/language",
     "custom/powermenu"
   ],
+
   /* === Modules Left === */
   "custom/archicon": {
     "format": "",
@@ -131,6 +133,23 @@
     "tooltip-format-ethernet": " {ifname} {ipaddr}/{cidr}",
     "tooltip-format-disconnected": "Disconnected",
     "max-length": 50
+  },
+  "battery": {
+    "bat": "BAT0",                // your battery device (check step 1)
+    "adapter": "AC",            // your AC adapter device
+    "interval": 30,               // refresh interval in seconds
+    "states": {
+      "good": 80,
+      "warning": 30,
+      "critical": 15
+    },
+   "format-icons": {
+     "charging": "",
+     "discharging": "",
+     "full": "",
+     "critical": ""
+   },
+    "format": "{icon} {capacity}%"
   },
   "hyprland/language": {
     "format": "{} ",

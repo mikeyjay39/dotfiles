@@ -26,6 +26,7 @@ window#waybar.hidden {
 #pulseaudio,
 #pulseaudio_slider,
 #network,
+#battery,
 #custom-powermenu,
 #language {
   color: #c0caf5; /* Tokyonight fg */
@@ -173,6 +174,11 @@ window#waybar.hidden {
   box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.5); /* Subtle shadow */
 }
 
+#battery {
+  color: white;
+  background: linear-gradient(90deg, #4caf50, #ff9800, #f44336);
+}
+
 #language {
   background: linear-gradient(180deg, #7aa2f7 0%, #7dcfff 100%); /* Tokyonight gradient */
   color: #1a1b26;
@@ -193,6 +199,7 @@ window#waybar.hidden {
 }
 
 /* === Optional animation === */
+
 @keyframes blink {
   to {
     background-color: #f7768e; /* Red */
