@@ -13,13 +13,13 @@ return {
 		"nvim-neotest/neotest",
 		dependencies = {
 			"nvim-neotest/nvim-nio",
-			"nvim-neotest/neotest-jest",
+			-- "nvim-neotest/neotest-jest",
 			"nvim-lua/plenary.nvim",
 			"antoinemadec/FixCursorHold.nvim",
 			"nvim-treesitter/nvim-treesitter",
 			"rcasia/neotest-java",
 			"rouge8/neotest-rust",
-			-- "marilari88/neotest-vitest",
+			"marilari88/neotest-vitest",
 		},
 		keys = {
 			{ "<leader>t", "", desc = "+test" },
