@@ -49,6 +49,9 @@ install_if_not_found mako
 # clipboard for Neovim to work on Wayland
 install_if_not_found wl-clipboard
 
+# emojis for Waybar
+install_if_not_found noto-fonts-emoji
+
 # printers
 install_if_not_found system-config-printer
 # below is the driver for HP printers, uncomment if you have an HP printer

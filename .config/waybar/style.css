@@ -1,7 +1,7 @@
 /* -- Global rules -- */
 * {
   border: none;
-  font-family: "JetbrainsMono Nerd Font";
+    font-family: "JetBrainsMono Nerd Font", "Noto Color Emoji", monospace;
   font-size: 15px;
   min-height: 10px;
 }
@@ -22,6 +22,7 @@ window#waybar.hidden {
 #disk,
 #temperature,
 #custom-weather,
+#custom-currency,
 #idle_inhibitor,
 #pulseaudio,
 #pulseaudio_slider,
@@ -91,6 +92,13 @@ window#waybar.hidden {
 }
 
 #custom-weather {
+  background: linear-gradient(180deg, #7dcfff 0%, #9ece6a 100%); /* Tokyonight gradient */
+  color: #1a1b26;
+  padding: 0 10px;
+  border-radius: 8px;
+}
+
+#custom-currency {
   background: linear-gradient(180deg, #7dcfff 0%, #9ece6a 100%); /* Tokyonight gradient */
   color: #1a1b26;
   padding: 0 10px;

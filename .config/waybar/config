@@ -6,7 +6,6 @@
   "exclusive": true,
   "passthrough": false,
   "gtk-layer-shell": true,
-  /* === Modules Order === */
   "modules-left": [
     "custom/archicon",
     "clock",
@@ -14,7 +13,8 @@
     "memory",
     "disk",
     "temperature",
-    "custom/weather"
+    "custom/weather",
+    "custom/currency"
   ],
   "modules-center": [
     "hyprland/workspaces"
@@ -30,8 +30,6 @@
     "hyprland/language",
     "custom/powermenu"
   ],
-
-  /* === Modules Left === */
   "custom/archicon": {
     "format": "",
     "on-click": "wofi --show drun",
@@ -69,14 +67,16 @@
       ""
     ]
   },
-  "custom/weather": {
-    "format": "{0}",
-    "interval": 600,
-    "exec": "curl -s 'wttr.in/Szeged?format=%l:+%t+%c'; curl -s 'wttr.in/Szeged?format=%C&m'",
-    "tooltip": true,
-    "tooltip-format": "{0}",
-  },
-  /* === Modules Center === */
+"custom/weather": {
+  "exec": "/home/mikeyjay/.config/waybar/scripts/weather.sh",
+  "interval": 600,
+  "format": "{}"
+},
+"custom/currency": {
+  "exec": "/home/mikeyjay/.config/waybar/scripts/usd_huf.sh",
+  "interval": 600,
+  "format": "{}"
+},
   "hyprland/workspaces": {
     "format": "{icon}",
     "format-icons": {
@@ -90,7 +90,6 @@
     "all-outputs": true,
     "show-special": true
   },
-  /* === Modules Right === */
   "wlr/taskbar": {
     "format": "{icon}",
     "all-outputs": true,
@@ -135,20 +134,20 @@
     "max-length": 50
   },
   "battery": {
-    "bat": "BAT0",                // your battery device (check step 1)
-    "adapter": "AC",            // your AC adapter device
-    "interval": 30,               // refresh interval in seconds
+    "bat": "BAT0",
+    "adapter": "AC",
+    "interval": 30,
     "states": {
       "good": 80,
       "warning": 30,
       "critical": 15
     },
-   "format-icons": {
-     "charging": "",
-     "discharging": "",
-     "full": "",
-     "critical": ""
-   },
+    "format-icons": {
+      "charging": "",
+      "discharging": "",
+      "full": "",
+      "critical": ""
+    },
     "format": "{icon} {capacity}%"
   },
   "hyprland/language": {
