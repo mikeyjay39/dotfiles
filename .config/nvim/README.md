@@ -3,6 +3,20 @@
 ## Extra things to install
 - nerd font
 - vscode-debugger: https://github.com/mxsdev/nvim-dap-vscode-js
+### For Java
+- [java-debug](https://github.com/microsoft/java-debug)
+  - Install:
+  ```
+  ./mvnw clean install
+  ```
+- [vscode-java-test](https://github.com/microsoft/vscode-java-test)
+  - Install:
+  ```
+  npm install && npm run build-plugin
+  ```
+For these Java tools, either pull and build from source, or try installing from AUR. If pulling and building,
+you might need to run the install commands. 
+NOTE: In a mono-repo, you might need to open the sub-project folder in Neovim to get the tools to work.
 
 # kickstart.nvim
 
