@@ -153,8 +153,8 @@
   "hyprland/language": {
     "format": "{} ",
     "on-click": "hyprctl switchxkblayout at-translated-set-2-keyboard next",
-    "format-es": "ESP",
-    "format-en": "ENG"
+    "format-en": "ENG",
+    "format-hu": "HUN"
   },
   "custom/powermenu": {
     "format": "⏻",
