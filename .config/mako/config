@@ -1,0 +1,16 @@
+# ~/.config/mako/config
+
+# Notifications disappear after 10 seconds
+default-timeout=10000
+
+# Allow timeouts to work
+ignore-timeout=0
+
+# Colors and style
+background-color=#1e1e2ecc
+text-color=#ffffff
+border-color=#88c0d0
+border-size=2
+
+# Font
+font=JetBrainsMono Nerd Font 10
