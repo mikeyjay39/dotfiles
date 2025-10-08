@@ -100,11 +100,21 @@ window#waybar.hidden {
   box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.5); /* Subtle shadow */
 }
 
+#custom-weather:hover {
+  color: #ffffff;
+  background: rgba(122, 162, 247, 0.3); /* stronger hover */
+}
+
 #custom-currency {
   background: rgba(128, 128, 128, 0.5); /* Transparent gray */
   color: #E5F3FD;
   padding-right: 15px;
   box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.5); /* Subtle shadow */
+}
+
+#custom-currency:hover {
+  color: #ffffff;
+  background: rgba(122, 162, 247, 0.3); /* stronger hover */
 }
 
 /* Modules center */
@@ -165,10 +175,20 @@ window#waybar.hidden {
   box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.5); /* Subtle shadow */
 }
 
+#idle_inhibitor:hover {
+  color: #ffffff;
+  background: rgba(122, 162, 247, 0.3); /* stronger hover */
+}
+
 #pulseaudio {
   background: rgba(128, 128, 128, 0.5); /* Transparent gray */
   color: #E5F3FD;
   box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.5); /* Subtle shadow */
+}
+
+#pulseaudio:hover {
+  color: #ffffff;
+  background: rgba(122, 162, 247, 0.3); /* stronger hover */
 }
 
 #pulseaudio_slider {
@@ -184,6 +204,11 @@ window#waybar.hidden {
   box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.5); /* Subtle shadow */
 }
 
+#network:hover {
+  color: #ffffff;
+  background: rgba(122, 162, 247, 0.3); /* stronger hover */
+}
+
 #battery {
   color: #E5F3FD;
   background: rgba(128, 128, 128, 0.5); /* Transparent gray */
@@ -191,11 +216,21 @@ window#waybar.hidden {
   box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.5); /* Subtle shadow */
 }
 
+#battery:hover {
+  color: #ffffff;
+  background: rgba(122, 162, 247, 0.3); /* stronger hover */
+}
+
 #language {
   background: rgba(128, 128, 128, 0.5); /* Transparent gray */
   color: #E5F3FD;
   padding-right: 15px;
   box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.5); /* Subtle shadow */
+}
+
+#language:hover {
+  color: #ffffff;
+  background: rgba(122, 162, 247, 0.3); /* stronger hover */
 }
 
 #custom-powermenu {
