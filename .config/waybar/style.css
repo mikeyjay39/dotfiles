@@ -68,6 +68,11 @@ window#waybar.hidden {
   padding-right: 17px;
 }
 
+#custom-archicon:hover {
+  color: #ffffff;
+  background: rgba(122, 162, 247, 0.3); /* stronger hover */
+}
+
 #clock {
   background: rgba(128, 128, 128, 0.5); /* Transparent gray */
   color: #E5F3FD;
