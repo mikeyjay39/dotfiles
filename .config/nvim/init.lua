@@ -655,7 +655,18 @@ require("lazy").setup({
 				-- clangd = {},
 				-- gopls = {},
 				-- pyright = {},
-				-- rust_analyzer = {},
+				-- NOTE: Disabled rust here because of rustaceanvim
+				-- rust_analyzer = {
+				--   -- explicitly set cmd if needed (optional, usually not required if in PATH)
+				--   cmd = { vim.fn.expand("~/.cargo/bin/rust-analyzer") },
+				--   -- you can pass rust-analyzer settings here
+				--   settings = {
+				--     ["rust-analyzer"] = {
+				--       cargo = { allFeatures = true },
+				--       checkOnSave = { command = "clippy" },
+				--     },
+				--   },
+				-- },
 				marksman = {},
 				bashls = {},
 				-- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
