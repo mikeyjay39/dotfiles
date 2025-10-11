@@ -46,6 +46,7 @@ install_if_not_found swww
 install_if_not_found blueman
 sudo systemctl enable --now bluetooth
 install_if_not_found mako
+
 # clipboard for Neovim to work on Wayland
 install_if_not_found wl-clipboard
 
@@ -66,3 +67,6 @@ sudo systemctl enable --now cups.service
 # end printers
 
 install_with_aur_if_not_found timeshift-autosnap
+
+# keyboard pointer for Hyprland
+install_with_aur_if_not_found wl-kbptr 
