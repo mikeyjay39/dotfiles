@@ -63,7 +63,7 @@
   "temperature": {
     "format": "{temperatureC}°C {icon}",
     "tooltip": true,
-    "tooltip-format": "CPU temperature: {temperatureC}°C\nCrítico si > 80°C",
+    "tooltip-format": "CPU temperature: {temperatureC}°C\nCritical if > 80°C",
     "format-icons": [
       ""
     ]
