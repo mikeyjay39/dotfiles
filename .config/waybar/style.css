@@ -71,6 +71,7 @@ window#waybar.hidden {
 #custom-archicon:hover {
   color: #ffffff;
   background: rgba(122, 162, 247, 0.3); /* stronger hover */
+  font-weight: bold;
 }
 
 #clock {
@@ -78,9 +79,21 @@ window#waybar.hidden {
   color: #E5F3FD;
 }
 
+#clock:hover {
+  color: #ffffff;
+  background: rgba(122, 162, 247, 0.3); /* stronger hover */
+  font-weight: bold;
+}
+
 #cpu {
   background: rgba(128, 128, 128, 0.5); /* Transparent gray */
   color: #E5F3FD;
+}
+
+#cpu:hover {
+  color: #ffffff;
+  background: rgba(122, 162, 247, 0.3); /* stronger hover */
+  font-weight: bold;
 }
 
 #memory {
@@ -88,14 +101,32 @@ window#waybar.hidden {
   color: #E5F3FD;
 }
 
+#memory:hover {
+  color: #ffffff;
+  background: rgba(122, 162, 247, 0.3); /* stronger hover */
+  font-weight: bold;
+}
+
 #disk {
   background: rgba(128, 128, 128, 0.5); /* Transparent gray */
   color: #E5F3FD;
 }
 
+#disk:hover {
+  color: #ffffff;
+  background: rgba(122, 162, 247, 0.3); /* stronger hover */
+  font-weight: bold;
+}
+
 #temperature {
   background: rgba(128, 128, 128, 0.5); /* Transparent gray */
   color: #E5F3FD;
+}
+
+#temperature:hover {
+  color: #ffffff;
+  background: rgba(122, 162, 247, 0.3); /* stronger hover */
+  font-weight: bold;
 }
 
 #custom-weather {
@@ -108,6 +139,7 @@ window#waybar.hidden {
 #custom-weather:hover {
   color: #ffffff;
   background: rgba(122, 162, 247, 0.3); /* stronger hover */
+  font-weight: bold;
 }
 
 #custom-currency {
@@ -120,6 +152,7 @@ window#waybar.hidden {
 #custom-currency:hover {
   color: #ffffff;
   background: rgba(122, 162, 247, 0.3); /* stronger hover */
+  font-weight: bold;
 }
 
 /* Modules center */
@@ -183,6 +216,7 @@ window#waybar.hidden {
 #idle_inhibitor:hover {
   color: #ffffff;
   background: rgba(122, 162, 247, 0.3); /* stronger hover */
+  font-weight: bold;
 }
 
 #pulseaudio {
@@ -194,6 +228,7 @@ window#waybar.hidden {
 #pulseaudio:hover {
   color: #ffffff;
   background: rgba(122, 162, 247, 0.3); /* stronger hover */
+  font-weight: bold;
 }
 
 #pulseaudio_slider {
@@ -212,6 +247,7 @@ window#waybar.hidden {
 #network:hover {
   color: #ffffff;
   background: rgba(122, 162, 247, 0.3); /* stronger hover */
+  font-weight: bold;
 }
 
 #battery {
@@ -224,6 +260,7 @@ window#waybar.hidden {
 #battery:hover {
   color: #ffffff;
   background: rgba(122, 162, 247, 0.3); /* stronger hover */
+  font-weight: bold;
 }
 
 #language {
@@ -236,6 +273,7 @@ window#waybar.hidden {
 #language:hover {
   color: #ffffff;
   background: rgba(122, 162, 247, 0.3); /* stronger hover */
+  font-weight: bold;
 }
 
 #custom-powermenu {
