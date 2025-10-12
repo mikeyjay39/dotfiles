@@ -42,7 +42,8 @@
     "tooltip-format": "{calendar}",
     "calendar": {
       "mode": "month"
-    }
+    },
+    "on-click": "brave https://calendar.google.com"
   },
   "cpu": {
     "format": "{usage}% ",
