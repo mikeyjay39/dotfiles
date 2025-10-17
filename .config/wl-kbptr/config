@@ -5,7 +5,7 @@
 
 [general]
 home_row_keys=
-modes=tile,click
+# modes=tile,click
 cancellation_status_code=0
 
 [mode_tile]
