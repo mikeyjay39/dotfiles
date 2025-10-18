@@ -90,7 +90,7 @@ if [ ~/.git-completion.bash ]; then
 fi
 
 # To auto open browser on aws sso login
-export BROWSER=wslview
+export BROWSER=xdg-open
 
 # nvm
 export NVM_DIR="$HOME/.nvm"
