@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-CITY="Szeged"
+CITY="Torrance"
 
 # Step 1: Use Open-Meteo Geocoding API to resolve city → lat/lon
 geo=$(curl -s "https://geocoding-api.open-meteo.com/v1/search?name=${CITY}&count=1&language=en&format=json")

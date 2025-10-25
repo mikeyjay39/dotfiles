@@ -37,7 +37,7 @@
     "tooltip-format": "App launcher"
   },
   "clock": {
-    "timezone": "Europe/Budapest",
+    "timezone": "America/Los_Angeles",
     "format": "{:%H:%M  %d, %m}",
     "tooltip-format": "{calendar}",
     "calendar": {
