@@ -74,3 +74,6 @@ install_with_aur_if_not_found wl-kbptr
 # save power on laptops
 install_if_not_found tlp
 sudo systemctl enable --now tlp.service
+
+# screenshot tool
+install_if_not_found hyprshot
