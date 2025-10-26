@@ -70,3 +70,7 @@ install_with_aur_if_not_found timeshift-autosnap
 
 # keyboard pointer for Hyprland
 install_with_aur_if_not_found wl-kbptr 
+
+# save power on laptops
+install_if_not_found tlp
+sudo systemctl enable --now tlp.service
