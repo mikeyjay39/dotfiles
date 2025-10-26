@@ -161,3 +161,5 @@ else
     npm -v # Should print "10.9.2".
 fi
 
+npm install -g typescript
+
