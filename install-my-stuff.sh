@@ -128,6 +128,9 @@ fi
 # jdtls
 install_with_aur_if_not_found jdtls
 
+# typescript debugger
+install_with_aur_if_not_found vscode-js-debug
+
 # informant
 if which informant >/dev/null 2>&1; then
 	echo informant already installed

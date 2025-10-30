@@ -7,10 +7,10 @@
 -- kickstart.nvim and not kitchen-sink.nvim ;)
 
 return {
-	{
-		"microsoft/vscode-js-debug",
-		build = "npm install --legacy-peer-deps && npx gulp dapDebugServer && mv dist out",
-	},
+	-- {
+	-- 	"microsoft/vscode-js-debug",
+	-- 	build = "npm install --legacy-peer-deps && npx gulp dapDebugServer && mv dist out",
+	-- },
 	{
 		-- NOTE: Yes, you can install new plugins here!
 		"mfussenegger/nvim-dap",
@@ -177,7 +177,8 @@ return {
 					-- 💀 Make sure to update this path to point to your installation
 					-- clone this repo: https://github.com/microsoft/vscode-js-debug/releases
 					args = {
-						"/home/mikeyjay/.local/share/nvim/lazy/vscode-js-debug/out/src/dapDebugServer.js",
+						-- "/home/mikeyjay/.local/share/nvim/lazy/vscode-js-debug/out/src/dapDebugServer.js",
+						"/usr/lib/node_modules/vscode-js-debug/src/dapDebugServer.js",
 						"${port}",
 					},
 				},

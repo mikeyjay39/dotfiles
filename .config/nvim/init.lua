@@ -301,7 +301,11 @@ require("lazy").setup({
 	{
 		"pmizio/typescript-tools.nvim",
 		dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
-		opts = {},
+		opts = {
+			settings = {
+				tsserver_logs = "verbose",
+			},
+		},
 	},
 	{
 		"mfussenegger/nvim-jdtls",
