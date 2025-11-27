@@ -17,6 +17,18 @@ sudo pacman -S "$PACKAGE"
 fi
 }
 
+install_with_yay_if_not_found() {
+  local PACKAGE="$1"
+
+  yay -Qi $PACKAGE >/dev/null 2>&1;
+
+  if [ $? -eq 0 ]; then
+    echo $PACKAGE already installed
+  else
+    yay -S "$PACKAGE"
+  fi
+}
+
 # arg 1 is name of command, arg 2 is package name
 install_with_aur_if_not_found() {
 local COMMAND="$1"
@@ -77,3 +89,6 @@ sudo systemctl enable --now tlp.service
 
 # screenshot tool
 install_if_not_found hyprshot
+
+# themes for GTK and light dark mode toggle NOTE: Make sure Brave is set to GTK mode and system theme
+install_with_yay_if_not_found gnome-themes-extra
