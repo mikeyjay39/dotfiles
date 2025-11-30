@@ -92,3 +92,6 @@ install_if_not_found hyprshot
 
 # themes for GTK and light dark mode toggle NOTE: Make sure Brave is set to GTK mode and system theme
 install_with_yay_if_not_found gnome-themes-extra
+
+# brightness control
+install_with_yay_if_not_found brightnessctl
