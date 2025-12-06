@@ -95,3 +95,7 @@ install_with_yay_if_not_found gnome-themes-extra
 
 # brightness control
 install_with_yay_if_not_found brightnessctl
+
+# cloud storage
+install_with_yay_if_not_found rclone
+install_with_yay_if_not_found fuse3
