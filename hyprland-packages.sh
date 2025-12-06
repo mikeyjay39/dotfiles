@@ -99,3 +99,5 @@ install_with_yay_if_not_found brightnessctl
 # cloud storage
 install_with_yay_if_not_found rclone
 install_with_yay_if_not_found fuse3
+
+# TODO: add ufw firewall setup
