@@ -100,4 +100,9 @@ install_with_yay_if_not_found brightnessctl
 install_with_yay_if_not_found rclone
 install_with_yay_if_not_found fuse3
 
-# TODO: add ufw firewall setup
+# firewall
+install_with_yay_if_not_found ufw
+# configure ufw
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw enable
