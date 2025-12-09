@@ -106,6 +106,7 @@ vim.keymap.set("n", "<leader>sc", ":FzfLua colorschemes<CR>", { desc = "[S]earch
 vim.keymap.set("n", "<leader>sr", ":FzfLua resume<CR>", { desc = "[S]earch [R]esume" })
 vim.keymap.set("n", "<leader>s.", ":FzfLua oldfiles<CR>", { desc = '[S]earch Recent Files ("." for repeat)' })
 vim.keymap.set("n", "<leader><leader>", ":FzfLua buffers<CR>", { desc = "[ ] Find existing buffers" })
+vim.keymap.set("n", "<leader>/", ":FzfLua lines<CR>", { desc = "[/] Fuzzily search in current buffer" })
 
 vim.keymap.set(
 	"n",
@@ -126,9 +127,12 @@ vim.keymap.set("n", "<leader>ct", function()
 	vim.api.nvim_put({ timestamp }, "c", true, true)
 end, { desc = "[C] [T]timestamp" })
 
-vim.keymap.set("n", "<leader>ec", function()
-	vim.api.nvim_put({ "✔" }, "c", true, true)
-end, { desc = "[E]moji [C]heckmark" })
+-- vim.keymap.set("n", "<leader>ec", function()
+-- 	vim.api.nvim_put({ "✔" }, "c", true, true)
+-- end, { desc = "[E]moji [C]heckmark" })
+
+-- Show diagnostics for the current line in a floating window
+vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show LSP error popup" })
 
 -- keymap that toggles between tokyonight and onedark themes
 vim.keymap.set("n", "<leader>Tt", function()
