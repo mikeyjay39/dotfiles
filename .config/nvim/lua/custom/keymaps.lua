@@ -100,6 +100,9 @@ vim.keymap.set(
 	":lua require('fzf-lua').live_grep({ cmd = 'rg --line-number --column --color=always --hidden'})<CR>",
 	{ desc = "[S]earch by [G]rep" }
 )
+vim.keymap.set("n", "<leader>sGd", ":FzfLua git_diff<CR>", { desc = "[S]earch [G]it Diff" })
+vim.keymap.set("n", "<leader>sGf", ":FzfLua git_files<CR>", { desc = "[S]earch [G]it Diff" })
+vim.keymap.set("n", "<leader>sGs", ":FzfLua git_status<CR>", { desc = "[S]earch [G]it Diff" })
 -- vim.keymap.set("n", "<leader>sg", ":FzfLua live_grep_glob<CR>", { desc = "[S]earch by [G]rep" })
 vim.keymap.set("n", "<leader>sd", ":FzfLua diagnostics_document<CR>", { desc = "[S]earch [D]iagnostics" })
 vim.keymap.set("n", "<leader>sc", ":FzfLua colorschemes<CR>", { desc = "[S]earch [C]olorschemes" })
