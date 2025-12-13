@@ -141,6 +141,12 @@ fi
 # codelldb - for rust debugging
 install_with_aur_if_not_found codelldb codelldb-bin
 
+# zsh
+install_if_not_found zsh
+install_if_not_found zsh-autosuggestions 
+install_if_not_found zsh-completions
+install_if_not_found zsh-syntax-highlighting
+
 stow -d ~/dotfiles -t ~ . --adopt
 
 # nvm
