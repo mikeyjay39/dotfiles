@@ -1,0 +1,24 @@
+# Static information about the filesystems.
+# See fstab(5) for details.
+
+# <file system> <dir> <type> <options> <dump> <pass>
+# /dev/sdb2
+UUID=c73f128e-f39e-4287-bc69-d87dd903c8d4	/         	btrfs     	rw,relatime,compress=zstd:3,ssd,discard=async,space_cache=v2,subvol=/@	0 0
+
+# /dev/sdb2
+UUID=c73f128e-f39e-4287-bc69-d87dd903c8d4	/home     	btrfs     	rw,relatime,compress=zstd:3,ssd,discard=async,space_cache=v2,subvol=/@home	0 0
+
+# /dev/sdb2
+UUID=c73f128e-f39e-4287-bc69-d87dd903c8d4	/var/cache/pacman/pkg	btrfs     	rw,relatime,compress=zstd:3,ssd,discard=async,space_cache=v2,subvol=/@pkg	0 0
+
+# /dev/sdb2
+UUID=c73f128e-f39e-4287-bc69-d87dd903c8d4	/var/log  	btrfs     	rw,relatime,compress=zstd:3,ssd,discard=async,space_cache=v2,subvol=/@log	0 0
+
+# /dev/sdb1
+UUID=8BA6-033D      	/boot     	vfat      	rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro	0 2
+
+# /dad network fileserver
+# This may require a reboot after cifs-utils is installed
+# to get IP address:
+# ping -c1 jcpower.local   
+//192.168.1.68/D /mnt/dad-fileserver cifs credentials=/etc/samba/private/share.cred,vers=3.0,_netdev 0 0

@@ -106,3 +106,6 @@ install_with_yay_if_not_found ufw
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
 sudo ufw enable
+
+# smb
+install_with_yay_if_not_found cifs-utils
