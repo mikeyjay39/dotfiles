@@ -109,3 +109,6 @@ sudo ufw enable
 
 # smb
 install_with_yay_if_not_found cifs-utils
+
+# syncthing
+install_with_yay_if_not_found syncthing
