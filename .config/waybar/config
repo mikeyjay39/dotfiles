@@ -43,7 +43,7 @@
     "calendar": {
       "mode": "month"
     },
-    "on-click": "brave https://calendar.google.com"
+    "on-click": "brave https://calendar.proton.me/"
   },
   "cpu": {
     "format": "{usage}% ",
