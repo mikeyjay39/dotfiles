@@ -14,6 +14,12 @@ bindkey -e
 #
 eval "$(starship init zsh)"
 
+# open commands in neovim like with bash
+autoload -U edit-command-line
+zle -N edit-command-line
+bindkey '^X^E' edit-command-line
+export EDITOR=nvim
+
 # zoxide
 eval "$(zoxide init zsh)"
 
