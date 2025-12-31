@@ -43,3 +43,4 @@ fi
 source ~/.my_functions.sh
 source ~/.my_aliases.sh
 
+fastfetch

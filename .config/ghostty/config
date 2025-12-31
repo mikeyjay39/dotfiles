@@ -21,4 +21,4 @@ keybind = alt+left=goto_split:left
 keybind = alt+down=goto_split:bottom
 keybind = alt+right=goto_split:right
 keybind = ctrl+alt+shift+j=write_screen_file:open
-command = /usr/bin/bash
+command = /usr/bin/zsh
