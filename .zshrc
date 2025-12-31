@@ -43,4 +43,9 @@ fi
 source ~/.my_functions.sh
 source ~/.my_aliases.sh
 
+# nvm setup
+source /usr/share/nvm/init-nvm.sh
+nvm install 22
+nvm use 22
+
 fastfetch

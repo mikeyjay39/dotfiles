@@ -176,25 +176,7 @@ fi
 stow -d ~/dotfiles -t ~ . --adopt
 
 # nvm
-if which node >/dev/null 2>&1; then
-	echo node already installed
-else
-    # Download and install nvm:
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
-    
-    # in lieu of restarting the shell
-    \. "$HOME/.nvm/nvm.sh"
-    
-    # Download and install Node.js:
-    nvm install 22
-    
-    # Verify the Node.js version:
-    node -v # Should print "v22.16.0".
-    nvm current # Should print "v22.16.0".
-    
-    # Verify npm version:
-    npm -v # Should print "10.9.2".
-fi
+install_with_yay_if_not_found nvm
 
 npm install -g typescript
 
