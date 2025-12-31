@@ -22,7 +22,7 @@ install_with_yay_if_not_found() {
 yay -Qi $PACKAGE >/dev/null 2>&1
 
   if [ $? -eq 0 ]; then
-    echo $PACKAGE already install
+    echo $PACKAGE already installed
   else
     yay -S "$PACKAGE"
   fi
@@ -177,6 +177,9 @@ stow -d ~/dotfiles -t ~ . --adopt
 
 # nvm
 install_with_yay_if_not_found nvm
+source /usr/share/nvm/init-nvm.sh
+nvm install 22
+nvm use 22
 
 npm install -g typescript
 
