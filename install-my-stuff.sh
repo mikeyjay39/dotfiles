@@ -46,6 +46,7 @@ fi
 
 }
 
+
 install_if_not_found which
 install_if_not_found cc base-devel
 install_if_not_found fastfetch
@@ -64,10 +65,24 @@ install_if_not_round npm
 install_if_not_found rustup
 rustup component add rust-analyzer
 
+# yay
+if which yay >/dev/null 2>&1; then
+	echo yay already installed
+else
+sudo pacman -S --needed base-devel git
+git clone https://aur.archlinux.org/yay.git
+cd yay
+makepkg -si
+cd ..
+rm -rf yay
+fi
+
 # github cli tool
 install_if_not_found gh github-cli
 # gh tui
 gh extension install dlvhdr/gh-dash
+
+install_with_yay_if_not_found git-crypt
 
 install_if_not_found starship
 # for nvim telescope
@@ -117,31 +132,16 @@ ln -s /usr/share/git/completion/git-completion.bash ~/.git-completion.bash
 fi
 
 # java
-pacman -Qi openjdk21-src >/dev/null 2>&1;
-if [ $? -ne 0 ]; then
-	echo openjdk21-src already installed
-else
-sudo pacman -S openjdk21-src
-sudo archlinux-java set java-21-openjdk
-fi
-
-# yay
-if which yay >/dev/null 2>&1; then
-	echo yay already installed
-else
-sudo pacman -S --needed base-devel git
-git clone https://aur.archlinux.org/yay.git
-cd yay
-makepkg -si
-cd ..
-rm -rf yay
+install_with_yay_if_not_found openjdk21-src
+if [ archlinux-java get -ne "java-21-openjdk" ]; then
+	sudo archlinux-java set java-21-openjdk
 fi
 
 # jdtls
-install_with_aur_if_not_found jdtls
+install_with_yay_if_not_found jdtls
 
 # typescript debugger
-install_with_aur_if_not_found vscode-js-debug
+install_with_yay_if_not_found vscode-js-debug
 
 # informant
 if which informant >/dev/null 2>&1; then
