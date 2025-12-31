@@ -16,6 +16,18 @@ sudo pacman -S "$PACKAGE"
 fi
 }
 
+install_with_yay_if_not_found() {
+  local PACKAGE="$1"
+
+yay -Qi $PACKAGE >/dev/null 2>&1
+
+  if [ $? -eq 0 ]; then
+    echo $PACKAGE already install
+  else
+    yay -S "$PACKAGE"
+  fi
+}
+
 # arg 1 is name of command, arg 2 is package name
 install_with_aur_if_not_found() {
 local COMMAND="$1"
@@ -141,11 +153,25 @@ fi
 # codelldb - for rust debugging
 install_with_aur_if_not_found codelldb codelldb-bin
 
+# zoxide
+install_with_yay_if_not_found zoxide
+
 # zsh
-install_if_not_found zsh
-install_if_not_found zsh-autosuggestions 
-install_if_not_found zsh-completions
-install_if_not_found zsh-syntax-highlighting
+install_with_yay_if_not_found zsh
+install_with_yay_if_not_found zsh-autosuggestions 
+install_with_yay_if_not_found zsh-completions
+install_with_yay_if_not_found zsh-syntax-highlighting
+
+# set up my custom functions and aliases
+if [ ! -e ~/.my_functions.sh ]; then
+        ln -s ~/dotfiles/.my_functions.sh ~/.my_functions.sh
+fi
+
+source ~/.my_functions.sh
+
+if [ ! -e ~/.my_aliases.sh ]; then
+        ln -s ~/dotfiles/.my_aliases.sh ~/.my_aliases.sh
+fi
 
 stow -d ~/dotfiles -t ~ . --adopt
 

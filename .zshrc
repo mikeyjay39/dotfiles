@@ -14,6 +14,9 @@ bindkey -e
 #
 eval "$(starship init zsh)"
 
+# zoxide
+eval "$(zoxide init zsh)"
+
 zstyle ':completion:*' menu select
 
 source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
@@ -29,4 +32,8 @@ if [ -x /usr/bin/dircolors ]; then
     alias fgrep='fgrep --color=auto'
     alias egrep='egrep --color=auto'
 fi
+
+# set up my custom functions and aliases
+source ~/.my_functions.sh
+source ~/.my_aliases.sh
 

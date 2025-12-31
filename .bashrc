@@ -141,7 +141,13 @@ fastfetch
 
 eval "$(starship init bash)"
 
+# zoxide
+eval "$(zoxide init bash)"
+
+# set up my custom functions and aliases
 source ~/.my_functions.sh
+source ~/.my_aliases.sh
+
 source ~/.scripts/mount-encrypted-usb-drive.sh
 
 # Created by `pipx` on 2025-05-25 01:13:53
