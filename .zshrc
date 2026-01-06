@@ -39,6 +39,12 @@ if [ -x /usr/bin/dircolors ]; then
     alias egrep='egrep --color=auto'
 fi
 
+# Bind Ctrl + left arrow to move backward by word
+bindkey '^[[1;5D' backward-word
+
+# Bind Ctrl + right arrow to move forward by word (optional, but recommended)
+bindkey '^[[1;5C' forward-word
+
 # set up my custom functions and aliases
 source ~/.my_functions.sh
 source ~/.my_aliases.sh
