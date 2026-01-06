@@ -29,7 +29,7 @@ unmount-encrypted-usb-drive() {
 		local name="usb-drive"
 		local device="$1"
 
-		sudo umount /mnt/${name}
+		sudo umount -l /mnt/${name}
 		sudo cryptsetup close "$name"
 		sudo eject "$device"
 }

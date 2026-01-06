@@ -42,6 +42,7 @@ fi
 # set up my custom functions and aliases
 source ~/.my_functions.sh
 source ~/.my_aliases.sh
+source ~/.scripts/mount-encrypted-usb-drive.sh
 
 # nvm setup
 source /usr/share/nvm/init-nvm.sh
