@@ -59,6 +59,9 @@ install_if_not_found blueman
 sudo systemctl enable --now bluetooth
 install_if_not_found mako
 
+# audio gui for pipewire
+install_with_yay_if_not_found pavucontrol
+
 # clipboard for Neovim to work on Wayland
 install_if_not_found wl-clipboard
 
