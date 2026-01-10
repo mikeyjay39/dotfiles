@@ -4,6 +4,22 @@ return {
 		event = "VeryLazy",
 		version = false, -- Never set this value to "*"! Never!
 		opts = {
+			behaviour = {
+				enable_cursor_planning_mode = true,
+				auto_apply_diff_after_generation = false, -- don't auto-apply code changes
+				auto_approve_tool_permissions = false, -- always ask before using file tools
+			},
+
+			-- mappings = {
+			-- 	sidebar = {
+			-- 		-- pick non-Tab keys for pane switching
+			-- 		switch_windows = { normal = "<C-l>", insert = "<C-l>" },
+			-- 		reverse_switch_windows = { normal = "<C-h>", insert = "<C-h>" },
+			-- 	},
+			-- 	-- (optionally) add suggestion keymaps if you're using Avante's own auto-suggestions
+			-- 	-- suggestion = { accept = "<Tab>" },
+			-- },
+
 			-- add any opts here
 			-- for example
 			provider = "copilot",
