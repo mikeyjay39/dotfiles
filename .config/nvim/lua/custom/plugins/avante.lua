@@ -83,6 +83,7 @@ What is the current date and time in ISO 8601 format?
 						},
 						-- required for Windows users
 						use_absolute_path = true,
+						verbose = false,
 					},
 				},
 			},
