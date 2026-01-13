@@ -5,11 +5,23 @@ return {
 		version = false, -- Never set this value to "*"! Never!
 		opts = {
 			behaviour = {
-				enable_cursor_planning_mode = true,
+				-- enable_cursor_planning_mode = true,
 				auto_apply_diff_after_generation = false, -- don't auto-apply code changes
 				auto_approve_tool_permissions = false, -- always ask before using file tools
 			},
+			instructions_file = "AGENTS.md",
 
+			-- Define your reusable prompt templates (shortcuts) here
+			shortcuts = {
+				{
+					name = "time",
+					description = "Get the current date and time",
+					details = "Returns the current date and time in ISO 8601 format.",
+					prompt = [[
+What is the current date and time in ISO 8601 format?
+          ]],
+				},
+			},
 			-- mappings = {
 			-- 	sidebar = {
 			-- 		-- pick non-Tab keys for pane switching
