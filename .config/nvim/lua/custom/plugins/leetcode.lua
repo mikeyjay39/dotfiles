@@ -10,6 +10,9 @@ return {
 		opts = {
 			-- configuration goes here
 			lang = "rust",
+			storage = {
+				home = vim.fn.expand("~/leetcode-rust/src"),
+			},
 		},
 	},
 }

@@ -18,6 +18,21 @@ For these Java tools, either pull and build from source, or try installing from 
 you might need to run the install commands. 
 NOTE: In a mono-repo, you might need to open the sub-project folder in Neovim to get the tools to work.
 
+### For Leetcode in Rust
+Create directory for cargo which is specified in the rustaceanvim config:
+```
+mkdir -p ~/leetcode-rust
+cd ~/leetcode-rust
+cargo init --lib
+
+```
+
+Add this to the lib.rs file to ignore leetcode functions:
+```
+#![allow(dead_code)]
+
+```
+
 # kickstart.nvim
 
 ## Introduction
