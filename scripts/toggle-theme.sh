@@ -31,6 +31,7 @@ if [[ $NEW_THEME == "$THEME_ONE" ]]; then
   sed -i '/^\s*skin:/s/:.*/: transparent/' "$K9S_CONFIG_FILE"
   sed -i 's/cursor-color/# cursor-color/' "$CONFIG_FILE"
   sed -i 's/# background = #0C0C0C/background = #0C0C0C/' "$CONFIG_FILE"
+  sed -i 's/background-opacity = 0.60/background-opacity = 0.80/' "$CONFIG_FILE"
       # GTK
     gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
     gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
@@ -44,6 +45,7 @@ else
   sed -i '/^\s*skin:/s/:.*/: catppuccin-latte-transparent/' "$K9S_CONFIG_FILE"
   sed -i 's/# cursor-color/cursor-color/' "$CONFIG_FILE"
   sed -i 's/background = #0C0C0C/# background = #0C0C0C/' "$CONFIG_FILE"
+  sed -i 's/background-opacity = 0.80/background-opacity = 0.60/' "$CONFIG_FILE"
       # GTK
     gsettings set org.gnome.desktop.interface color-scheme 'prefer-light'
     gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita'

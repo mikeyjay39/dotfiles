@@ -1,7 +1,7 @@
 font-family = JetBrainsMono Nerd Font
-theme = TokyoNight Night
+theme = Atom One Light
 # theme = Atom One Light
-# # # cursor-color = 6689fa
+# # cursor-color = 6689fa
 # theme = tokyonight-day
 #theme = nightfox
 #theme = OneHalfDark
@@ -10,8 +10,8 @@ theme = TokyoNight Night
 # theme = Github
 # theme = GitHub-Dark-Colorblind
 # theme = GitHub-Light-Colorblind
-background = #0C0C0C
-background-opacity = 0.80
+# background = #0C0C0C
+background-opacity = 0.60
 background-blur-radius = 20
 font-size = 18
 keybind = ctrl+shift+up=scroll_page_up
