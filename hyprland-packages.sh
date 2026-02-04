@@ -85,6 +85,9 @@ install_with_aur_if_not_found timeshift-autosnap
 
 # keyboard pointer for Hyprland
 install_with_aur_if_not_found wl-kbptr 
+# NOTE: sometimes this breaks when opencv updates. To fix:
+# yay -S wl-kbptr --rebuild
+
 
 # save power on laptops
 install_if_not_found tlp
