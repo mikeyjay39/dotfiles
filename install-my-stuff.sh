@@ -46,73 +46,15 @@ fi
 
 }
 
+source ./install/install-base-packages.sh
 
-install_if_not_found which
-install_if_not_found cc base-devel
-install_if_not_found fastfetch
-install_if_not_found git
-install_if_not_found man man-db
-install_if_not_found stow
-install_if_not_found btop
-install_if_not_found nvim neovim
-install_if_not_found kubectl
-install_if_not_found k9s
-install_if_not_found psql postgresql
-install_if_not_found xclip
-install_if_not_found unzip
-install_if_not_found ghostty
-install_if_not_round npm
-install_if_not_found rustup
-rustup component add rust-analyzer
-
-# yay
-if which yay >/dev/null 2>&1; then
-	echo yay already installed
-else
-sudo pacman -S --needed base-devel git
-git clone https://aur.archlinux.org/yay.git
-cd yay
-makepkg -si
-cd ..
-rm -rf yay
-fi
-
-# github cli tool
-install_if_not_found gh github-cli
-# gh tui
-gh extension install dlvhdr/gh-dash
-
-install_with_yay_if_not_found git-crypt
-
-install_if_not_found starship
-# for nvim telescope
-install_if_not_found rg ripgrep
-# for nvim telescope. sharkdp/dp
-install_if_not_found fd
-install_if_not_found fzf
-instanll_if_not_found rustup
-install_if_not_found rust-analyzer
-
-
-if which docker >/dev/null 2>&1; then
-	echo docker already installed
-else
-install_if_not_found docker
-sudo systemctl start docker.service
-sudo systemctl enable docker.service
-sudo usermod -aG docker $USER
-newgrp docker
-fi
-
-install_if_not_found docker-compose
-
-fc-list | grep "JetBrainsMono" >/dev/null 2>&1;
-if [ $? -eq 0 ]; then
-	echo "JetBrainsMonoNerdFont alrady installed"
-else
-sudo pacman -S ttf-jetbrains-mono-nerd
-fc-cache -fv
-fi
+install_if_not_found kubectl 
+install_if_not_found k9s 
+install_if_not_found psql postgresql 
+install_if_not_found ghostty 
+install_if_not_round npm 
+install_if_not_found rustup 
+component add rust-analyzer
 
 # kaf
 if which kaf >/dev/null 2>&1; then
