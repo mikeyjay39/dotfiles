@@ -48,6 +48,8 @@ fi
 
 source ./install/install-base-packages.sh
 
+gh extension install dlvhdr/gh-dash
+
 install_if_not_found kubectl 
 install_if_not_found k9s 
 install_if_not_found psql postgresql 

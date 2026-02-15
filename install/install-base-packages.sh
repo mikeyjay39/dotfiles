@@ -47,5 +47,4 @@ yay -S --noconfirm \
 	zsh-completions\
 	zsh-syntax-highlighting
 
-gh extension install dlvhdr/gh-dash
 fc-cache -fv
