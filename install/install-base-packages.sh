@@ -49,7 +49,3 @@ yay -S --noconfirm \
 
 gh extension install dlvhdr/gh-dash
 fc-cache -fv
-systemctl start docker.service
-systemctl enable docker.service
-usermod -aG docker $USER
-newgrp docker

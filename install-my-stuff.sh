@@ -95,9 +95,6 @@ fi
 # codelldb - for rust debugging
 install_with_aur_if_not_found codelldb codelldb-bin
 
-# zoxide
-install_with_yay_if_not_found zoxide
-
 # zsh
 install_with_yay_if_not_found zsh
 install_with_yay_if_not_found zsh-autosuggestions 
@@ -115,6 +112,10 @@ if [ ! -e ~/.my_aliases.sh ]; then
         ln -s ~/dotfiles/.my_aliases.sh ~/.my_aliases.sh
 fi
 
+systemctl start docker.service
+systemctl enable docker.service
+usermod -aG docker $USER
+newgrp docker
 stow -d ~/dotfiles -t ~ . --adopt
 
 # nvm
