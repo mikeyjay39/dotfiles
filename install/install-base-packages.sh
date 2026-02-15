@@ -4,7 +4,7 @@ set -Eeuo pipefail
 # Contains basic packages needed for my main driver, for wsl, and for inside containers.
 
  pacman -Syu --noconfirm
- pacman -Syu --noconfirm \
+ pacman -S --noconfirm \
 	 base-devel \
 	 git \
 	 which
@@ -21,7 +21,7 @@ else
 	rm -rf yay
 fi
 
-yay -Syu --noconfirm \
+yay -S --noconfirm \
 	btop \
 	curl \
 	docker \
