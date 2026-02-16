@@ -9,6 +9,12 @@ compinit
 HISTFILE=~/.histfile
 HISTSIZE=1000
 SAVEHIST=1000
+setopt SHARE_HISTORY          # Share history between all sessions
+setopt APPEND_HISTORY         # Append to history file, don't overwrite
+setopt INC_APPEND_HISTORY     # Write to history file immediately, not on shell exit
+setopt HIST_IGNORE_DUPS       # Don't record duplicate consecutive commands
+setopt HIST_FIND_NO_DUPS      # Don't display duplicates when searching
+setopt HIST_REDUCE_BLANKS     # Remove superfluous blanks from history
 bindkey -e
 # End of lines configured by zsh-newuser-install
 #
