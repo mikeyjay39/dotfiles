@@ -112,7 +112,7 @@ systemctl enable docker.service
 usermod -aG docker $USER
 newgrp docker
 # stow -d ~/dotfiles -t ~ . --adopt
-source install/setup-symlinks.sh
+source ./install/setup-symlinks.sh
 
 # nvm
 install_with_yay_if_not_found nvm
