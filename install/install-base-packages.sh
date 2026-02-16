@@ -27,6 +27,7 @@ yay -S --noconfirm \
 	docker \
 	docker-compose \
 	fastfetch \
+	fontconfig \
 	fd \
 	fzf \
 	git-crypt \
