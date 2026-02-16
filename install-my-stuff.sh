@@ -49,7 +49,7 @@ fi
 source ./install/install-base-packages.sh
 source ./install/install-rust-dependencies.sh
 
-gh extension install dlvhdr/gh-dash
+# gh extension install dlvhdr/gh-dash
 
 install_if_not_found kubectl 
 install_if_not_found k9s 
@@ -94,7 +94,7 @@ else
 fi
 
 # codelldb - for rust debugging
-install_with_aur_if_not_found codelldb codelldb-bin
+# install_with_aur_if_not_found codelldb codelldb-bin
 
 # set up my custom functions and aliases
 if [ ! -e ~/.my_functions.sh ]; then
@@ -111,7 +111,8 @@ systemctl start docker.service
 systemctl enable docker.service
 usermod -aG docker $USER
 newgrp docker
-stow -d ~/dotfiles -t ~ . --adopt
+# stow -d ~/dotfiles -t ~ . --adopt
+source install/setup-symlinks.sh
 
 # nvm
 install_with_yay_if_not_found nvm
