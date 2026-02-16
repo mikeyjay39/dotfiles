@@ -47,6 +47,7 @@ fi
 }
 
 source ./install/install-base-packages.sh
+source ./install/install-rust-dependencies.sh
 
 gh extension install dlvhdr/gh-dash
 
@@ -55,8 +56,6 @@ install_if_not_found k9s
 install_if_not_found psql postgresql 
 install_if_not_found ghostty 
 install_if_not_round npm 
-install_if_not_found rustup 
-component add rust-analyzer
 
 # kaf
 if which kaf >/dev/null 2>&1; then
@@ -96,12 +95,6 @@ fi
 
 # codelldb - for rust debugging
 install_with_aur_if_not_found codelldb codelldb-bin
-
-# zsh
-install_with_yay_if_not_found zsh
-install_with_yay_if_not_found zsh-autosuggestions 
-install_with_yay_if_not_found zsh-completions
-install_with_yay_if_not_found zsh-syntax-highlighting
 
 # set up my custom functions and aliases
 if [ ! -e ~/.my_functions.sh ]; then
