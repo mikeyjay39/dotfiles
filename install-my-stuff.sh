@@ -1,4 +1,5 @@
-#!/usr/bin/sh
+#!/usr/bin/env bash
+set -Eeuo pipefail
 
 install_if_not_found() {
 local COMMAND="$1"
@@ -48,6 +49,8 @@ fi
 
 source ./install/install-base-packages.sh
 source ./install/install-rust-dependencies.sh
+source ./install/install-java-dependencies.sh
+source ./install/install-typescript-dependencies.sh
 
 # gh extension install dlvhdr/gh-dash
 
@@ -75,16 +78,16 @@ ln -s /usr/share/git/completion/git-completion.bash ~/.git-completion.bash
 fi
 
 # java
-install_with_yay_if_not_found openjdk21-src
-if [ archlinux-java get -ne "java-21-openjdk" ]; then
-	sudo archlinux-java set java-21-openjdk
-fi
+# install_with_yay_if_not_found openjdk21-src
+# if [ archlinux-java get -ne "java-21-openjdk" ]; then
+# 	sudo archlinux-java set java-21-openjdk
+# fi
 
 # jdtls
-install_with_yay_if_not_found jdtls
+# install_with_yay_if_not_found jdtls
 
 # typescript debugger
-install_with_yay_if_not_found vscode-js-debug
+# install_with_yay_if_not_found vscode-js-debug
 
 # informant
 if which informant >/dev/null 2>&1; then
