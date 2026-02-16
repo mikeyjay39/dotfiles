@@ -34,6 +34,7 @@ yay -S --noconfirm \
 	github-cli \
 	man-db \
 	neovim \
+	nvm \ # nodejs needed for copilot in neovim
 	rg \
 	ripgrep \
 	starship \
