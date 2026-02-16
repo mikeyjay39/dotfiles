@@ -7,3 +7,6 @@ pacman -S --noconfirm \
 rustup toolchain install stable
 rustup default stable
 rustup component add rust-analyzer
+
+yay -S --noconfirm \
+	codelldb-bin
