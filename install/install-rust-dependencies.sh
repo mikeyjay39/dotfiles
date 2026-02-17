@@ -2,7 +2,8 @@
 set -Eeuo pipefail
 
 pacman -S --noconfirm \
-	 rustup
+	 rustup \
+	 postgresql-libs 
 
 rustup toolchain install stable
 rustup default stable
