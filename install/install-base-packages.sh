@@ -24,7 +24,6 @@ fi
 yay -S --noconfirm \
 	btop \
 	curl \
-	cursor-cli \
 	docker \
 	docker-compose \
 	fastfetch \
