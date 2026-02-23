@@ -59,4 +59,7 @@ source ~/.scripts/mount-encrypted-usb-drive.sh
 # nvm setup
 source /usr/share/nvm/init-nvm.sh
 
+# envars
+source ~/env.zsh
+
 fastfetch
