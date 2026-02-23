@@ -60,6 +60,6 @@ source ~/.scripts/mount-encrypted-usb-drive.sh
 source /usr/share/nvm/init-nvm.sh
 
 # envars
-source ~/env.zsh
+source ~/env.sh
 
 fastfetch
