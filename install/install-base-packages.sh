@@ -40,6 +40,7 @@ yay -S --noconfirm \
 	starship \
 	stow \
 	ttf-jetbrains-mono-nerd \
+	tmux \
 	unzip \
 	wl-clipboard \
 	xclip \
