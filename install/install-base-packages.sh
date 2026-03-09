@@ -32,6 +32,7 @@ yay -S --noconfirm \
 	fzf \
 	git-crypt \
 	github-cli \
+	lsof \
 	man-db \
 	neovim \
 	nvm \
