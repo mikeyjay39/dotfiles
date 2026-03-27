@@ -7,8 +7,8 @@ compinit
 # End of lines added by compinstall
 # Lines configured by zsh-newuser-install
 HISTFILE=~/.histfile
-HISTSIZE=1000
-SAVEHIST=1000
+HISTSIZE=10000
+SAVEHIST=10000
 setopt SHARE_HISTORY          # Share history between all sessions
 setopt APPEND_HISTORY         # Append to history file, don't overwrite
 setopt INC_APPEND_HISTORY     # Write to history file immediately, not on shell exit
