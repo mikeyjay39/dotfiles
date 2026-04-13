@@ -6,6 +6,13 @@ return {
 		-- or if using mini.icons/mini.nvim
 		-- dependencies = { "echasnovski/mini.icons" },
 		opts = {
+			previewers = {
+				builtin = {
+					render_markdown = {
+						enabled = false,
+					},
+				},
+			},
 			keymap = {
 				fzf = {
 					-- This line maps Ctrl+Q to select all results and then accept them,
