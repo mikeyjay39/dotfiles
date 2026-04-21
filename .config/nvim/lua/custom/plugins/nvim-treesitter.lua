@@ -1,6 +1,7 @@
 -- Neovim 0.12+ uses nvim-treesitter `main` (see `:help nvim-treesitter` and upstream README).
 local parsers = {
 	"bash",
+	"zsh",
 	"c",
 	"diff",
 	"html",
