@@ -1,41 +1,70 @@
+-- Neovim 0.12+ uses nvim-treesitter `main` (see `:help nvim-treesitter` and upstream README).
+local parsers = {
+	"bash",
+	"c",
+	"diff",
+	"html",
+	"lua",
+	"luadoc",
+	"markdown",
+	"markdown_inline",
+	"query",
+	"vim",
+	"vimdoc",
+	"java",
+	"typescript",
+	"rust",
+}
+
+-- Filetypes that should use treesitter highlight + nvim-treesitter indent (parser names differ).
+local ts_filetypes = {
+	"bash",
+	"sh",
+	"zsh",
+	"c",
+	"diff",
+	"html",
+	"lua",
+	"markdown",
+	"query",
+	"vim",
+	"help",
+	"java",
+	"typescript",
+	"typescriptreact",
+	"rust",
+}
+
+local prepended_bins = {}
+
+local function prepend_path_bins()
+	local sep = vim.fn.has("win32") == 1 and ";" or ":"
+	for _, dir in ipairs({ vim.fn.expand("~/.local/bin"), vim.fn.expand("~/.cargo/bin") }) do
+		if not prepended_bins[dir] and vim.fn.isdirectory(dir) == 1 then
+			vim.env.PATH = dir .. sep .. vim.env.PATH
+			prepended_bins[dir] = true
+		end
+	end
+end
+
 return {
-	{ -- Highlight, edit, and navigate code
+	{
 		"nvim-treesitter/nvim-treesitter",
+		branch = "main",
+		lazy = false,
 		build = ":TSUpdate",
-		-- [[ Configure Treesitter ]] See `:help nvim-treesitter`
-		opts = {
-			ensure_installed = {
-				"bash",
-				"c",
-				"diff",
-				"html",
-				"lua",
-				"luadoc",
-				"markdown",
-				"markdown_inline",
-				"query",
-				"vim",
-				"vimdoc",
-				"java",
-				"typescript",
-				"rust",
-			},
-			-- Autoinstall languages that are not installed
-			auto_install = true,
-			highlight = {
-				enable = true,
-				-- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
-				--  If you are experiencing weird indenting issues, add the language to
-				--  the list of additional_vim_regex_highlighting and disabled languages for indent.
-				additional_vim_regex_highlighting = { "ruby" },
-			},
-			indent = { enable = true, disable = { "ruby" } },
-		},
-		-- There are additional nvim-treesitter modules that you can use to interact
-		-- with nvim-treesitter. You should go explore a few and see what interests you:
-		--
-		--    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
-		--    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
-		--    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
+		-- Before load/build so `:TSUpdate` can find `tree-sitter` (e.g. under ~/.cargo/bin).
+		init = prepend_path_bins,
+		config = function()
+			require("nvim-treesitter").install(parsers):wait(300000)
+
+			vim.api.nvim_create_autocmd("FileType", {
+				pattern = ts_filetypes,
+				callback = function()
+					vim.treesitter.start()
+					vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+				end,
+			})
+		end,
 	},
 }

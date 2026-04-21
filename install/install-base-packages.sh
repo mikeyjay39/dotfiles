@@ -21,6 +21,7 @@ else
 	rm -rf yay
 fi
 
+# tree-sitter-cli is needed now for nvim-treesitter
 yay -S --noconfirm \
 	btop \
 	curl \
@@ -40,6 +41,7 @@ yay -S --noconfirm \
 	ripgrep \
 	starship \
 	stow \
+	tree-sitter-cli \
 	ttf-jetbrains-mono-nerd \
 	tmux \
 	unzip \
