@@ -23,7 +23,6 @@ return {
 	require("custom.plugins.rustaceanvim"),
 	require("custom.plugins.smear-cursor"),
 	require("custom.plugins.smooth-cursor"),
-	require("custom.plugins.todo-comments"),
 	require("custom.plugins.typescript-tools"),
 	require("custom.plugins.which-key"),
 }

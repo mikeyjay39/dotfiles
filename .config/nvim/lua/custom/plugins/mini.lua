@@ -17,6 +17,48 @@ return {
 			-- - sr)'  - [S]urround [R]eplace [)] [']
 			require("mini.surround").setup()
 
+			-- Autopairs (replaces nvim-autopairs; works with nvim-cmp without extra hooks)
+			require("mini.pairs").setup()
+
+			-- Highlight TODO/FIXME-style words (replaces todo-comments.nvim text highlighting)
+			local hipatterns = require("mini.hipatterns")
+			hipatterns.setup({
+				highlighters = {
+					fixme = {
+						pattern = "%f[%w]()FIXME()%f[%W]",
+						group = "MiniHipatternsFixme",
+					},
+					hack = {
+						pattern = "%f[%w]()HACK()%f[%W]",
+						group = "MiniHipatternsHack",
+					},
+					todo = {
+						pattern = "%f[%w]()TODO()%f[%W]",
+						group = "MiniHipatternsTodo",
+					},
+					note = {
+						pattern = "%f[%w]()NOTE()%f[%W]",
+						group = "MiniHipatternsNote",
+					},
+					warn = {
+						pattern = "%f[%w]()WARN()%f[%W]",
+						group = "DiagnosticWarn",
+					},
+					perf = {
+						pattern = "%f[%w]()PERF()%f[%W]",
+						group = "MiniHipatternsNote",
+					},
+					test = {
+						pattern = "%f[%w]()TEST()%f[%W]",
+						group = "MiniHipatternsTodo",
+					},
+					fix = {
+						pattern = "%f[%w]()FIX()%f[%W]",
+						group = "MiniHipatternsFixme",
+					},
+				},
+			})
+
 			-- Simple and easy statusline.
 			--  You could remove this setup call if you don't like it,
 			--  and try some other statusline plugin
