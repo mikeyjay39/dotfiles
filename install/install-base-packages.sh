@@ -53,4 +53,6 @@ yay -S --noconfirm \
 	zsh-completions\
 	zsh-syntax-highlighting
 
+git config --global core.editor "nvim"
+
 fc-cache -fv
