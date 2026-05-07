@@ -24,6 +24,7 @@ fi
 # tree-sitter-cli is needed now for nvim-treesitter
 yay -S --noconfirm \
 	btop \
+	chafa \
 	curl \
 	docker \
 	docker-compose \
@@ -33,10 +34,12 @@ yay -S --noconfirm \
 	fzf \
 	git-crypt \
 	github-cli \
+	lazydocker \
 	lsof \
 	man-db \
 	neovim \
 	nvm \
+	reflector \
 	rg \
 	ripgrep \
 	starship \
