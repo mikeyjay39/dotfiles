@@ -11,6 +11,7 @@ return {
 	require("custom.plugins.diffview"),
 	require("custom.plugins.fzf-lua"),
 	require("custom.plugins.gitsigns"),
+	require("custom.plugins.img-clip"),
 	require("custom.plugins.leetcode"),
 	require("custom.plugins.mini"),
 	require("custom.plugins.neotest"),

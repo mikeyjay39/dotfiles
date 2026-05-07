@@ -64,7 +64,7 @@ return {
 				{ "<leader>l", group = "[L]SP" },
 				{ "<leader>L", group = "[L]LM", icon = { icon = "" } },
 				{ "<leader>n", group = "[N]oice", icon = { icon = "💥" } },
-				{ "<leader>p", group = "[P]roject" },
+				{ "<leader>p", group = "[P]aste image" },
 				{ "<leader>q", group = "[Q]uickfix" },
 				{ "<leader>r", group = "[R]ename" },
 				{ "<leader>s", group = "[S]earch", icon = { icon = "🔍" } },
