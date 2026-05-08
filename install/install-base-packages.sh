@@ -58,4 +58,8 @@ yay -S --noconfirm \
 
 git config --global core.editor "nvim"
 
+# reflector setup
+source ./update-reflector-fastest.sh
+systemctl enable reflector.timer
+
 fc-cache -fv
