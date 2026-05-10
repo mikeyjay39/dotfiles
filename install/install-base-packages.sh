@@ -23,6 +23,7 @@ fi
 
 # tree-sitter-cli is needed now for nvim-treesitter
 yay -S --noconfirm \
+	bind \
 	btop \
 	chafa \
 	curl \
