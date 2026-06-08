@@ -21,6 +21,9 @@ M.setup = function()
 			}),
 		},
 	})
+
+	-- After neotest-rust is fully loaded (avoid circular require with debug.lua)
+	require("custom.neotest-rust-dap-patch").apply()
 end
 
 return M
