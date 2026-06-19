@@ -14,6 +14,7 @@ local parsers = {
 	"vimdoc",
 	"java",
 	"typescript",
+	"tsx",
 	"rust",
 }
 
