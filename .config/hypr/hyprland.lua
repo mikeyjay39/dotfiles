@@ -10,38 +10,163 @@ hl.env("HYPRCURSOR_SIZE", "24")
 ----------------
 ---- MONITORS ---
 ----------------
+-- Auto-select monitor layout by connected panel descriptions.
+-- Capture unknown sets with: ~/.scripts/hypr-monitor-info.sh
 
--- NOTE: HP Monitors
--- hl.monitor({ output = "DP-1", mode = "1920x1080@59", position = "0x0", scale = 1 })
--- hl.monitor({ output = "DP-7", mode = "1920x1080@59", position = "-1920x0", scale = 1 })
--- hl.workspace_rule({ workspace = "1", monitor = "DP-7", layout = "tabbed" })
--- hl.workspace_rule({ workspace = "2", monitor = "DP-1", layout = "tabbed" })
--- hl.workspace_rule({ workspace = "3", monitor = "eDP-1", layout = "tabbed" })
+local LAPTOP_OUTPUT = "eDP-1"
 
--- NOTE: Samsung Monitors
--- hl.monitor({ output = "DP-2", mode = "1920x1200@59", position = "0x0", scale = 1 })
--- hl.monitor({ output = "DP-1", mode = "1920x1200@59", position = "-1920x0", scale = 1 })
--- hl.workspace_rule({ workspace = "1", monitor = "DP-1", layout = "tabbed" })
--- hl.workspace_rule({ workspace = "2", monitor = "DP-2", layout = "tabbed" })
--- hl.workspace_rule({ workspace = "3", monitor = "eDP-1", layout = "tabbed" })
+local function getExternalMonitors()
+	local externals = {}
+	for _, monitor in ipairs(hl.get_monitors()) do
+		if monitor.name ~= LAPTOP_OUTPUT then
+			externals[#externals + 1] = monitor
+		end
+	end
+	return externals
+end
 
--- NOTE: ASUS monitors (active)
-hl.monitor({ output = "eDP-1", mode = "1920x1080@60", position = "-1920x0", scale = 1 })
-hl.monitor({ output = "DP-1", mode = "1920x1080@59", position = "0x0", scale = 1 })
-hl.monitor({ output = "DP-2", mode = "1920x1080@59", position = "1920x0", scale = 1 })
+local function countDescriptionMatches(externals, patterns)
+	local score = 0
+	for _, monitor in ipairs(externals) do
+		for _, pattern in ipairs(patterns) do
+			if monitor.description:find(pattern, 1, true) then
+				score = score + 1
+				break
+			end
+		end
+	end
+	return score
+end
 
-hl.workspace_rule({ workspace = "1", monitor = "eDP-1", layout = "tabbed" })
-hl.workspace_rule({ workspace = "2", monitor = "DP-1", layout = "tabbed" })
-hl.workspace_rule({ workspace = "3", monitor = "DP-2", layout = "tabbed" })
-hl.workspace_rule({ workspace = "4", monitor = "eDP-1" })
-hl.workspace_rule({ workspace = "5", monitor = "DP-1" })
-hl.workspace_rule({ workspace = "6", monitor = "DP-2" })
-hl.workspace_rule({ workspace = "7", monitor = "eDP-1" })
-hl.workspace_rule({ workspace = "8", monitor = "DP-1" })
-hl.workspace_rule({ workspace = "9", monitor = "DP-2" })
-hl.workspace_rule({ workspace = "10", monitor = "eDP-1" })
-hl.workspace_rule({ workspace = "11", monitor = "DP-1" })
-hl.workspace_rule({ workspace = "12", monitor = "DP-2" })
+local function applyWorkspaceRules(monitors)
+	for workspace = 1, 3 do
+		hl.workspace_rule({ workspace = tostring(workspace), monitor = monitors[workspace], layout = "tabbed" })
+	end
+	for workspace = 4, 12 do
+		local monitor = monitors[((workspace - 1) % #monitors) + 1]
+		hl.workspace_rule({ workspace = tostring(workspace), monitor = monitor })
+	end
+end
+
+local function applySamsungLayout()
+	hl.monitor({ output = LAPTOP_OUTPUT, mode = "1920x1080@60", position = "1920x0", scale = 1 })
+	hl.monitor({ output = "DP-1", mode = "1920x1200@59", position = "-1920x0", scale = 1 })
+	hl.monitor({ output = "DP-2", mode = "1920x1200@59", position = "0x0", scale = 1 })
+	applyWorkspaceRules({ LAPTOP_OUTPUT, "DP-1", "DP-2" })
+end
+
+local function applyAsusLayout()
+	hl.monitor({ output = LAPTOP_OUTPUT, mode = "1920x1080@60", position = "-1920x0", scale = 1 })
+	hl.monitor({ output = "DP-1", mode = "1920x1080@59", position = "0x0", scale = 1 })
+	hl.monitor({ output = "DP-2", mode = "1920x1080@59", position = "1920x0", scale = 1 })
+	applyWorkspaceRules({ LAPTOP_OUTPUT, "DP-1", "DP-2" })
+end
+
+local function applyHpLayout()
+	hl.monitor({ output = "DP-1", mode = "1920x1080@59", position = "0x0", scale = 1 })
+	hl.monitor({ output = "DP-7", mode = "1920x1080@59", position = "-1920x0", scale = 1 })
+	applyWorkspaceRules({ "DP-7", "DP-1", LAPTOP_OUTPUT })
+end
+
+local function applyLaptopOnlyLayout()
+	hl.monitor({ output = LAPTOP_OUTPUT, mode = "1920x1080@60", position = "0x0", scale = 1 })
+end
+
+-- Capture descriptions per dock with: ~/.scripts/hypr-monitor-info.sh
+-- Paste the suggested lua entries below (skip eDP-1 / laptop panel).
+--
+-- HP set: auto-detected via DP-7 port. Add hpDescriptionPatterns only if
+-- you need a backup match when port names change.
+--
+-- ASUS set: add unique description substrings after docking once.
+local asusDescriptionPatterns = {
+	-- "ASUSTeK COMPUTER INC ...",
+}
+
+local hpDescriptionPatterns = {
+	-- "HP Inc ...",
+}
+
+local profiles = {
+	{
+		id = "samsung",
+		match = function(externals)
+			return countDescriptionMatches(externals, { "Samsung Electric Company SyncMaster" })
+		end,
+		apply = applySamsungLayout,
+	},
+	{
+		id = "asus",
+		match = function(externals)
+			if #asusDescriptionPatterns == 0 then
+				return 0
+			end
+			return countDescriptionMatches(externals, asusDescriptionPatterns)
+		end,
+		apply = applyAsusLayout,
+	},
+	{
+		id = "hp",
+		match = function(externals)
+			for _, monitor in ipairs(externals) do
+				if monitor.name == "DP-7" then
+					return 100
+				end
+			end
+			if #hpDescriptionPatterns == 0 then
+				return 0
+			end
+			return countDescriptionMatches(externals, hpDescriptionPatterns)
+		end,
+		apply = applyHpLayout,
+	},
+	{
+		id = "laptop",
+		match = function(externals)
+			return #externals == 0 and 1 or 0
+		end,
+		apply = applyLaptopOnlyLayout,
+	},
+}
+
+local lastAppliedProfileKey = nil
+
+local function profileKey(profileId, externals)
+	local parts = { profileId }
+	for _, monitor in ipairs(externals) do
+		parts[#parts + 1] = monitor.name .. ":" .. monitor.description
+	end
+	return table.concat(parts, "|")
+end
+
+local function applyBestMonitorProfile()
+	local externals = getExternalMonitors()
+	local bestProfile = nil
+	local bestScore = 0
+
+	for _, profile in ipairs(profiles) do
+		local score = profile.match(externals)
+		if score > bestScore then
+			bestScore = score
+			bestProfile = profile
+		end
+	end
+
+	if not bestProfile then
+		return
+	end
+
+	local key = profileKey(bestProfile.id, externals)
+	if key == lastAppliedProfileKey then
+		return
+	end
+	lastAppliedProfileKey = key
+	bestProfile.apply()
+end
+
+hl.on("monitor.added", applyBestMonitorProfile)
+hl.on("monitor.removed", applyBestMonitorProfile)
+applyBestMonitorProfile()
 
 ---------------------
 ---- MY PROGRAMS ----
