@@ -48,28 +48,56 @@ local function applyWorkspaceRules(monitors)
 	end
 end
 
+local function positionX(position)
+	return tonumber(position:match("^(-?%d+)x")) or 0
+end
+
+local function applyLayout(specs)
+	for _, spec in ipairs(specs) do
+		hl.monitor(spec)
+	end
+	local ordered = {}
+	for _, spec in ipairs(specs) do
+		ordered[#ordered + 1] = spec
+	end
+	table.sort(ordered, function(a, b)
+		return positionX(a.position) < positionX(b.position)
+	end)
+	local names = {}
+	for _, spec in ipairs(ordered) do
+		names[#names + 1] = spec.output
+	end
+	applyWorkspaceRules(names)
+end
+
 local function applySamsungLayout()
-	hl.monitor({ output = LAPTOP_OUTPUT, mode = "1920x1080@60", position = "1920x0", scale = 1 })
-	hl.monitor({ output = "DP-1", mode = "1920x1200@59", position = "-1920x0", scale = 1 })
-	hl.monitor({ output = "DP-2", mode = "1920x1200@59", position = "0x0", scale = 1 })
-	applyWorkspaceRules({ LAPTOP_OUTPUT, "DP-1", "DP-2" })
+	applyLayout({
+		{ output = "DP-1", mode = "1920x1200@59", position = "-1920x0", scale = 1 },
+		{ output = "DP-2", mode = "1920x1200@59", position = "0x0", scale = 1 },
+		{ output = LAPTOP_OUTPUT, mode = "1920x1080@60", position = "1920x0", scale = 1 },
+	})
 end
 
 local function applyAsusLayout()
-	hl.monitor({ output = LAPTOP_OUTPUT, mode = "1920x1080@60", position = "-1920x0", scale = 1 })
-	hl.monitor({ output = "DP-1", mode = "1920x1080@59", position = "0x0", scale = 1 })
-	hl.monitor({ output = "DP-2", mode = "1920x1080@59", position = "1920x0", scale = 1 })
-	applyWorkspaceRules({ LAPTOP_OUTPUT, "DP-1", "DP-2" })
+	applyLayout({
+		{ output = LAPTOP_OUTPUT, mode = "1920x1080@60", position = "-1920x0", scale = 1 },
+		{ output = "DP-1", mode = "1920x1080@59", position = "0x0", scale = 1 },
+		{ output = "DP-2", mode = "1920x1080@59", position = "1920x0", scale = 1 },
+	})
 end
 
 local function applyHpLayout()
-	hl.monitor({ output = "DP-1", mode = "1920x1080@59", position = "0x0", scale = 1 })
-	hl.monitor({ output = "DP-7", mode = "1920x1080@59", position = "-1920x0", scale = 1 })
-	applyWorkspaceRules({ "DP-7", "DP-1", LAPTOP_OUTPUT })
+	applyLayout({
+		{ output = "DP-7", mode = "1920x1080@59", position = "-1920x0", scale = 1 },
+		{ output = "DP-1", mode = "1920x1080@59", position = "0x0", scale = 1 },
+		{ output = LAPTOP_OUTPUT, mode = "1920x1080@60", position = "1920x0", scale = 1 },
+	})
 end
 
 local function applyLaptopOnlyLayout()
-	hl.monitor({ output = LAPTOP_OUTPUT, mode = "1920x1080@60", position = "0x0", scale = 1 })
+	applyLayout({
+		{ output = LAPTOP_OUTPUT, mode = "1920x1080@60", position = "0x0", scale = 1 },
+	})
 end
 
 -- Capture descriptions per dock with: ~/.scripts/hypr-monitor-info.sh
