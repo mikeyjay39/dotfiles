@@ -37,7 +37,7 @@
     "tooltip-format": "App launcher"
   },
   "clock": {
-    "timezone": "America/Los_Angeles",
+    "timezone": "Europe/Budapest",
     "format": "{:%H:%M  %d, %m}",
     "tooltip-format": "{calendar}",
     "calendar": {
@@ -68,16 +68,16 @@
       ""
     ]
   },
-"custom/weather": {
-  "exec": "/home/mikeyjay/.config/waybar/scripts/weather.sh",
-  "interval": 600,
-  "format": "{}"
-},
-"custom/currency": {
-  "exec": "/home/mikeyjay/.config/waybar/scripts/usd_huf.sh",
-  "interval": 600,
-  "format": "{}"
-},
+  "custom/weather": {
+    "exec": "/home/mikeyjay/.config/waybar/scripts/weather.sh",
+    "interval": 600,
+    "format": "{}"
+  },
+  "custom/currency": {
+    "exec": "/home/mikeyjay/.config/waybar/scripts/usd_huf.sh",
+    "interval": 600,
+    "format": "{}"
+  },
   "hyprland/workspaces": {
     "format": "{name}",
     "format-icons": {
