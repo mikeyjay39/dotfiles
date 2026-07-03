@@ -465,10 +465,9 @@ require("lazy").setup({
 				jsonls = {},
 				-- jdtls = {},
 				sqlls = {
-					capabilities = capabilities,
 					filetypes = { "sql" },
-					root_dir = function(_)
-						return vim.loop.cwd()
+					root_dir = function(_, on_dir)
+						on_dir(vim.uv.cwd())
 					end,
 				},
 				-- clangd = {},
@@ -507,7 +506,7 @@ require("lazy").setup({
 								callSnippet = "Replace",
 							},
 							-- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-							-- diagnostics = { disable = { 'missing-fields' } },
+							diagnostics = { disable = { "missing-fields" } },
 						},
 					},
 				},
@@ -521,26 +520,21 @@ require("lazy").setup({
 			--  You can press `g?` for help in this menu.
 			require("mason").setup()
 
-			-- You can add other tools here that you want Mason to install
-			-- for you, so that they are available from within Neovim.
-			local ensure_installed = vim.tbl_keys(servers or {})
-			vim.list_extend(ensure_installed, {
-				"stylua", -- Used to format Lua code
-			})
-			require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
+			for server_name, server in pairs(servers) do
+				server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
+				vim.lsp.config(server_name, server)
+			end
+
+			require("mason-tool-installer").setup({ ensure_installed = { "stylua" } })
 
 			require("mason-lspconfig").setup({
-				handlers = {
-					function(server_name)
-						-- require("lspconfig").jdtls.setup({})
-						local server = servers[server_name] or {}
-						-- This handles overriding only values explicitly passed
-						-- by the server configuration above. Useful when disabling
-						-- certain features of an LSP (for example, turning off formatting for ts_ls)
-						server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
-						require("lspconfig")[server_name].setup(server)
-					end,
-				},
+				ensure_installed = vim.tbl_keys(servers),
+				-- mason-lspconfig v2 auto-enables every Mason-installed package that
+				-- maps to an lspconfig entry. nvim-lspconfig ships an experimental
+				-- `stylua` "LSP" (cmd = { "stylua", "--lsp" }) which our stylua build
+				-- doesn't support, so it crashes with exit code 2 on every Lua file.
+				-- stylua is only used as a formatter (see conform.lua), so exclude it.
+				automatic_enable = { exclude = { "stylua" } },
 			})
 		end,
 	},
