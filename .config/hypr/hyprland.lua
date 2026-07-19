@@ -321,7 +321,7 @@ hl.animation({ leaf = "workspaces", enabled = true, speed = 7, bezier = "easeOut
 ---------------------
 hl.bind(mainMod .. " + return", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + F1", hl.dsp.exec_cmd(terminal))
-hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen({ action = "toggle" }))
+hl.bind(mainMod .. " + Z", hl.dsp.window.fullscreen({ action = "toggle" }))
 hl.bind(mainMod .. " + Q", hl.dsp.window.close())
 hl.bind(mainMod .. " + escape", hl.dsp.exit())
 hl.bind("CTRL + M", hl.dsp.exec_cmd("wl-kbptr -o modes=tile,click"))
