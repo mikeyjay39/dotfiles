@@ -346,6 +346,44 @@ hl.bind(mainMod .. " + right", hl.dsp.window.swap({ direction = "r" }))
 hl.bind(mainMod .. " + up", hl.dsp.window.swap({ direction = "u" }))
 hl.bind(mainMod .. " + down", hl.dsp.window.swap({ direction = "d" }))
 
+-- move mouse with ydotool
+local accel_script = "~/.config/hypr/mouse_accel.sh"
+hl.bind("ALT + h", hl.dsp.exec_cmd("ydotool mousemove -x -$(" .. accel_script .. ") -y 0"), { repeating = true })
+hl.bind("ALT + l", hl.dsp.exec_cmd("ydotool mousemove -x $(" .. accel_script .. ") -y 0"), { repeating = true })
+hl.bind("ALT + k", hl.dsp.exec_cmd("ydotool mousemove -x -0 -y -$(" .. accel_script .. ")"), { repeating = true })
+hl.bind("ALT + j", hl.dsp.exec_cmd("ydotool mousemove -x -0 -y $(" .. accel_script .. ")"), { repeating = true })
+
+-- Scroll Down
+hl.bind("ALT + u", hl.dsp.exec_cmd("sh -c 'ydotool mousemove -w -- 0 3'"), { repeating = true })
+
+-- Scroll Up
+hl.bind("ALT + d", hl.dsp.exec_cmd("sh -c 'ydotool mousemove -w -- 0 -3'"), { repeating = true })
+
+-- mouse left click
+hl.bind("ALT + return", hl.dsp.exec_cmd("ydotool click 0xC0"), { repeating = true })
+-- mouse right click
+hl.bind("ALT + SHIFT + return", hl.dsp.exec_cmd("ydotool click 0xC1"), { repeating = true })
+hl.bind(
+	"ALT + h + j",
+	hl.dsp.exec_cmd("ydotool mousemove -x -$(" .. accel_script .. ") -y $(" .. accel_script .. ")"),
+	{ repeating = true }
+)
+hl.bind(
+	"ALT + h + k",
+	hl.dsp.exec_cmd("ydotool mousemove -x -$(" .. accel_script .. ") -y -$(" .. accel_script .. ")"),
+	{ repeating = true }
+)
+hl.bind(
+	"ALT + l + j",
+	hl.dsp.exec_cmd("ydotool mousemove -x $(" .. accel_script .. ") -y $(" .. accel_script .. ")"),
+	{ repeating = true }
+)
+hl.bind(
+	"ALT + l + k",
+	hl.dsp.exec_cmd("ydotool mousemove -x $(" .. accel_script .. ") -y -$(" .. accel_script .. ")"),
+	{ repeating = true }
+)
+
 -- toggle between vertical and horizontal split
 hl.bind(mainMod .. " + SHIFT + T", hl.dsp.layout("togglesplit"))
 

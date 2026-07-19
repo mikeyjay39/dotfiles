@@ -118,3 +118,7 @@ install_with_yay_if_not_found cifs-utils
 
 # syncthing
 install_with_yay_if_not_found syncthing
+
+install_if_not_found ydotool
+systemctl --user enable ydotoold.service
+systemctl --user start ydotoold.service   
