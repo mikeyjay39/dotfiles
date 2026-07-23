@@ -1,8 +1,50 @@
--- If you started neovim within `~/dev/xy/project-1` this would resolve to `project-1`
-local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ":p:h:t")
 local home = os.getenv("HOME")
-local workspace_dir = home .. "/jdtls-workspace/" .. project_name
+
+-- nvim-jdtls runs `java.project.getSettings` on `language/status` ServiceReady to fill |'path'|.
+-- eclipse.jdt.ls often is not ready yet (multi-module / worktrees) and returns errors like
+-- "<service> does not exist" — harmless for LSP but noisy.
+-- true: skip that sync (recommended; LSP features unchanged; `gf` on classpath less smart)
+-- false + ms > 0: defer sync; false + 0: stock behavior (may error)
+local jdtls_skip_service_ready_sourcepath = true
+local jdtls_defer_sourcepath_ms = 0
+
+-- Prefer Maven/Gradle roots over `.git`. If `.git` wins first, jdtls uses the repo root while the
+-- Java project lives in a subdir — then java.project.getSettings can fail with "parent does not exist".
+local markers_java = {
+	"pom.xml",
+	"mvnw",
+	"gradlew",
+	"settings.gradle",
+	"build.gradle",
+	"build.gradle.kts",
+}
+local markers_flat = vim.deepcopy(markers_java)
+table.insert(markers_flat, ".git")
+
+local root_dir = vim.fs.root(0, { markers_java, ".git" })
+if not root_dir then
+	root_dir = require("jdtls.setup").find_root(markers_flat)
+end
+if not root_dir then
+	local buf = vim.api.nvim_buf_get_name(0)
+	if buf and buf ~= "" then
+		root_dir = vim.fs.dirname(buf)
+	end
+end
+if not root_dir then
+	root_dir = vim.fn.getcwd()
+end
+
+-- `-data` must match this exact project location. Using only the folder basename (e.g. fix-translator)
+-- makes different worktrees or old layouts share one Eclipse dir; metadata then references project names
+-- that are missing → java.project.getSettings fails with "<name> does not exist".
+local root_abs = vim.fn.fnamemodify(root_dir, ":p")
+local workspace_key = vim.fn.sha256(root_abs)
+local workspace_dir = home .. "/jdtls-workspace/" .. workspace_key
+vim.fn.mkdir(workspace_dir, "p")
+
 local config = {
+	name = "jdtls",
 	cmd = {
 		"/usr/lib/jvm/java-21-openjdk/bin/java",
 		"-jar",
@@ -12,7 +54,7 @@ local config = {
 		"-data",
 		workspace_dir,
 	},
-	root_dir = vim.fn.getcwd(),
+	root_dir = root_dir,
 }
 
 -- NOTE: need to run ./mwnw clean install for this
@@ -70,5 +112,28 @@ config.init_options = {
 	bundles = bundles,
 }
 
--- NOTE: uncomment this to turn on
+local orig_lsp_start = vim.lsp.start
+vim.lsp.start = function(lsp_config, start_opts)
+	if lsp_config.name == "jdtls" and lsp_config.handlers and lsp_config.handlers["language/status"] then
+		local status_h = lsp_config.handlers["language/status"]
+		lsp_config.handlers["language/status"] = function(err, result, ctx)
+			if result and result.type == "ServiceReady" then
+				if jdtls_skip_service_ready_sourcepath then
+					return
+				end
+				if jdtls_defer_sourcepath_ms > 0 then
+					vim.defer_fn(function()
+						status_h(err, result, ctx)
+					end, jdtls_defer_sourcepath_ms)
+					return
+				end
+			end
+			return status_h(err, result, ctx)
+		end
+	end
+	return orig_lsp_start(lsp_config, start_opts)
+end
+
 jdtls.start_or_attach(config)
+
+vim.lsp.start = orig_lsp_start
