@@ -15,6 +15,11 @@ background = #0C0C0C
 background-opacity = 0.8
 # background = #F5F5F5
 font-size = 18
+# Close leftover cell-fit gap under tmux status (applies to new windows)
+window-padding-x = 0
+window-padding-y = 0
+window-padding-balance = true
+window-padding-color = extend
 keybind = ctrl+shift+up=scroll_page_up
 keybind = ctrl+shift+down=scroll_page_down
 keybind = alt+up=goto_split:top
