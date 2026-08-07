@@ -34,7 +34,20 @@ What is the current date and time in ISO 8601 format?
 
 			-- add any opts here
 			-- for example
-			provider = "copilot",
+			provider = "cursor", -- ACP provider defined below; :AvanteSwitchProvider copilot to switch
+			acp_providers = {
+				cursor = {
+					command = "cursor-agent",
+					args = { "acp" },
+					auth_method = "cursor_login", -- reuses `cursor-agent login`, no API key
+					env = {
+						-- Avante spawns ACP agents with PATH only; the cursor-agent
+						-- wrapper runs under `set -u` and dereferences $HOME, so it
+						-- exits immediately without this.
+						HOME = os.getenv("HOME"),
+					},
+				},
+			},
 			-- openai = {
 			-- 	endpoint = "https://api.openai.com/v1",
 			-- 	model = "gpt-4o", -- your desired model (or use gpt-4o, etc.)
