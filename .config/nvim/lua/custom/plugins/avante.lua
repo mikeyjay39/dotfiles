@@ -3,6 +3,25 @@ return {
 		"yetone/avante.nvim",
 		event = "VeryLazy",
 		version = false, -- Never set this value to "*"! Never!
+		init = function()
+			-- Avante maps <Tab> buffer-locally in the sidebar (pane switching), which
+			-- shadows copilot.vim's global <Tab> accept map inside the input window.
+			vim.api.nvim_create_autocmd("FileType", {
+				pattern = { "AvanteInput", "AvantePromptInput" },
+				callback = function(ev)
+					if vim.fn.exists("*copilot#Accept") == 0 then
+						return
+					end
+					vim.keymap.set("i", "<C-a>", 'copilot#Accept("")', {
+						buffer = ev.buf,
+						expr = true,
+						replace_keycodes = false,
+						silent = true,
+						desc = "Accept Copilot suggestion",
+					})
+				end,
+			})
+		end,
 		opts = {
 			behaviour = {
 				-- enable_cursor_planning_mode = true,
@@ -22,15 +41,17 @@ What is the current date and time in ISO 8601 format?
           ]],
 				},
 			},
-			-- mappings = {
-			-- 	sidebar = {
-			-- 		-- pick non-Tab keys for pane switching
-			-- 		switch_windows = { normal = "<C-l>", insert = "<C-l>" },
-			-- 		reverse_switch_windows = { normal = "<C-h>", insert = "<C-h>" },
-			-- 	},
-			-- 	-- (optionally) add suggestion keymaps if you're using Avante's own auto-suggestions
-			-- 	-- suggestion = { accept = "<Tab>" },
-			-- },
+			mappings = {
+				-- sidebar = {
+				-- 	-- pick non-Tab keys for pane switching
+				-- 	switch_windows = { normal = "<C-l>", insert = "<C-l>" },
+				-- 	reverse_switch_windows = { normal = "<C-h>", insert = "<C-h>" },
+				-- },
+				-- NOTE: mappings.suggestion only takes effect when
+				-- behaviour.auto_suggestions is true; the ghost text in the input
+				-- window comes from copilot.vim, mapped in `init` below.
+				-- suggestion = { accept = "<C-a>" },
+			},
 
 			-- add any opts here
 			-- for example
