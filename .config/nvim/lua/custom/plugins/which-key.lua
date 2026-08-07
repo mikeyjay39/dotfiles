@@ -60,7 +60,7 @@ return {
 				{ "<leader>a", group = "[A]vante", mode = { "n", "v" }, icon = { icon = "🤖" } },
 				{ "<leader>c", group = "[C]ode", mode = { "n", "x" }, icon = { icon = "</>" } },
 				{ "<leader>d", group = "[D]ocument" },
-				{ "<leader>g", group = "[G]it diffview", icon = { icon = "" } },
+				{ "<leader>g", group = "[G]it", icon = { icon = "" } },
 				{ "<leader>l", group = "[L]SP" },
 				{ "<leader>L", group = "[L]LM", icon = { icon = "" } },
 				{ "<leader>n", group = "[N]oice", icon = { icon = "💥" } },

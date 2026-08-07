@@ -75,6 +75,10 @@ vim.keymap.set("n", "<leader>gm", ":DiffviewOpen origin/main <CR>", { desc = "[G
 vim.keymap.set("n", "<leader>gc", ":DiffviewClose <CR>", { desc = "[G]it diffview[C]lose" })
 vim.keymap.set("n", "<leader>gh", ":DiffviewFileHistory %<CR>", { desc = "[G]it diffview[H]istory" })
 
+-- gitsigns bindings
+vim.keymap.set("n", "<leader>gB", ":Gitsigns blame<CR>", { desc = "[G]itsigns [B]lame" })
+vim.keymap.set("n", "<leader>gb", ":Gitsigns change_base main<CR>", { desc = "[G]itsigns change [b]ase main" })
+
 -- copilot bindings
 vim.keymap.set("n", "<leader>Lo", ":CopilotChatOpen<CR>", { desc = "[L]LM [O]pen" })
 vim.keymap.set("n", "<leader>Lr", ":CopilotChatReset<CR>", { desc = "[L]LM CopilotChat[R]eset" })
