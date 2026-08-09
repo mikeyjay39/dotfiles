@@ -243,6 +243,23 @@ hl.config({
 		allow_tearing = false,
 		layout = "tabbed",
 	},
+	-- Group borders: #7aa2f7 = tmux fg=blue / TokyoNight Night palette 4
+	group = {
+		col = {
+			border_active = "rgba(7aa2f7ee)",
+			border_inactive = "rgba(595959aa)",
+			border_locked_active = "rgba(7aa2f7ee)",
+			border_locked_inactive = "rgba(595959aa)",
+		},
+		groupbar = {
+			col = {
+				active = "rgba(7aa2f7ee)",
+				inactive = "rgba(595959aa)",
+				locked_active = "rgba(7aa2f7ee)",
+				locked_inactive = "rgba(595959aa)",
+			},
+		},
+	},
 	decoration = {
 		rounding = 10,
 		rounding_power = 2,
