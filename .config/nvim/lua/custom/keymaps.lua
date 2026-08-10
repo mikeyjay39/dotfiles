@@ -134,6 +134,24 @@ vim.keymap.set("n", "<leader>ct", function()
 	vim.api.nvim_put({ timestamp }, "c", true, true)
 end, { desc = "[C] [T]timestamp" })
 
+-- Copy just the file name
+vim.keymap.set("n", "<leader>cn", function()
+	vim.fn.setreg("+", vim.fn.expand("%:t"))
+	print("Copied file name: " .. vim.fn.expand("%:t"))
+end, { desc = "[C]opy current file [n]ame" })
+
+-- Copy relative file path
+vim.keymap.set("n", "<leader>cr", function()
+	vim.fn.setreg("+", vim.fn.expand("%"))
+	print("Copied relative path: " .. vim.fn.expand("%"))
+end, { desc = "[C]opy [r]elative file path" })
+
+-- Copy absolute file path
+vim.keymap.set("n", "<leader>cf", function()
+	vim.fn.setreg("+", vim.fn.expand("%:p"))
+	print("Copied absolute path: " .. vim.fn.expand("%:p"))
+end, { desc = "[C]opy absolute [f]ile path" })
+
 -- vim.keymap.set("n", "<leader>ec", function()
 -- 	vim.api.nvim_put({ "✔" }, "c", true, true)
 -- end, { desc = "[E]moji [C]heckmark" })
