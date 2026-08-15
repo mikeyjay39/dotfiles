@@ -11,3 +11,17 @@ for command in ${HOME}/dotfiles/.cursor/commands/*; do
     ln -s "$command" "$target_link"
   fi
 done
+
+# Cursor agent notify hooks (tmux + notify-send)
+mkdir -p "${HOME}/.cursor/hooks"
+ln -sfn "${HOME}/dotfiles/.cursor/hooks.json" "${HOME}/.cursor/hooks.json"
+ln -sfn "${HOME}/dotfiles/.cursor/hooks/agent-tmux.sh" "${HOME}/.cursor/hooks/agent-tmux.sh"
+chmod +x "${HOME}/dotfiles/.cursor/hooks/agent-tmux.sh"
+
+# Claude Code hooks (same notify script); merge carefully if settings already exist
+mkdir -p "${HOME}/.claude"
+if [ ! -e "${HOME}/.claude/settings.json" ]; then
+  ln -s "${HOME}/dotfiles/.claude/settings.json" "${HOME}/.claude/settings.json"
+elif [ -L "${HOME}/.claude/settings.json" ]; then
+  ln -sfn "${HOME}/dotfiles/.claude/settings.json" "${HOME}/.claude/settings.json"
+fi

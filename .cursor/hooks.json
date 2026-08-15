@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeSubmitPrompt": [
+      {
+        "command": "./hooks/agent-tmux.sh running cursor"
+      }
+    ],
+    "stop": [
+      {
+        "command": "./hooks/agent-tmux.sh done cursor"
+      }
+    ]
+  }
+}
