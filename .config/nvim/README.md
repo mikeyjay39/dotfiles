@@ -19,19 +19,9 @@ you might need to run the install commands.
 NOTE: In a mono-repo, you might need to open the sub-project folder in Neovim to get the tools to work.
 
 ### For Leetcode in Rust
-Create directory for cargo which is specified in the rustaceanvim config:
-```
-mkdir -p ~/leetcode-rust
-cd ~/leetcode-rust
-cargo init --lib
-
-```
-
-Add this to the lib.rs file to ignore leetcode functions:
-```
-#![allow(dead_code)]
-
-```
+Rust LSP is set up automatically by the `question_enter` hook in `lua/custom/plugins/leetcode.lua`
+(writes a `Cargo.toml` for the open problem under `stdpath("data")/leetcode`). No manual crate needed.
+Use `:Leet lang rust` to switch from the TypeScript default.
 
 # kickstart.nvim
 
