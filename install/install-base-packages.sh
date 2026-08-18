@@ -57,6 +57,9 @@ yay -S --noconfirm \
 	zsh-completions\
 	zsh-syntax-highlighting
 
+# Make view PKGBUILD enabled by default
+yay --editmenu --save
+
 git config --global core.editor "nvim"
 
 # reflector setup
