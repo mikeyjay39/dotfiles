@@ -30,6 +30,16 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.cursor/hooks/agent-tmux.sh running claude"
+          }
+        ]
+      }
     ]
   }
 }
