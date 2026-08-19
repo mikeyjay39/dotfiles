@@ -3,12 +3,12 @@
   "hooks": {
     "beforeSubmitPrompt": [
       {
-        "command": "./hooks/agent-tmux.sh running cursor"
+        "command": "/bin/bash -c '\"$HOME/.cursor/hooks/agent-tmux.sh\" running cursor'"
       }
     ],
     "stop": [
       {
-        "command": "./hooks/agent-tmux.sh done cursor"
+        "command": "/bin/bash -c '\"$HOME/.cursor/hooks/agent-tmux.sh\" done cursor'"
       }
     ]
   }

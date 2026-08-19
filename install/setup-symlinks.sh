@@ -13,6 +13,10 @@ for command in ${HOME}/dotfiles/.cursor/commands/*; do
 done
 
 # Cursor agent notify hooks (tmux + notify-send)
+# The ~/.cursor/hooks.json symlink is user-level config. Command paths must still
+# be cwd-proof: a session whose workspace is $HOME loads this same file as
+# *project* hooks and runs them from ~, so ./hooks/agent-tmux.sh misses.
+# hooks.json therefore calls $HOME/.cursor/hooks/agent-tmux.sh (this symlink).
 mkdir -p "${HOME}/.cursor/hooks"
 ln -sfn "${HOME}/dotfiles/.cursor/hooks.json" "${HOME}/.cursor/hooks.json"
 ln -sfn "${HOME}/dotfiles/.cursor/hooks/agent-tmux.sh" "${HOME}/.cursor/hooks/agent-tmux.sh"
