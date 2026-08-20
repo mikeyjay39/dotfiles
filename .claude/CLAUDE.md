@@ -11,6 +11,7 @@ Write clean, maintainable code. Match the conventions already in the file/repo y
 - **No dead code:** delete unused code, commented-out blocks, and speculative "might need it later" hooks (YAGNI).
 - **Comments explain _why_,** not _what_. Code says what; comments justify non-obvious decisions.
 - **Don't over-engineer:** the simplest solution that fits the existing design wins.
+- **American English:** use American spelling in code, comments, docs, and identifiers (`color`, `initialize`, `behavior`, `canceled` — not `colour`, `initialise`, `behaviour`, `cancelled`). Follow the existing codebase if it already standardizes on another variant.
 
 ## SOLID
 
