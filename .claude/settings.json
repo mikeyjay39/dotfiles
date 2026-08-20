@@ -31,6 +31,17 @@
         ]
       }
     ],
+    "PreToolUse": [
+      {
+        "matcher": "AskUserQuestion",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.cursor/hooks/agent-tmux.sh needs-input claude"
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "hooks": [
