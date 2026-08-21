@@ -1,4 +1,5 @@
 ---
+name: clean-code
 description: Detailed clean-code and SOLID guidance with good/bad examples and a self-review checklist. Use when writing or refactoring non-trivial code, or when asked about clean code, design principles, code smells, or SOLID (SRP, OCP, LSP, ISP, DIP).
 ---
 
@@ -9,7 +10,8 @@ examples use pseudocode-ish JS/TS but the principles apply everywhere.
 
 **Golden rule:** match the conventions of the code you're editing. These principles serve
 readability and changeability; they are guidance, not dogma. When a principle and local
-convention conflict, prefer local convention and note the trade-off.
+convention conflict, prefer local convention and note the trade-off. Use American English
+spelling in code, comments, and docs (`color`, `initialize`, `behavior`).
 
 ---
 
@@ -162,7 +164,7 @@ class InvoiceMailer { send(invoice) {} }
 ### O — Open/Closed
 
 *Open to extension, closed to modification.* Add new behavior without editing the
-existing switch/if-chain.
+existing switch or if-chain.
 
 ```js
 // bad — every new shape edits this function
@@ -243,7 +245,7 @@ class OrderService {
 - **Rule of three:** tolerate duplication until you've seen the same thing three times
   and understand why it varies — then abstract.
 - **Fit the codebase:** a "cleaner" pattern that clashes with established conventions is
-  usually a net loss. Consistency beats local optimisation.
+  usually a net loss. Consistency beats local optimization.
 - **These are trade-offs, not laws.** State the trade-off when you deviate.
 
 ---

@@ -30,6 +30,6 @@ elif [ -L "${HOME}/.claude/settings.json" ]; then
   ln -sfn "${HOME}/dotfiles/.claude/settings.json" "${HOME}/.claude/settings.json"
 fi
 
-# skills
-ln -sfn "${HOME}/dotfiles/.skills" "${HOME}/dotfiles/.cursor/skills"
+# skills — single source of truth in ~/dotfiles/.skills, shared by both agents
+ln -sfn "${HOME}/dotfiles/.skills" "${HOME}/.cursor/skills"
 ln -sfn "${HOME}/dotfiles/.skills" "${HOME}/dotfiles/.claude/skills"
