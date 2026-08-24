@@ -57,6 +57,24 @@ local config = {
 	root_dir = root_dir,
 }
 
+-- Repo-local Maven settings (omskit and its worktrees).
+-- This repo pins Maven to `.mvn/settings.xml`, which sets a repo-local `<localRepository>.m2/repository`
+-- (holding the com.valstro.oms:* 1.0.0-SNAPSHOT parent + sibling modules) and the CodeArtifact mirror/auth.
+-- jdtls' m2e otherwise defaults to ~/.m2, never resolves those siblings, and imports a broken classpath —
+-- the LSP attaches but gives no completion/diagnostics (looks like "not loading"). Point m2e at it, and
+-- run the server from the repo root so the *relative* localRepository resolves to <repo>/.m2/repository.
+local repo_root = vim.fs.root(root_dir, ".mvn") or vim.fs.root(0, ".git")
+local maven_settings = repo_root and (repo_root .. "/.mvn/settings.xml")
+if maven_settings and vim.uv.fs_stat(maven_settings) then
+	config.cmd_cwd = repo_root
+	config.settings = {
+		java = {
+			configuration = { maven = { userSettings = maven_settings } },
+			import = { maven = { enabled = true } },
+		},
+	}
+end
+
 -- NOTE: need to run ./mwnw clean install for this
 -- https://github.com/microsoft/java-debug
 -- TODO: automate it in this setup
