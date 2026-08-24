@@ -6,6 +6,13 @@ return {
 		-- or if using mini.icons/mini.nvim
 		-- dependencies = { "echasnovski/mini.icons" },
 		opts = {
+			winopts = {
+				fullscreen = true,
+				preview = {
+					layout = "vertical",
+					vertical = "down:60%", -- preview below the file list (adjust % to taste)
+				},
+			},
 			previewers = {
 				builtin = {
 					render_markdown = {
