@@ -140,11 +140,21 @@ vim.keymap.set("n", "<leader>cn", function()
 	print("Copied file name: " .. vim.fn.expand("%:t"))
 end, { desc = "[C]opy current file [n]ame" })
 
--- Copy relative file path
+-- Copy file path relative to the current working directory
 vim.keymap.set("n", "<leader>cr", function()
-	vim.fn.setreg("+", vim.fn.expand("%"))
-	print("Copied relative path: " .. vim.fn.expand("%"))
-end, { desc = "[C]opy [r]elative file path" })
+	local path = vim.fn.fnamemodify(vim.fn.expand("%:p"), ":.")
+	vim.fn.setreg("+", path)
+	print("Copied relative path: " .. path)
+end, { desc = "[C]opy [r]elative file path (cwd)" })
+
+-- Copy file path relative to the git repo root (falls back to cwd)
+vim.keymap.set("n", "<leader>cR", function()
+	local abs = vim.fn.expand("%:p")
+	local root = vim.fs.root(abs, ".git")
+	local path = root and abs:sub(#root + 2) or vim.fn.fnamemodify(abs, ":.")
+	vim.fn.setreg("+", path)
+	print("Copied repo-relative path: " .. path)
+end, { desc = "[C]opy repo-[R]oot relative file path" })
 
 -- Copy absolute file path
 vim.keymap.set("n", "<leader>cf", function()
