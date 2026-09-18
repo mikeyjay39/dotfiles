@@ -9,10 +9,29 @@ local function escape_test_pattern(s)
 	return (s:gsub("[%(%)%[%]%.%*%+%-%?%$%^%/]", "\\%0"):gsub(" ", "\\s"))
 end
 
+-- Rewrite the --testNamePattern entry of a command list in place. Returns true if found.
+local function replace_test_name_pattern(list, pattern)
+	if type(list) ~= "table" then
+		return false
+	end
+	for i, arg in ipairs(list) do
+		if type(arg) == "string" and arg:match("^%-%-testNamePattern=") then
+			list[i] = "--testNamePattern=" .. pattern
+			return true
+		end
+	end
+	return false
+end
+
 -- vitest v5 joins describe/it names with " > " when matching --testNamePattern.
 -- neotest-vitest (c3c6971) still joins them with a single space, so every test nested
 -- inside a describe fails to match and is reported "skipped".
 -- Wrap build_spec to rebuild the pattern with the " > " separator.
+--
+-- The rewrite must hit two places. A normal run reads the pattern from spec.command.
+-- A debugger (DAP) run reads it from spec.strategy.args, which get_strategy_config builds
+-- as a copy of command *at build time* — so rewriting spec.command alone leaves the debug
+-- config with the old single-space pattern, and the debugger skips every nested test.
 --
 -- TEMPORARY: remove this wrapper (and call require("neotest-vitest")({...}) directly)
 -- once https://github.com/marilari88/neotest-vitest/pull/99 is merged and pulled in.
@@ -20,7 +39,7 @@ local function patch_vitest_separator(adapter)
 	local orig_build_spec = adapter.build_spec
 	adapter.build_spec = function(args)
 		local spec = orig_build_spec(args)
-		if not (spec and spec.command and args.tree) then
+		if not (spec and args.tree) then
 			return spec
 		end
 
@@ -39,11 +58,9 @@ local function patch_vitest_separator(adapter)
 			pattern = pattern .. "$"
 		end
 
-		for i, arg in ipairs(spec.command) do
-			if type(arg) == "string" and arg:match("^%-%-testNamePattern=") then
-				spec.command[i] = "--testNamePattern=" .. pattern
-				break
-			end
+		replace_test_name_pattern(spec.command, pattern)
+		if spec.strategy then
+			replace_test_name_pattern(spec.strategy.args, pattern)
 		end
 		return spec
 	end
