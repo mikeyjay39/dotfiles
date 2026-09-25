@@ -1,3 +1,12 @@
+# Writing style
+
+- Write all prose in ASD-STE100 Simplified Technical English. This includes chat replies, docs, code comments, commit messages, and PR text.
+- Keep sentences short: 20 words or fewer in procedures, 25 or fewer in descriptions. Give one instruction per sentence.
+- Use the active voice and the imperative for instructions. Use only simple verb tenses.
+- Use approved STE words, each with one meaning. Technical names (identifiers, commands, product names) are allowed.
+- Keep paragraphs to 6 sentences or fewer. Use lists for steps.
+- Do not apply STE to code identifiers or quoted text.
+
 # Coding standards
 
 Write clean, maintainable code. Match the conventions already in the file/repo you're editing.
