@@ -15,6 +15,7 @@ Discard any PR template. Do not preserve checklist sections, shout-outs, or plac
 - Do **not** invent ticket content, acceptance criteria, or tests. Ground objective and scenarios in Notion; ground entrypoint and test links in the PR diff.
 - Work from the **current working directory’s** git repository (detect remote/repo from cwd).
 - Be concise. Prefer short links and a high-level diagram over long prose.
+- Use ASD-STE100 Simplified Technmical English.
 
 ## Steps
 
