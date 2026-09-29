@@ -37,6 +37,8 @@ elif [ -L "${HOME}/.claude/settings.json" ]; then
   ln -sfn "${HOME}/dotfiles/.claude/settings.json" "${HOME}/.claude/settings.json"
 fi
 ln -sfn "${HOME}/dotfiles/.claude/CLAUDE.md" "${HOME}/.claude/CLAUDE.md"
+ln -sfn "${HOME}/dotfiles/.claude/statusline.sh" "${HOME}/.claude/statusline.sh"
+chmod +x "${HOME}/dotfiles/.claude/statusline.sh"
 
 # skills — single source of truth in ~/dotfiles/.skills, shared by both agents
 ln -sfn "${HOME}/dotfiles/.skills" "${HOME}/.cursor/skills"
