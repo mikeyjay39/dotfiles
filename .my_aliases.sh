@@ -10,4 +10,4 @@ alias history='history 0'
 alias proton-drive-docs-backup='rclone copy protondrive:file_cabinet/ /mnt/usb-drive/my_documents/file_cabinet/ --progress'
 
 # rm
-aliast rm='rm --preserve-root'
+alias rm='rm --preserve-root'
