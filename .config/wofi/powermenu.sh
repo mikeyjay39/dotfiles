@@ -2,7 +2,7 @@
 
 options=" Lock | hyprlock
  Sleep | systemctl suspend
-󰈆 Logout | hyprctl dispatch exit
+󰈆 Logout | hyprctl dispatch 'hl.dsp.exit()'
  Reboot | systemctl reboot
  Shutdown | systemctl poweroff
  Btop (System Processes) | ghostty -e btop"
