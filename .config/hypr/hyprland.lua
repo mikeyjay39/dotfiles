@@ -70,27 +70,28 @@ local function applyLayout(specs)
 	applyWorkspaceRules(names)
 end
 
+-- Keep the leftmost monitor at x = 0. awww does not draw on a monitor left of x = 0.
 local function applySamsungLayout()
 	applyLayout({
-		{ output = "DP-1", mode = "1920x1200@59", position = "-1920x0", scale = 1 },
-		{ output = "DP-2", mode = "1920x1200@59", position = "0x0", scale = 1 },
-		{ output = LAPTOP_OUTPUT, mode = "1920x1080@60", position = "1920x0", scale = 1 },
+		{ output = "DP-1", mode = "1920x1200@59", position = "0x0", scale = 1 },
+		{ output = "DP-2", mode = "1920x1200@59", position = "1920x0", scale = 1 },
+		{ output = LAPTOP_OUTPUT, mode = "1920x1080@60", position = "3840x0", scale = 1 },
 	})
 end
 
 local function applyAsusLayout()
 	applyLayout({
-		{ output = LAPTOP_OUTPUT, mode = "1920x1080@60", position = "-1920x0", scale = 1 },
-		{ output = "DP-1", mode = "1920x1080@59", position = "0x0", scale = 1 },
-		{ output = "DP-2", mode = "1920x1080@59", position = "1920x0", scale = 1 },
+		{ output = LAPTOP_OUTPUT, mode = "1920x1080@60", position = "0x0", scale = 1 },
+		{ output = "DP-1", mode = "1920x1080@59", position = "1920x0", scale = 1 },
+		{ output = "DP-2", mode = "1920x1080@59", position = "3840x0", scale = 1 },
 	})
 end
 
 local function applyHpLayout()
 	applyLayout({
-		{ output = "DP-7", mode = "1920x1080@59", position = "-1920x0", scale = 1 },
-		{ output = "DP-1", mode = "1920x1080@59", position = "0x0", scale = 1 },
-		{ output = LAPTOP_OUTPUT, mode = "1920x1080@60", position = "1920x0", scale = 1 },
+		{ output = "DP-7", mode = "1920x1080@59", position = "0x0", scale = 1 },
+		{ output = "DP-1", mode = "1920x1080@59", position = "1920x0", scale = 1 },
+		{ output = LAPTOP_OUTPUT, mode = "1920x1080@60", position = "3840x0", scale = 1 },
 	})
 end
 
@@ -212,8 +213,17 @@ hl.on("hyprland.start", function()
 	hl.exec_cmd("waybar")
 	hl.exec_cmd("hypridle")
 	hl.exec_cmd("nm-applet --indicator")
-	hl.exec_cmd('sh -c "sleep 1 && awww-daemon"')
-	hl.exec_cmd("awww img ~/.config/hypr/modules/wallpaper/bible.gif")
+	-- Start the daemon, then set the image after the daemon answers.
+	hl.exec_cmd([[sh -c 'awww-daemon &
+pid=$!
+i=0
+while [ "$i" -lt 50 ]; do
+	awww query >/dev/null 2>&1 && break
+	i=$((i + 1))
+	sleep 0.1
+done
+awww img "$HOME/.config/hypr/modules/wallpaper/bible.gif"
+wait "$pid"']])
 	hl.exec_cmd('sh -c "sleep 2 && wpctl set-volume @DEFAULT_AUDIO_SINK@ 30%"')
 	hl.exec_cmd("blueman-applet")
 end)
