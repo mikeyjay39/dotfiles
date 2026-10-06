@@ -58,5 +58,5 @@ else
 
 fi
 
-echo "Theme toggled to: $NEW_THEME. Presee Ctrl+Shift+, to apply the changes."
+echo "Theme toggled to: $NEW_THEME. Press Ctrl+Shift+, to apply the changes."
 
