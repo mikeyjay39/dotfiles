@@ -348,7 +348,9 @@ hl.animation({ leaf = "workspaces", enabled = true, speed = 7, bezier = "easeOut
 ---- KEYBINDINGS ----
 ---------------------
 hl.bind(mainMod .. " + return", hl.dsp.exec_cmd(terminal))
+-- Dell Inspiron: F1 is Mute when Fn lock is media-first. Bind both.
 hl.bind(mainMod .. " + F1", hl.dsp.exec_cmd(terminal))
+hl.bind(mainMod .. " + XF86AudioMute", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + Z", hl.dsp.window.fullscreen({ action = "toggle" }))
 hl.bind(mainMod .. " + Q", hl.dsp.window.close())
 hl.bind("CTRL + M", hl.dsp.exec_cmd("wl-kbptr -o modes=tile,click"))
