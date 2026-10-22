@@ -62,4 +62,6 @@ source /usr/share/nvm/init-nvm.sh
 # envars
 source ~/env.sh
 
-fastfetch
+# Skip in tmux: fastfetch reads terminal input and eats the commands that
+# tmux-resurrect types into restored panes
+[[ -z $TMUX ]] && fastfetch
