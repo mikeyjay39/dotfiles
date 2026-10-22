@@ -78,7 +78,16 @@ elif [[ "$state" != "off" ]]; then
   )
 fi
 
-if [[ "$do_notify" -eq 1 ]]; then
-  "$tmux_bin" display-message -d 4000 "${agent}: ${label}" 2>/dev/null || true
+[[ "$do_notify" -eq 1 ]] || exit 0
+
+message="${agent}: ${label}"
+if [[ -n "${TMUX_PANE:-}" ]]; then
+  location="$("$tmux_bin" display-message -p -t "$TMUX_PANE" '#S:#I' 2>/dev/null || true)"
+  [[ -n "$location" ]] && message="$message · $location"
 fi
+
+# Send to every client, so you see agents in background sessions too.
+while IFS= read -r client; do
+  [[ -n "$client" ]] && "$tmux_bin" display-message -c "$client" -d 4000 "$message" 2>/dev/null || true
+done < <("$tmux_bin" list-clients -F '#{client_name}' 2>/dev/null)
 exit 0
