@@ -25,5 +25,6 @@ return {
 	require("custom.plugins.smear-cursor"),
 	require("custom.plugins.smooth-cursor"),
 	require("custom.plugins.typescript-tools"),
+	require("custom.plugins.vim-obsession"),
 	require("custom.plugins.which-key"),
 }
