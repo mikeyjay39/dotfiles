@@ -35,6 +35,7 @@ yay -S --noconfirm \
 	fzf \
 	git-crypt \
 	github-cli \
+	inetutils \
 	lazydocker \
 	lsof \
 	man-db \
@@ -48,6 +49,7 @@ yay -S --noconfirm \
 	tree-sitter-cli \
 	ttf-jetbrains-mono-nerd \
 	tmux \
+	tmux-plugin-manager \
 	unzip \
 	wl-clipboard \
 	xclip \
