@@ -6,9 +6,15 @@ set -u
 
 client="${1:?client name required}"
 
+# A pane format inherits @agent-state from its window, so read the pane-local value.
 find_pane_in_state() {
-  tmux list-panes -a -F '#{pane_id} #{@agent-state}' |
-    awk -v state="$1" '$2 == state { print $1; exit }'
+  local pane
+  for pane in $(tmux list-panes -a -F '#{pane_id}'); do
+    if [[ "$(tmux show-options -pqv -t "$pane" @agent-state)" == "$1" ]]; then
+      echo "$pane"
+      return
+    fi
+  done
 }
 
 pane="$(find_pane_in_state needs-input)"
