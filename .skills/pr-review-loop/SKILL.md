@@ -16,7 +16,8 @@ Do not apply STE to code identifiers or quoted text.
 
 - Work on the PR of the current branch. If there is no open PR, stop and tell the user.
 - Commit and push each round of fixes. The user asked for this.
-- Do not merge. Do not force-push. Do not change the PR title or body.
+- Do not merge. Do not force-push. Do not change the PR title.
+- Update the PR body only when your fixes make it incorrect or incomplete. Keep its structure and change only the parts that the fixes affect.
 - The reviewer does not edit files. Only you change the code.
 
 ## Steps
@@ -24,18 +25,18 @@ Do not apply STE to code identifiers or quoted text.
 ### 1. Detect the PR
 
 ```bash
-gh pr view --json number,url,headRefName,baseRefName
+gh pr view --json number,url,headRefName,baseRefName,body
 git status --short
 ```
 
-- Record the PR number, the head branch and the base branch.
+- Record the PR number, the head branch, the base branch and the body.
 - If the working tree has changes that are not committed, stop and ask the user what to do with them.
 
 ### 2. Spawn the reviewer
 
 Spawn one subagent with a clean context. Do not give it your conversation or your opinions about the code.
 
-- Claude Code: use the Agent tool with the `general-purpose` type. Keep the agent ID for step 5.
+- Claude Code: use the Agent tool with the `general-purpose` type. Keep the agent ID for step 6.
 - Cursor: use the Task (subagent) tool.
 
 Give the reviewer this brief. Fill in the values:
@@ -62,7 +63,21 @@ If you find no issues, return exactly: NO ISSUES
 - Commit with a message that says what the fixes do. Push to the head branch.
 - Record the new commit SHA.
 
-### 5. Ask for a new review
+### 5. Update the PR body
+
+Compare the PR body with the fixes of this round.
+
+- If a fix changes the behavior, the scope, an interface or the steps to verify, update the related text in the body.
+- If the body is still correct, do not change it. Go to step 6.
+
+To update the body:
+
+1. Write the current body to a file in a temporary directory: `gh pr view <number> --json body -q .body > <file>`.
+2. Edit that file. Keep the sections and the format. Do not rewrite the parts that the fixes do not affect.
+3. Apply it: `gh pr edit <number> --body-file <file>`.
+4. Record what you changed in the body.
+
+### 6. Ask for a new review
 
 Ask the same reviewer to review again.
 
@@ -76,21 +91,22 @@ In the message, give:
 - The findings that you did not fix, and the reason for each one.
 - The same output rules: a numbered list, or exactly `NO ISSUES`.
 
-### 6. Repeat
+### 7. Repeat
 
-Do steps 3 to 5 again until the reviewer returns `NO ISSUES`.
+Do steps 3 to 6 again until the reviewer returns `NO ISSUES`.
 
 Stop and ask the user if one of these occurs:
 
 - The loop completes 5 rounds and the reviewer still finds issues.
 - The reviewer reports again a finding that you did not fix for a stated reason.
 
-### 7. Report
+### 8. Report
 
 Tell the user:
 
 - The number of rounds.
 - A table of the findings and the fixes, for each round.
 - The findings that you did not fix, and the reason for each one.
+- The changes to the PR body in each round, or "no change".
 - The results of the checks.
 - The final commit SHA and the PR URL.
