@@ -78,6 +78,9 @@ elif [[ "$state" != "off" ]]; then
   )
 fi
 
+# Show or hide the agent status line now that the state changed.
+~/.config/tmux/agent-status-lines.sh 2>/dev/null || true
+
 [[ "$do_notify" -eq 1 ]] || exit 0
 
 message="${agent}: ${label}"
