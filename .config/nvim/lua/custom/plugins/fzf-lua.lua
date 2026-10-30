@@ -20,6 +20,10 @@ return {
 					},
 				},
 			},
+			fzf_opts = {
+				-- A footer, not a header, because fzf-lua writes its own per-picker hints to the header.
+				["--footer"] = "tab/s-tab: mark row | alt-q: marked to quickfix | ctrl-q: all to quickfix | ctrl-a: toggle all",
+			},
 			keymap = {
 				fzf = {
 					-- This line maps Ctrl+Q to select all results and then accept them,
