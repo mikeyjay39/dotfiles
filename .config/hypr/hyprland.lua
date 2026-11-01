@@ -213,6 +213,8 @@ hl.on("hyprland.start", function()
 	hl.exec_cmd("waybar")
 	hl.exec_cmd("hypridle")
 	hl.exec_cmd("nm-applet --indicator")
+	-- Mirror Hyprland's runtime log into ~/.local/state/hyprland/logs/.
+	hl.exec_cmd("~/.scripts/hypr-durable-log.sh")
 	-- Start the daemon, then set the image after the daemon answers.
 	hl.exec_cmd([[sh -c 'awww-daemon &
 pid=$!
@@ -241,6 +243,12 @@ hl.config({
 ---- LOOK AND FEEL ----
 -----------------------
 hl.config({
+	-- Keep logs for crash triage. Runtime log dies with the session.
+	-- stdout also goes to the journal. A mirror script copies the file log.
+	debug = {
+		disable_logs = false,
+		enable_stdout_logs = true,
+	},
 	general = {
 		gaps_in = 2,
 		gaps_out = 2,
