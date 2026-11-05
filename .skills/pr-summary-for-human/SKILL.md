@@ -20,7 +20,7 @@ Write all prose in ASD-STE100 Simplified Technical English. Do not apply STE to 
 ## Guardrails
 
 - Make one write only: a single general comment, with `gh pr comment`. Do not approve, request changes, add line comments, commit, push or change the code.
-- Post as soon as the comment is written. The user does not want to see a draft first.
+- Post as soon as the comment is written and every diagram renders (step 6). The user does not want to see a draft first.
 - The target must have an open PR. If it has none, stop and tell the user.
 - Every claim must come from code you read. Give a link for each review item, each risk, and each after sequence or activity diagram.
 - Say in the comment what you did not verify (for example, you did not run the tests).
@@ -63,11 +63,16 @@ A diff alone hides the execution path. For each changed production file:
   - `sequenceDiagram` for the end-to-end path across components.
   - `flowchart` (activity) for a decision function (guards, branches, outcomes).
   - `classDiagram` for a change to the domain model or state shape.
-  - Highlight new or risky nodes with `style <id> stroke:<color>,stroke-width:2px`.
+  - Highlight new or risky parts. The syntax is different for each diagram type:
+    - `flowchart`: `style <id> stroke:<color>,stroke-width:2px`.
+    - `sequenceDiagram`: put the new messages in a `rect rgba(<r>, <g>, <b>, 0.15)` … `end` block. A sequence diagram has no `style` statement, and a `style` line breaks the whole diagram.
+  - Do not put a `;` in a sequence-diagram message or note. Mermaid reads it as the end of the line. Write "then" or "," in its place.
 - **New-behavior locations:** for each **after** `sequenceDiagram` and `flowchart`, record the `path:line` (or line range) on the new side where the new behavior is. Use one location per new step or branch that matters, usually 1 to 3.
 - **Outcome table:** when the change alters results, show each input case with its before and after result.
 - **Review focus:** 4 to 8 places, in priority order, each with `path:line` or a line range, what to check, and why. Mark the 2 or 3 highest-risk places.
-- **Trade-offs:** one row per major decision with the gains and the costs. Name the non-functional attribute for each one: correctness, consistency, performance, availability, storage, compatibility, rollback, operability, maintainability, security.
+- **Trade-offs:** one row per major decision. For each decision, name the non-functional requirement that it optimizes and the one that it sacrifices. Use the list: correctness, consistency, performance, scalability, availability, storage, compatibility, rollback, operability, maintainability, security. Add a short qualifier when one word is not clear (for example, "Performance (load on Redis)" against "Performance (CPU)").
+  - A decision always has a cost. If you can not find the requirement that it sacrifices, read the code again. Do not leave the cell empty.
+  - The two requirements can have the same name with different qualifiers. Example: "Correctness (step membership)" is optimized, and "Correctness (delivered rate)" is sacrificed.
 - **Risks and gaps:** one row per item with severity (High, Medium, Low), what it is, where it is and why. Include migration, deploy, rollback, data-change and test-coverage risks. Include mismatches between the commit or PR text and the code.
 - **Questions for the author:** the open points you can not settle from the code.
 
@@ -116,6 +121,10 @@ Write the comment to `<scratchpad>/pr-<n>-summary.md`, or to `${TMPDIR:-/tmp}/pr
      What to check, and why.
   ```
 
+- Start the trade-offs section with the line "Each row names the non-functional requirement that the decision optimizes (⬆️) and the one that it sacrifices (⬇️)." Then use these columns, in this order:
+
+  `| Decision | ⬆️ Optimizes | Gain | ⬇️ Sacrifices | Cost |`
+
 - In the risks table, make each `path:line` in the "Where / why" cell a link.
 - Make each table a Markdown pipe table. Escape a literal `|` in a cell as `\|`.
 - Show severity with emoji: 🔴 High, 🟠 Medium, ⚪ Low. Mark the highest-risk review items with 🔴.
@@ -123,7 +132,46 @@ Write the comment to `<scratchpad>/pr-<n>-summary.md`, or to `${TMPDIR:-/tmp}/pr
 - End with a `### Not verified` list.
 - Check the length with `wc -c`. GitHub rejects a comment longer than 65,536 characters. If it is longer than 65,000, ask the user which sections to remove.
 
-### 6. Post and open
+### 6. Check that each diagram renders
+
+GitHub shows a parse error in place of a diagram that Mermaid can not read. Render each diagram before you post. Do not post until all of them render.
+
+1. Put each ` ```mermaid ` block in its own file:
+
+   ````bash
+   mkdir -p <scratchpad>/mmd && rm -f <scratchpad>/mmd/*
+   awk -v d=<scratchpad>/mmd '/^```mermaid/{n++; f=sprintf("%s/d%02d.mmd",d,n); inb=1; next} /^```/{if(inb){inb=0; close(f)}; next} inb{print > f}' <file>
+   ````
+
+2. Find a local Chrome for mermaid-cli. Its own pinned Chrome is often not installed:
+
+   ```bash
+   find ~/.cache/puppeteer -type f \( -name chrome-headless-shell -o -name chrome \) | sort | tail -1
+   ```
+
+   Write `<scratchpad>/puppeteer.json` with that path: `{"executablePath":"<path>","args":["--no-sandbox"]}`. If no Chrome is found, run `pnpm dlx puppeteer browsers install chrome-headless-shell`.
+
+3. Render each file. A parse error gives a non-zero exit code and the failed line:
+
+   ```bash
+   for f in <scratchpad>/mmd/d*.mmd; do
+     pnpm dlx @mermaid-js/mermaid-cli@11.4.2 -q -p <scratchpad>/puppeteer.json -i "$f" -o "${f%.mmd}.svg" 2>&1 | grep -A3 'Error:' && echo "$f FAIL" || echo "$f OK"
+   done
+   ```
+
+4. For each failed diagram, fix the block in `<file>`. Then do steps 1 and 3 again, until every diagram is OK. Common causes:
+   - A `style` line in a `sequenceDiagram`. Use a `rect` block.
+   - A `;` in a sequence message. It ends the line.
+   - A `"`, `(`, `{` or `[` in a flowchart node label with no quotes. Put the label in quotes: `A["label (x)"]`.
+   - A `classDiagram` member with `<` or `>`. Use `~T~` for a generic type.
+
+If a posted comment has a broken diagram, fix the file, do steps 1 to 4, and then edit the comment in place. Do not post a second comment:
+
+```bash
+gh api -X PATCH repos/<owner>/<repo>/issues/comments/<comment id> -F body=@<file> -q .html_url
+```
+
+### 7. Post and open
 
 ```bash
 gh pr comment <n> --body-file <file>    # prints the comment URL
@@ -139,7 +187,7 @@ command -v xdg-open && xdg-open "<url>"           # Linux
 
 `explorer.exe` returns exit code 1 when it succeeds. Do not treat that as a failure.
 
-### 7. Report
+### 8. Report
 
 In the reply, give:
 
