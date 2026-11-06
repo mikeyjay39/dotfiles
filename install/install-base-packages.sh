@@ -52,6 +52,7 @@ yay -S --noconfirm \
 	tmux-plugin-manager \
 	unzip \
 	wl-clipboard \
+	worktrunk \
 	xclip \
 	zoxide \
 	zsh \
