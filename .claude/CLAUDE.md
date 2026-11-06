@@ -24,7 +24,7 @@ Write clean, maintainable code. Match the conventions already in the file/repo y
 
 ## SOLID
 
-- **S — Single Responsibility:** a module/class/function has one reason to change.
+- **S — Single Responsibility:** a module or class is responsible to one actor — one person or group who asks for its changes. Do not split code that the same actor changes together. ("Do one thing" is a separate rule for functions.)
 - **O — Open/Closed:** open to extension, closed to modification — add behavior without editing existing code.
 - **L — Liskov Substitution:** subtypes must be usable anywhere their base type is, without surprises.
 - **I — Interface Segregation:** many small, focused interfaces beat one fat one; don't force clients to depend on methods they don't use.

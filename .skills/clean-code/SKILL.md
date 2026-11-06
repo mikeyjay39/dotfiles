@@ -59,6 +59,9 @@ function sumAmounts(orders) { return orders.reduce((sum, o) => sum + parseCents(
 If you're adding a comment to label a "section" of a function, that section wants to be
 its own function.
 
+This rule is about functions. It does not justify more classes, files, or components —
+for those, see SRP and the cohesion guardrail below.
+
 ### Guard clauses over nesting
 
 Return/throw early so the happy path stays flat.
@@ -142,24 +145,45 @@ today's requirement, not an imagined future one.
 
 ### S — Single Responsibility
 
-*A unit has one reason to change.* Separate distinct concerns.
+*A module is responsible to one, and only one, actor.* An actor is a person or group of
+stakeholders who ask for changes. "Reason to change" means *actor* — not "concern",
+"task", or "technical layer".
+
+SRP is **not** "do one thing". That rule is for functions. A class with many methods that
+all serve one actor obeys SRP.
 
 ```js
-// bad — one class formats, persists, and emails
-class Invoice {
-  render() {/* html */}
-  save() {/* db */}
-  email() {/* smtp */}
+// bad — three actors share one class
+class Employee {
+  calculatePay() {}  // CFO / accounting
+  reportHours() {}   // COO / HR
+  save() {}          // CTO / DBAs
 }
 
-// good — split by reason to change
-class Invoice {}
-class InvoiceRenderer { render(invoice) {} }
-class InvoiceRepository { save(invoice) {} }
-class InvoiceMailer { send(invoice) {} }
+// good — split by actor
+class PayCalculator { calculatePay(employee) {} }
+class HourReporter  { reportHours(employee) {} }
+class EmployeeRepository { save(employee) {} }
 ```
 
-**Why:** a change to email delivery no longer risks breaking rendering or persistence.
+```js
+// bad — over-split: accounting owns all of these rules and changes them together
+class PayCalculator      { calculate(e) {} }
+class OvertimeCalculator { calculate(e) {} }
+class TaxCalculator      { calculate(e) {} }
+
+// good — one actor, one module
+class PayCalculator {
+  calculatePay(employee) {}
+  overtime(employee) {}
+  tax(employee) {}
+}
+```
+
+**Test:** ask "who asks for this to change?" If two parts have the same answer and change
+together, keep them together.
+
+**Why:** a change requested by one actor cannot break code that another actor depends on.
 
 ### O — Open/Closed
 
@@ -242,6 +266,9 @@ class OrderService {
 
 - **YAGNI / KISS:** the simplest thing that satisfies the requirement wins. Don't add
   layers, interfaces, or config for hypothetical needs.
+- **Cohesion (Common Closure):** keep together what changes together, for the same
+  actor, at the same time. A new class, file, or component needs a different actor or a
+  real second caller. Indirection with one caller is a cost, not a benefit.
 - **Rule of three:** tolerate duplication until you've seen the same thing three times
   and understand why it varies — then abstract.
 - **Fit the codebase:** a "cleaner" pattern that clashes with established conventions is
@@ -260,8 +287,9 @@ Before finishing a change, skim it and ask:
 - [ ] Is any duplication *genuine* — or would abstracting it couple unrelated things?
 - [ ] Are errors handled or propagated deliberately (nothing swallowed)?
 - [ ] Do comments explain *why*, and is there no commented-out/dead code left?
-- [ ] Does each unit have a single reason to change (SRP)?
+- [ ] Is each module responsible to one actor (SRP)?
+- [ ] Did I split anything that the same actor changes together (cohesion)?
 - [ ] Can new cases be added without editing existing logic (OCP)?
-- [ ] Do subtypes honour their base type's contract (LSP)?
+- [ ] Do subtypes honor their base type's contract (LSP)?
 - [ ] Are interfaces focused, and dependencies injected against abstractions (ISP/DIP)?
 - [ ] Is this the simplest solution that fits the existing design (YAGNI/KISS)?
