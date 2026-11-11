@@ -67,6 +67,13 @@ A diff alone hides the execution path. For each changed production file:
     - `flowchart`: `style <id> stroke:<color>,stroke-width:2px`.
     - `sequenceDiagram`: put the new messages in a `rect rgba(<r>, <g>, <b>, 0.15)` … `end` block. A sequence diagram has no `style` statement, and a `style` line breaks the whole diagram.
   - Do not put a `;` in a sequence-diagram message or note. Mermaid reads it as the end of the line. Write "then" or "," in its place.
+  - Keep each line of a label to 24 characters or fewer. GitHub cuts off longer lines, and the render check in step 6 does not show it. Split a longer label with `<br/>`. This rule applies to:
+    - flowchart node and edge text: `A["Add lib to<br/>package.json"]`
+    - participant names: `participant G as injected-lib-paths<br/>generator`
+    - sequence messages and notes: `P->>R: map exports<br/>to entry points`
+    - `loop`, `alt`, `else` and `opt` labels
+  - Split a long identifier at a word boundary, for example `injectedLib<br/>EntryPoints`.
+  - Give each participant a short alias, and put the long name after `as`.
 - **New-behavior locations:** for each **after** `sequenceDiagram` and `flowchart`, record the `path:line` (or line range) on the new side where the new behavior is. Use one location per new step or branch that matters, usually 1 to 3.
 - **Outcome table:** when the change alters results, show each input case with its before and after result.
 - **Review focus:** 4 to 8 places, in priority order, each with `path:line` or a line range, what to check, and why. Mark the 2 or 3 highest-risk places.
@@ -134,7 +141,7 @@ Write the comment to `<scratchpad>/pr-<n>-summary.md`, or to `${TMPDIR:-/tmp}/pr
 
 ### 6. Check that each diagram renders
 
-GitHub shows a parse error in place of a diagram that Mermaid can not read. Render each diagram before you post. Do not post until all of them render.
+GitHub shows a parse error in place of a diagram that Mermaid can not read. GitHub also cuts off a long label line. Check each diagram before you post. Do not post until all of them render and the length check prints nothing.
 
 1. Put each ` ```mermaid ` block in its own file:
 
@@ -143,7 +150,28 @@ GitHub shows a parse error in place of a diagram that Mermaid can not read. Rend
    awk -v d=<scratchpad>/mmd '/^```mermaid/{n++; f=sprintf("%s/d%02d.mmd",d,n); inb=1; next} /^```/{if(inb){inb=0; close(f)}; next} inb{print > f}' <file>
    ````
 
-2. Find a local Chrome for mermaid-cli. Its own pinned Chrome is often not installed:
+2. Check the length of each label line. The check prints each line longer than 24 characters, with its file and line number. No output means all labels are OK:
+
+   ```bash
+   for f in <scratchpad>/mmd/d*.mmd; do
+     awk -v f="$f" -v max=24 '
+       function check(label,  n, parts, i) {
+         n = split(label, parts, /<br\/?>/)
+         for (i = 1; i <= n; i++)
+           if (length(parts[i]) > max) printf "%s:%d: %d chars: %s\n", f, NR, length(parts[i]), parts[i]
+       }
+       /^[[:space:]]*(style|classDef|linkStyle|rect|end|%%)/ { next }
+       /"/ { s = $0; while (match(s, /"[^"]*"/)) { check(substr(s, RSTART + 1, RLENGTH - 2)); s = substr(s, RSTART + RLENGTH) }; next }
+       /^[[:space:]]*(loop|alt|else|opt|par|critical) / { t = $0; sub(/^[[:space:]]*[a-z]+ /, "", t); check(t); next }
+       / as / { t = $0; sub(/.* as /, "", t); check(t); next }
+       /: / { t = $0; sub(/^[^:]*: /, "", t); check(t) }
+     ' "$f"
+   done
+   ```
+
+   For each line that it prints, split the label in `<file>` with `<br/>`. Then do steps 1 and 2 again.
+
+3. Find a local Chrome for mermaid-cli. Its own pinned Chrome is often not installed:
 
    ```bash
    find ~/.cache/puppeteer -type f \( -name chrome-headless-shell -o -name chrome \) | sort | tail -1
@@ -151,7 +179,7 @@ GitHub shows a parse error in place of a diagram that Mermaid can not read. Rend
 
    Write `<scratchpad>/puppeteer.json` with that path: `{"executablePath":"<path>","args":["--no-sandbox"]}`. If no Chrome is found, run `pnpm dlx puppeteer browsers install chrome-headless-shell`.
 
-3. Render each file. A parse error gives a non-zero exit code and the failed line:
+4. Render each file. A parse error gives a non-zero exit code and the failed line:
 
    ```bash
    for f in <scratchpad>/mmd/d*.mmd; do
@@ -159,13 +187,13 @@ GitHub shows a parse error in place of a diagram that Mermaid can not read. Rend
    done
    ```
 
-4. For each failed diagram, fix the block in `<file>`. Then do steps 1 and 3 again, until every diagram is OK. Common causes:
+5. For each failed diagram, fix the block in `<file>`. Then do steps 1, 2 and 4 again, until every diagram is OK. Common causes:
    - A `style` line in a `sequenceDiagram`. Use a `rect` block.
    - A `;` in a sequence message. It ends the line.
    - A `"`, `(`, `{` or `[` in a flowchart node label with no quotes. Put the label in quotes: `A["label (x)"]`.
    - A `classDiagram` member with `<` or `>`. Use `~T~` for a generic type.
 
-If a posted comment has a broken diagram, fix the file, do steps 1 to 4, and then edit the comment in place. Do not post a second comment:
+If a posted comment has a broken diagram or a cut-off label, fix the file, do steps 1 to 5, and then edit the comment in place. Do not post a second comment:
 
 ```bash
 gh api -X PATCH repos/<owner>/<repo>/issues/comments/<comment id> -F body=@<file> -q .html_url
