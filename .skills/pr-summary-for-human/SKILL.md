@@ -1,6 +1,6 @@
 ---
 name: pr-summary-for-human
-description: Posts a review summary of a PR as a general comment, and opens the comment in the browser. The summary has before and after Mermaid UML diagrams of each use case's execution path, the critical code to review, the trade-offs of the major decisions in non-functional terms, and the risks and gaps. Each review item, and each after sequence or activity diagram, links to its lines in the PR's Files changed tab. It does not approve or request changes. Use when asked to summarize a PR for review, or to diagram the before and after of a PR.
+description: Posts a review summary of a PR as a general comment, and opens the comment in the browser. The summary has before and after Mermaid UML diagrams of each use case's execution path, with a short reason for each after change, the critical code to review, the trade-offs of the major decisions in non-functional terms, and the risks and gaps. Each review item, and each after sequence or activity diagram, links to its lines in the PR's Files changed tab. It does not approve or request changes. Use when asked to summarize a PR for review, or to diagram the before and after of a PR.
 ---
 
 # PR Summary For Human
@@ -12,6 +12,10 @@ The user's original instructions:
 And the later change:
 
 > Instead of making an html page let's just post the summary as a general comment on the PR without approving or blocking. Add links to the items under critical areas to review that jump to referenced area of code in the files changed section. Similarly for the UML diagrams, if they are activity or sequence diagrams then please add a link to line under files changes where I can find the new behavior.
+
+And the next change:
+
+> Add a brief 1-2 sentence explanation for each "after" uml diagram explaining why the new behavior change was made and why it is necessary.
 
 The target is in `$ARGUMENTS`: a PR number, a PR URL, a branch name, or nothing. Nothing means the PR of the current branch.
 
@@ -75,6 +79,9 @@ A diff alone hides the execution path. For each changed production file:
   - Split a long identifier at a word boundary, for example `injectedLib<br/>EntryPoints`.
   - Give each participant a short alias, and put the long name after `as`.
 - **New-behavior locations:** for each **after** `sequenceDiagram` and `flowchart`, record the `path:line` (or line range) on the new side where the new behavior is. Use one location per new step or branch that matters, usually 1 to 3.
+- **Why the change:** for each **after** diagram of every type, write 1 or 2 sentences. Say why the PR makes the new behavior, and why it is necessary. Name the problem, bug or requirement that the before behavior does not meet.
+  - Take the reason from the PR body, the commit messages, the linked ticket or issue, or the code and tests.
+  - If no source states the reason, write the most likely reason and mark it "(inferred)". Then add a question for the author.
 - **Outcome table:** when the change alters results, show each input case with its before and after result.
 - **Review focus:** 4 to 8 places, in priority order, each with `path:line` or a line range, what to check, and why. Mark the 2 or 3 highest-risk places.
 - **Trade-offs:** one row per major decision. For each decision, name the non-functional requirement that it optimizes and the one that it sacrifices. Use the list: correctness, consistency, performance, scalability, availability, storage, compatibility, rollback, operability, maintainability, security. Add a short qualifier when one word is not clear (for example, "Performance (load on Redis)" against "Performance (CPU)").
@@ -117,7 +124,11 @@ Write the comment to `<scratchpad>/pr-<n>-summary.md`, or to `${TMPDIR:-/tmp}/pr
 - Next, write a short list of what the PR does.
 - Put each diagram in a ` ```mermaid ` fence. GitHub renders Mermaid.
 - Put each diagram in its own `<details open><summary><strong>Before</strong></summary>` … `</details>` block. Put an empty line after `<summary>` and before `</details>`. GitHub does not support side-by-side columns.
-- In each **after** `sequenceDiagram` or `flowchart` block, below the fence and before `</details>`, add one line per location:
+- In each **after** block of every diagram type, below the fence and before `</details>`, add the reason first:
+
+  `**Why:** <1 or 2 sentences>`
+
+- In each **after** `sequenceDiagram` or `flowchart` block, below the `**Why:**` line, add one line per location:
 
   `**New behavior:** [path:line](link): <what the code does there>`
 
