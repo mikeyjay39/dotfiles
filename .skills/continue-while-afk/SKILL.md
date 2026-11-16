@@ -17,7 +17,8 @@ Use this skill only in a session that runs `control-agent` and has worker tmux s
 
 ## Goal and stop condition
 
-A work item is **done** when its PR is open and every check passes. Check it with:
+A work item is **done** when its PR is open and every check passes. The human
+merges that PR later. The controller does **not** merge it. Check it with:
 
 ```bash
 gh pr view <pr> --json state,statusCheckRollup
@@ -36,7 +37,9 @@ Each check must be `SUCCESS`, `SKIPPED` or `NEUTRAL`. The only other end state i
 
 These rules do not change while the human is away:
 
-- Never merge a PR.
+- Never merge a PR. This includes story → feature, story → a stacked base,
+  feature → `main`, and any other merge. Do not run `gh pr merge`. Leave PRs
+  open for the human to review and merge.
 - Never force-push to `main` or to a shared branch.
 - Do no destructive or irreversible operation. Examples: delete a branch or data, deploy to production, change a secret, rewrite pushed history on a shared branch.
 - Limit outward-facing output to PR creation, PR comments, and PR body updates.
@@ -69,7 +72,7 @@ Use the watch loop of `control-agent`, with these additions:
 
 - **A PR opens.** Post the decision records of that work item on the PR. Watch its checks. The worker releases its slot, so start the next queued worker.
 - **A check fails.** Put the owner worker first in the queue. When it has a slot, tell it to fix the failure. If the failure looks flaky (infrastructure, a timeout, or a test that the change does not touch), run it again one time with `gh run rerun <run-id> --failed`.
-- **A blocker is not merged.** Decide for each blocked work item, and record the decision. The recommended option is to base the branch on the blocker's branch and open a stacked PR against it.
+- **A blocker is not merged.** Decide for each blocked work item, and record the decision. The recommended option is to base the branch on the blocker's branch and open a stacked PR against it. Do **not** merge the blocker (or the stacked PR) to unblock work. The human merges both later.
 - **Park a work item. Do not stop the loop.** Park a work item when one of these is true:
   - It needs something that only the human can give, such as credentials, access, or a destructive operation.
   - The same check fails 3 times after fixes.
