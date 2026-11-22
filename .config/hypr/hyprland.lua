@@ -38,13 +38,27 @@ local function countDescriptionMatches(externals, patterns)
 	return score
 end
 
+-- Map workspaces across monitors left-to-right by modulo:
+-- workspace n -> monitors[((n - 1) % #monitors) + 1]
+-- With 3 monitors: 1,4,7,10 -> mon1; 2,5,8,11 -> mon2; 3,6,9,12 -> mon3.
 local function applyWorkspaceRules(monitors)
-	for workspace = 1, 3 do
-		hl.workspace_rule({ workspace = tostring(workspace), monitor = monitors[workspace], layout = "tabbed" })
+	local n = #monitors
+	if n == 0 then
+		return
 	end
-	for workspace = 4, 12 do
-		local monitor = monitors[((workspace - 1) % #monitors) + 1]
-		hl.workspace_rule({ workspace = tostring(workspace), monitor = monitor })
+	for workspace = 1, 12 do
+		local index = ((workspace - 1) % n) + 1
+		local rule = {
+			workspace = tostring(workspace),
+			monitor = monitors[index],
+		}
+		if workspace <= n then
+			rule.default = true
+		end
+		if workspace <= 3 then
+			rule.layout = "tabbed"
+		end
+		hl.workspace_rule(rule)
 	end
 end
 
@@ -107,9 +121,10 @@ end
 -- HP set: auto-detected via DP-7 port. Add hpDescriptionPatterns only if
 -- you need a backup match when port names change.
 --
--- ASUS set: add unique description substrings after docking once.
+-- ASUS set: unique description substrings from hypr-monitor-info.sh.
 local asusDescriptionPatterns = {
-	-- "ASUSTeK COMPUTER INC ...",
+	"ASUS VE278",
+	"DELL E248WFP",
 }
 
 local hpDescriptionPatterns = {
@@ -155,6 +170,24 @@ local profiles = {
 			return #externals == 0 and 1 or 0
 		end,
 		apply = applyLaptopOnlyLayout,
+	},
+	-- Low-score fallback: keep current positions, still apply modulo workspace rules.
+	{
+		id = "generic",
+		match = function(externals)
+			return #externals
+		end,
+		apply = function()
+			local current = hl.get_monitors()
+			table.sort(current, function(a, b)
+				return a.x < b.x
+			end)
+			local names = {}
+			for _, monitor in ipairs(current) do
+				names[#names + 1] = monitor.name
+			end
+			applyWorkspaceRules(names)
+		end,
 	},
 }
 
