@@ -85,8 +85,10 @@ install_with_aur_if_not_found timeshift-autosnap
 
 # keyboard pointer for Hyprland
 install_with_aur_if_not_found wl-kbptr 
-# NOTE: sometimes this breaks when opencv updates. To fix:
-# yay -S wl-kbptr --rebuild
+# NOTE: AUR v0.4.1 still needs opencv4. After OpenCV upgrades, rebuild from main:
+#   edit ~/.cache/yay/wl-kbptr/PKGBUILD to use git+https://github.com/moverest/wl-kbptr.git
+#   then: cd ~/.cache/yay/wl-kbptr && makepkg -si
+# Upstream OpenCV 5 fix is on main (no release yet). See AUR comments / PR #104.
 
 
 # save power on laptops
