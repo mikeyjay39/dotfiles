@@ -82,7 +82,7 @@ To read more than the report, run `tmux capture-pane -p -J -S -200 -t <session> 
 <skill-dir>/scripts/send-to-worker.sh <session> "<text>"
 ```
 
-The script adds the prefix `From the control session:`. A message sent while the worker is busy waits in its queue for its next turn.
+The script adds the prefix `From the control session:`. It sends to the pane that runs the agent (`claude` or `cursor-agent`), not to the active pane, because the human can open a shell or an editor in the session. It stops with an error when no pane, or more than one pane, runs an agent. A message sent while the worker is busy waits in its queue for its next turn.
 
 An idle pane can show dim suggested text in its input box. Claude Code does this. It is not human input. Never submit it.
 
