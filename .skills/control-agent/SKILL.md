@@ -70,24 +70,20 @@ Run these steps from the main repo checkout. `<scratchpad>` is this session's sc
      ```bash
      gh issue view <n> --json state,closedByPullRequestsReferences
      ```
-5. **Check the tools.** Run `command -v tmux wt claude gh`. `claude` can be a zsh alias, so always start it by `send-keys` into the pane shell, never as the tmux session command.
-6. **Find the branch prefix.** Run `git branch --list '*/tkt-*' '*/gh-*'` and take the handle of the git user (for example `mjeszenka`).
-7. **Create the worktrees from fresh `main`.** Each takes minutes, because the `pre-start` hooks run `pnpm install` and assign a Tilt slot. Run all of them one after the other in one Bash call, with `run_in_background: true` and `timeout: 600000`:
+5. **Find the branch prefix.** Run `git branch --list '*/tkt-*' '*/gh-*'` and take the handle of the git user (for example `mikeyjay39`).
+6. **Write one prompt file per work item** at `<scratchpad>/prompts/<id>.md`. Use the template in [`../assign-work/references/worker-prompt.md`](../assign-work/references/worker-prompt.md). A blocked work item gets the plan-only block from that file.
+7. **Start one worker per work item** with the [`assign-work`](../assign-work/SKILL.md) script. Its preconditions apply: this session must run in tmux. `<skills-dir>` is the parent folder of this skill. The worker CLI is the same as the CLI of this session. Each worktree takes minutes, because the `pre-start` hooks run `pnpm install` and assign a Tilt slot. Run all of them one after the other in one Bash call, with `run_in_background: true` and `timeout: 600000`:
    ```bash
-   git fetch -q origin main
-   wt switch --create <branch> --base origin/main --no-cd -y
+   <skills-dir>/assign-work/scripts/assign-work.sh \
+     --session <session> --branch <branch> --prompt-file <scratchpad>/prompts/<id>.md
    ```
-8. **Record each worktree.** Get its path from `git worktree list`. Get its Tilt slot with `grep -oP 'for slot \K[0-9]+' <worktree>/.env.tilt.ports`. No file means slot 0.
-9. **Write one prompt file per work item** at `<scratchpad>/prompts/<id>.md`. Use the template in [`references/agent-prompt.md`](references/agent-prompt.md). A blocked work item gets the plan-only block from that file.
-10. **Start one session per work item:**
-    ```bash
-    tmux new-session -d -s <session> -c <worktree>
-    tmux send-keys -t <session> "claude -n <session> \"\$(cat <scratchpad>/prompts/<id>.md)\"" Enter
-    ```
-11. **Check each start.** Wait about 20 s. Run `tmux capture-pane -p -t <session>`. The step is done when each pane shows Claude at work on `/vs-implement`. If a pane shows a trust prompt or an error, fix it before you continue.
-12. **Report the setup** (see [Reports](#reports)). Then start the watcher.
+   Record the `worktree=` and `slot=` that each run prints.
+8. **Check each start.** Wait about 20 s. Run `tmux capture-pane -p -t <session>`. The step is done when each pane shows the worker at work. If a pane shows a trust prompt or an error, fix it before you continue.
+9. **Report the setup** (see [Reports](#reports)). Then start the watcher.
 
 ## The watch loop
+
+Workers report into this pane with `From worker <session>: <kind>: <text>`. Handle each report as [`assign-work`](../assign-work/SKILL.md#reports-from-workers) tells you. The watcher is a fallback for a worker that stops without a report.
 
 1. **Start the watcher** with `run_in_background: true`:
    ```bash
@@ -109,19 +105,15 @@ Run these steps from the main repo checkout. `<scratchpad>` is this session's sc
 - **A live run:** `gh run watch <id> --exit-status --interval 60 >/dev/null 2>&1; gh run view <id> --json conclusion,url,jobs`. An agent that waits on its own run looks idle to `watch.sh`, so watch the run instead.
 - **Live runs share one environment.** Give one agent the run slot at a time, so that runs do not change each other's figures.
 
-**After a restart:** background tasks and `/tmp` are gone. Keep scripts in this skill folder, not in the scratchpad. Check that the tmux sessions still run `claude`, and read each pane. Check the runs and PRs for events you missed, then start the watches again.
+**After a restart:** background tasks and `/tmp` are gone. Keep scripts in this skill folder, not in the scratchpad. Check that the tmux sessions still run `claude` or `cursor-agent`, and read each pane. Check the runs and PRs for events you missed, then start the watches again.
 
 ## Sending a message to an agent
 
-Send the text and the Enter key as two calls. `-l` keeps the text literal:
-
 ```bash
-tmux send-keys -t <session> -l "From the control session: <text>"
-sleep 0.5
-tmux send-keys -t <session> Enter
+<skills-dir>/assign-work/scripts/send-to-worker.sh <session> "<text>"
 ```
 
-A message sent while the agent is busy waits in its queue for its next turn.
+The script adds the prefix `From the control session:`. A message sent while the agent is busy waits in its queue for its next turn.
 
 ## Grey suggestions are not answers
 

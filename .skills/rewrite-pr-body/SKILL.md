@@ -32,7 +32,7 @@ If there is no open PR for the current branch, stop and tell the user.
 
 From `headRefName`, match case-insensitively: `tkt-(\d+)`.
 
-- Normalize to `TKT-<number>` (e.g. `mjeszenka/tkt-20622-foo` → `TKT-20622`).
+- Normalize to `TKT-<number>` (e.g. `<git-user>/tkt-20622-foo` → `TKT-20622`).
 - If no match, stop and tell the user the branch name has no `TKT-` / `tkt-` prefix.
 
 ### 3. Fetch the Notion ticket
