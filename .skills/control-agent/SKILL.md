@@ -1,6 +1,6 @@
 ---
 name: control-agent
-description: Makes this session the controller of one Claude agent per Notion ticket or GitHub issue. Each agent gets its own worktrunk worktree, Tilt slot and tmux session, and runs /vs-implement. The controller first gets acceptance criteria from the human for each sparse ticket or issue, then coordinates the agents and flags the human. Use when asked to control agents, coordinate agents on tickets or issues, or spawn an agent per ticket or issue.
+description: Controls Claude, Cursor, or OpenCode V2 workers for Notion tickets or GitHub issues. Each worker gets an isolated worktree and tmux session. The controller checks acceptance criteria, coordinates workers, and reports questions to the human. Use when asked to control agents, coordinate agents on tickets or issues, or spawn an agent per ticket or issue.
 argument-hint: '<TKT-… | #<n> | <issue-url>> […] [FTR-…]'
 ---
 
@@ -72,10 +72,15 @@ Run these steps from the main repo checkout. `<scratchpad>` is this session's sc
      ```
 5. **Find the branch prefix.** Run `git branch --list '*/tkt-*' '*/gh-*'` and take the handle of the git user (for example `mikeyjay39`).
 6. **Write one prompt file per work item** at `<scratchpad>/prompts/<id>.md`. Use the template in [`../assign-work/references/worker-prompt.md`](../assign-work/references/worker-prompt.md). A blocked work item gets the plan-only block from that file.
-7. **Start one worker per work item** with the [`assign-work`](../assign-work/SKILL.md) script. Its preconditions apply: this session must run in tmux. `<skills-dir>` is the parent folder of this skill. The worker CLI is the same as the CLI of this session. Each worktree takes minutes, because the `pre-start` hooks run `pnpm install` and assign a Tilt slot. Run all of them one after the other in one Bash call, with `run_in_background: true` and `timeout: 600000`:
+7. **Start at most three active workers** with the [`assign-work`](../assign-work/SKILL.md) script. Queue later items.
+   Its preconditions apply. `<skills-dir>` is the canonical global `.skills` folder.
+   Select `claude`, `cursor`, or `opencode`. Use OpenCode when the human requests it.
+   Get the boss pane ID explicitly. OpenCode tools need not inherit the controller's tmux environment.
+   Each worktree can take minutes. Use the CLI's shell background support where available.
    ```bash
    <skills-dir>/assign-work/scripts/assign-work.sh \
-     --session <session> --branch <branch> --prompt-file <scratchpad>/prompts/<id>.md
+     --session <session> --branch <branch> --prompt-file <scratchpad>/prompts/<id>.md \
+     --agent <claude|cursor|opencode> --boss-pane <boss-pane-id>
    ```
    Record the `worktree=` and `slot=` that each run prints.
 8. **Check each start.** Wait about 20 s. Run `tmux capture-pane -p -t <session>`. The step is done when each pane shows the worker at work. If a pane shows a trust prompt or an error, fix it before you continue.
@@ -87,11 +92,13 @@ Workers report into this pane with `From worker <session>: <kind>: <text>`. Hand
 
 1. **Start the watcher** with `run_in_background: true`:
    ```bash
-   ~/.claude/skills/control-agent/scripts/watch.sh <session-a> <session-b> …
+   <skills-dir>/control-agent/scripts/watch.sh <session-a> <session-b> …
    ```
    Pass only the sessions that you expect to work. Leave out an agent that waits on purpose, for example a blocked work item that finished its plan. Otherwise the watcher fires at once. It prints `IDLE: <session>` or `GONE: <session>`, then exits, and that wakes you.
    - Do not start it with `&` or `disown`. Only a `run_in_background` call wakes you when it exits.
    - Run only one watcher at a time. To stop one, use `pgrep -f '[w]atch.sh'` and `kill <pid>`. Do not use `pkill -f watch.sh`, because it also stops its own shell.
+   - The watcher checks the registered worker pane. For OpenCode, it checks the explicit session ID through the V2 API.
+   - `UNKNOWN` with exit code 2 means identity or API checks failed. Check that error. Do not mark the worker idle.
 2. **Read the agent's last turn:**
    ```bash
    tmux capture-pane -p -J -S -200 -t <session> | grep -v '^\s*$' | tail -60
@@ -101,11 +108,13 @@ Workers report into this pane with `From worker <session>: <kind>: <text>`. Hand
 
 **Other watches**, each with `run_in_background: true`:
 
-- **PR feedback:** `~/.claude/skills/control-agent/scripts/watch-pr.sh <pr> [owner-login] [repo]`. It exits on a review or comment from anyone but the owner, or on a state change. Send the feedback to the agent that owns the PR.
+- **PR feedback:** `<skills-dir>/control-agent/scripts/watch-pr.sh <pr> [owner-login] [repo]`. It exits on a review or comment from anyone but the owner, or on a state change. Send the feedback to the agent that owns the PR.
 - **A live run:** `gh run watch <id> --exit-status --interval 60 >/dev/null 2>&1; gh run view <id> --json conclusion,url,jobs`. An agent that waits on its own run looks idle to `watch.sh`, so watch the run instead.
 - **Live runs share one environment.** Give one agent the run slot at a time, so that runs do not change each other's figures.
 
-**After a restart:** background tasks and `/tmp` are gone. Keep scripts in this skill folder, not in the scratchpad. Check that the tmux sessions still run `claude` or `cursor-agent`, and read each pane. Check the runs and PRs for events you missed, then start the watches again.
+**After a restart:** check background tasks and temporary files. Keep scripts in this skill folder, not in the scratchpad.
+Check that registered worker panes still run Claude, Cursor, or OpenCode. Read each pane.
+Keep the recorded OpenCode session IDs. Check the runs and PRs, then start the watches again.
 
 ## Sending a message to an agent
 

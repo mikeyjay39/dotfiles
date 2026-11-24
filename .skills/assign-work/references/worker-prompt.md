@@ -18,9 +18,13 @@ Then write the first line from this table:
 | SDLC     | Issue or text | `/vs-implement`            | `Use the vs-implement skill on the work item below.`               |
 | Not SDLC | Any           | `Implement the work item below. Test it. Then open a PR.` | Same as Claude.                       |
 
-The worker CLI is the same as the boss CLI. Use the column of the CLI that this session runs. `/vs-implement` cannot fetch a GitHub issue or read free text, so the work block below gives the worker the work.
+For OpenCode, use the Cursor column. Ask it to load the named skill; do not assume Claude slash-command syntax.
+Use the selected worker CLI, which can differ from the boss CLI.
+`/vs-implement` cannot fetch a GitHub issue or read free text, so the work block below gives the worker the work.
 
-`assign-work.sh` sets `ASSIGN_WORK_REPORT` in every shell of the worker session. Keep the body below word for word, so that both CLIs report the same way.
+The launcher appends a report command with the explicit worker name and boss pane ID.
+OpenCode tool shells use a shared server. They need not inherit tmux or per-worker variables.
+For a manual launch, fill the command below with absolute paths and explicit IDs.
 
 ## Body
 
@@ -30,7 +34,8 @@ The worker CLI is the same as the boss CLI. Use the column of the CLI that this 
 You are a worker agent. A control session coordinates you and other workers. It may type messages to you; they start with "From the control session:".
 
 Report to the control session with this shell command. Send one line each time:
-  "$ASSIGN_WORK_REPORT" "<kind>: <text>"
+  <absolute-skill-dir>/scripts/report-to-boss.sh --session <worker-session> --boss-pane <boss-pane-id> "<kind>: <text>"
+Use the exact command appended by the launcher. Do not infer identity from `TMUX_PANE` or worker variables.
 Send a report only at these points, because each report interrupts the control session:
 - "started: <your plan in one line>" when you know your plan.
 - "question: <one clear question>" when you need a decision. Then stop and wait.

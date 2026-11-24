@@ -1,9 +1,18 @@
 #!/usr/bin/env bash
-# Usage: report-to-boss.sh <message>
+# Usage: report-to-boss.sh [--session <worker> --boss-pane <pane-id>] <message>
 # Run from inside a worker started by assign-work.sh. Types "From worker <session>: <message>"
 # into the boss pane and submits it.
 set -euo pipefail
 
+if [[ "${1:-}" == --session ]]; then
+  [[ $# -ge 5 && "$3" == --boss-pane && "$2" =~ ^[a-zA-Z0-9_-]+$ && "$4" =~ ^%[0-9]+$ ]] || {
+    echo 'report-to-boss: use --session <worker> --boss-pane <pane-id> <message>' >&2; exit 2;
+  }
+  session=$2 boss_pane=$4
+  shift 4
+  [[ -n "$1" ]] || exit 2
+  exec "$(dirname "$0")/send-to-pane.sh" "$boss_pane" "From worker $session: $*"
+fi
 [[ $# -ge 1 && -n "$1" ]] || { echo "usage: $(basename "$0") <message>" >&2; exit 2; }
 [[ -n "${TMUX_PANE:-}" ]] || { echo "report-to-boss: not in a tmux pane" >&2; exit 1; }
 

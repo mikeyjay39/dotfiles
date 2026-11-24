@@ -1,12 +1,53 @@
 #!/usr/bin/env bash
-# Cursor / Claude agent lifecycle → tmux pane state + desktop notify.
+# Cursor / Claude / OpenCode lifecycle → tmux pane state + desktop notify.
 # Usage: agent-tmux.sh <running|done|needs-input|off> [agent-name]
+# OpenCode also requires: --pane <id> --session <id> --client <token> --generation <number> [--quiet]
 # Always drains stdin (hook JSON). Exit 0 so agents never fail-closed on notify.
 set -u
 
 state="${1:-done}"
 agent="${2:-agent}"
 payload="$(cat || true)"
+
+# OpenCode events come from a shared server. Only the TUI can bind its session to a pane.
+quiet=0
+if [[ "$agent" == opencode ]]; then
+  shift 2
+  pane='' session='' client='' generation=''
+  while (( $# )); do
+    if [[ "$1" == --quiet ]]; then quiet=1; shift; continue; fi
+    [[ $# -ge 2 ]] || exit 0
+    case "$1" in
+      --pane) pane=$2 ;;
+      --session) session=$2 ;;
+      --client) client=$2 ;;
+      --generation) generation=$2 ;;
+      *) exit 0 ;;
+    esac
+    shift 2
+  done
+  [[ "$pane" =~ ^%[0-9]+$ && "$session" =~ ^ses[a-zA-Z0-9_-]+$ && "$client" =~ ^[a-zA-Z0-9_-]+$ && "$generation" =~ ^[1-9][0-9]*$ ]] || exit 0
+  # Serialize binding and updates across plugin reloads, not only within one TUI instance.
+  exec 9>"${XDG_RUNTIME_DIR:-/tmp}/opencode-tmux-pane-${pane#%}.lock" || exit 0
+  flock -w 3 9 || exit 0
+  binding=$(tmux show-options -pqv -t "$pane" @opencode-binding 2>/dev/null) || exit 0
+  if [[ "$state" == bind ]]; then
+    if [[ -n "$binding" ]]; then
+      IFS='|' read -r previous_session previous_generation previous_client extra <<<"$binding"
+      [[ "$previous_session" =~ ^ses[a-zA-Z0-9_-]+$ && "$previous_generation" =~ ^[1-9][0-9]*$ && -n "$previous_client" && -z "$extra" ]] || exit 0
+      # Compare canonical decimal strings without integer overflow.
+      if (( ${#generation} < ${#previous_generation} )); then exit 0; fi
+      if (( ${#generation} == ${#previous_generation} )); then
+        [[ "$generation" < "$previous_generation" ]] && exit 0
+        [[ "$generation" == "$previous_generation" && "$client" != "$previous_client" ]] && exit 0
+      fi
+    fi
+    tmux set-option -p -t "$pane" @opencode-binding "$session|$generation|$client" 2>/dev/null || true
+    exit 0
+  fi
+  [[ "$binding" == "$session|$generation|$client" ]] || exit 0
+  TMUX_PANE=$pane
+fi
 
 status=""
 hook_event=""
@@ -34,6 +75,7 @@ case "$state" in
     do_sound=1
     ;;
 esac
+if [[ "$quiet" -eq 1 ]]; then do_notify=0; do_sound=0; fi
 
 title="${agent} agent"
 body="$label"
