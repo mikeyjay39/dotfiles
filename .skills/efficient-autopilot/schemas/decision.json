@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["title", "context", "decision", "options_not_taken", "trade_offs", "reason", "how_to_change"],
+  "properties": {
+    "title": { "type": "string" },
+    "context": { "type": "string" },
+    "decision": { "type": "string" },
+    "options_not_taken": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["option", "reason"],
+        "properties": { "option": { "type": "string" }, "reason": { "type": "string" } }
+      }
+    },
+    "trade_offs": { "type": "string" },
+    "reason": { "type": "string" },
+    "how_to_change": { "type": "string" }
+  }
+}

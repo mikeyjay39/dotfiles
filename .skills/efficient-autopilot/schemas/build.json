@@ -1,0 +1,9 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["summary", "decisions"],
+  "properties": {
+    "summary": { "type": "string" },
+    "decisions": { "type": "array", "items": "$decision" }
+  }
+}

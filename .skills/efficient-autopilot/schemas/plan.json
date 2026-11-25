@@ -1,0 +1,114 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "feature_title",
+    "stories",
+    "decisions"
+  ],
+  "properties": {
+    "feature_title": {
+      "type": "string"
+    },
+    "stories": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "title",
+          "issue",
+          "summary",
+          "acceptance_criteria",
+          "depends_on",
+          "verify_commands",
+          "proof",
+          "proof_commands",
+          "branch",
+          "plan_markdown"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]*$"
+          },
+          "title": {
+            "type": "string"
+          },
+          "issue": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "summary": {
+            "type": "string"
+          },
+          "acceptance_criteria": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "depends_on": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "verify_commands": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "proof": {
+            "enum": [
+              "cli",
+              "api",
+              "ui",
+              "tilt",
+              "none"
+            ]
+          },
+          "proof_commands": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "branch": {
+            "type": "string"
+          },
+          "plan_markdown": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "applies_to",
+          "record"
+        ],
+        "properties": {
+          "applies_to": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "record": "$decision"
+        }
+      }
+    }
+  }
+}

@@ -1,4 +1,7 @@
 {
+  "env": {
+    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "60"
+  },
   "hooks": {
     "UserPromptSubmit": [
       {
@@ -57,10 +60,10 @@
     "type": "command",
     "command": "$HOME/.claude/statusline.sh"
   },
-  "theme": "auto",
-  "editorMode": "vim",
+  "enabledPlugins": {
+    "rust-analyzer-lsp@claude-plugins-official": true
+  },
   "tui": "default",
-  "env": {
-    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "60"
-  }
+  "theme": "auto",
+  "editorMode": "vim"
 }

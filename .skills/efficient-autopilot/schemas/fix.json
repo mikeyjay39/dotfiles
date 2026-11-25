@@ -1,0 +1,18 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["summary", "fixed", "decisions"],
+  "properties": {
+    "summary": { "type": "string" },
+    "fixed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["problem", "how"],
+        "properties": { "problem": { "type": "string" }, "how": { "type": "string" } }
+      }
+    },
+    "decisions": { "type": "array", "items": "$decision" }
+  }
+}

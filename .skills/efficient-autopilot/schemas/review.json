@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["verdict", "summary", "findings"],
+  "properties": {
+    "verdict": { "enum": ["pass", "fix"] },
+    "summary": { "type": "string" },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["file", "line", "severity", "summary", "failure_scenario"],
+        "properties": {
+          "file": { "type": "string" },
+          "line": { "type": "integer" },
+          "severity": { "enum": ["important", "nit"] },
+          "summary": { "type": "string" },
+          "failure_scenario": { "type": "string" }
+        }
+      }
+    }
+  }
+}
