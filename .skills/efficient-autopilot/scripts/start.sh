@@ -50,8 +50,9 @@ session="autopilot-$(basename "$run_dir")"
 ! tmux has-session -t "=$session" 2>/dev/null || fail "tmux session $session already exists"
 
 printf -v pipeline '%q ' "$script_dir/autopilot.sh" "$run_dir"
-# Keep the machine awake during the run. systemd-inhibit is absent on some hosts.
-if command -v systemd-inhibit >/dev/null; then
+# Keep the machine awake during the run. systemd-inhibit is absent on some hosts, and fails
+# when it cannot reach the system bus. Then the run continues without the inhibitor.
+if command -v systemd-inhibit >/dev/null && systemd-inhibit --list >/dev/null 2>&1; then
   printf -v pipeline '%q ' systemd-inhibit --what=sleep:idle --who=efficient-autopilot \
     --why='Autopilot run in progress' "$script_dir/autopilot.sh" "$run_dir"
 fi
@@ -60,7 +61,8 @@ printf -v progress '%q ' watch -n 10 "$script_dir/progress.sh" "$run_dir"
 tmux new-session -d -s "$session" -c "$(<"$run_dir/repo")" \
   "$pipeline; echo; echo 'Run ended. Summary: $run_dir/summary.md. Press Enter to close.'; read -r"
 tmux split-window -v -l 14 -t "$session" -c "$run_dir" "$progress"
-tmux select-pane -t "$session:0.0"
+# Select the pane above the new progress pane. A fixed index fails when tmux base-index is not 0.
+tmux select-pane -t "$session" -U
 
 echo "run_dir=$run_dir"
 echo "session=$session"

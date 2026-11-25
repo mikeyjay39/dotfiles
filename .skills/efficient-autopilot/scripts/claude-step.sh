@@ -114,7 +114,8 @@ run_attempt() {
   set -e
   record_usage "$events"
   attempt_result=$(jq -c 'select(.type == "result")' "$events" 2>/dev/null | tail -1)
-  attempt_session=$(jq -r 'select(.session_id != null) | .session_id' "$events" 2>/dev/null | head -1)
+  # jq stops at the first match. `jq | head -1` fails with SIGPIPE on a long log, and pipefail then stops the script.
+  attempt_session=$(jq -rn 'first(inputs | select(.session_id != null) | .session_id) // empty' "$events" 2>/dev/null || true)
   [[ $status -eq 0 || -n "$attempt_result" ]] || attempt_result=''
 }
 
