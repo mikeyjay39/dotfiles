@@ -143,9 +143,16 @@ today's requirement, not an imagined future one.
 
 ## Part 2 — SOLID
 
+- **S — Single Responsibility:** a class or module is responsible to a single actor, which is the one person or group who asks for its changes. That actor is its single reason to change. Do not split code that the same actor changes together. "Do one thing" is a separate rule, for functions.
+- **O — Open/Closed:** open to extension, closed to modification — add behavior without editing existing code.
+- **L — Liskov Substitution:** subtypes must be usable anywhere their base type is, without surprises.
+- **I — Interface Segregation:** many small, focused interfaces beat one fat one; don't force clients to depend on methods they don't use.
+- **D — Dependency Inversion:** depend on abstractions, not concretions; inject dependencies rather than hard-wiring them.
+
 ### S — Single Responsibility
 
-*A module is responsible to one, and only one, actor.* An actor is a person or group of
+*A class or module is responsible to one, and only one, actor. That actor is its single
+reason to change.* An actor is a person or group of
 stakeholders who ask for changes. "Reason to change" means *actor* — not "concern",
 "task", or "technical layer".
 

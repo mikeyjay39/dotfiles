@@ -59,5 +59,8 @@
   },
   "theme": "auto",
   "editorMode": "vim",
-  "tui": "default"
+  "tui": "default",
+  "env": {
+    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "60"
+  }
 }

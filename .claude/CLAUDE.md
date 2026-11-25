@@ -22,13 +22,5 @@ Write clean, maintainable code. Match the conventions already in the file/repo y
 - **Don't over-engineer:** the simplest solution that fits the existing design wins.
 - **American English:** use American spelling in code, comments, docs, and identifiers (`color`, `initialize`, `behavior`, `canceled` — not `colour`, `initialise`, `behaviour`, `cancelled`). Follow the existing codebase if it already standardizes on another variant.
 
-## SOLID
-
-- **S — Single Responsibility:** a module or class is responsible to one actor — one person or group who asks for its changes. Do not split code that the same actor changes together. ("Do one thing" is a separate rule for functions.)
-- **O — Open/Closed:** open to extension, closed to modification — add behavior without editing existing code.
-- **L — Liskov Substitution:** subtypes must be usable anywhere their base type is, without surprises.
-- **I — Interface Segregation:** many small, focused interfaces beat one fat one; don't force clients to depend on methods they don't use.
-- **D — Dependency Inversion:** depend on abstractions, not concretions; inject dependencies rather than hard-wiring them.
-
-For detailed guidance, examples, and a self-review checklist when writing or refactoring
+For SOLID, detailed guidance with examples, and a self-review checklist when writing or refactoring
 non-trivial code, use the **`clean-code`** skill.
