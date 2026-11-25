@@ -9,6 +9,7 @@ OpenCode uses a shared server. Put explicit worker identity and the boss pane in
 Register the worker pane and OpenCode session ID in tmux session options.
 Do not send messages to a session's active window. Reject absent or ambiguous agent targets.
 Do not report OpenCode idle from terminal text alone. API failures must return `UNKNOWN`.
+`watch.sh` reads the report time that `report-to-boss.sh` records. Keep both sides when you change one.
 Keep the three-active-worker cap and repository-specific stack limits.
 Keep feature and stacked PR bases explicit. Do not merge PRs or bypass repository database and destructive-operation rules.
 

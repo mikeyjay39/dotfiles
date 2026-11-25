@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Usage: assign-work.sh --session <name> --branch <branch> --prompt-file <file>
-#                       [--agent claude|cursor|opencode] [--boss-pane <pane>]
+#                       [--agent claude|cursor|opencode] [--boss-pane <pane>] [--model <model>]
 # Creates (or reuses) a worktrunk worktree for <branch> from fresh origin/main, starts a tmux
 # session in it, and starts a worker agent there with the prompt. The worker reports back to
 # the boss pane with report-to-boss.sh. Prints "key=value" lines for the boss to parse.
@@ -16,7 +16,7 @@ fail() {
   exit 1
 }
 
-session='' branch='' prompt_file='' agent='' boss_pane="${TMUX_PANE:-}" boss_pane_explicit=false
+session='' branch='' prompt_file='' agent='' model='' boss_pane="${TMUX_PANE:-}" boss_pane_explicit=false
 while [[ $# -gt 0 ]]; do
   [[ $# -ge 2 && -n "$2" ]] || usage
   case "$1" in
@@ -24,6 +24,7 @@ while [[ $# -gt 0 ]]; do
     --branch) branch=$2; shift 2 ;;
     --prompt-file) prompt_file=$2; shift 2 ;;
     --agent) agent=$2; shift 2 ;;
+    --model) model=$2; shift 2 ;;
     --boss-pane) boss_pane=$2; boss_pane_explicit=true; shift 2 ;;
     *) usage ;;
   esac
@@ -64,7 +65,7 @@ if [[ -f "$worktree/.env.tilt.ports" ]]; then
 fi
 
 "$script_dir/start-worker.sh" --session "$session" --worktree "$worktree" \
-  --prompt-file "$prompt_file" --boss-pane "$boss_pane" --agent "$agent"
+  --prompt-file "$prompt_file" --boss-pane "$boss_pane" --agent "$agent" ${model:+--model "$model"}
 
 echo "worktree=$worktree"
 echo "slot=$slot"

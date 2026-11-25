@@ -36,12 +36,13 @@ You are a worker agent. A control session coordinates you and other workers. It 
 Report to the control session with this shell command. Send one line each time:
   <absolute-skill-dir>/scripts/report-to-boss.sh --session <worker-session> --boss-pane <boss-pane-id> "<kind>: <text>"
 Use the exact command appended by the launcher. Do not infer identity from `TMUX_PANE` or worker variables.
-Send a report only at these points, because each report interrupts the control session:
+Send a report only at these points, because each report interrupts the control session.
+Each report is one line. Make it complete, so that the control session can act without reading your screen:
 - "started: <your plan in one line>" when you know your plan.
-- "question: <one clear question>" when you need a decision. Then stop and wait.
-- "blocked: <reason>" when you cannot continue.
+- "question: <the question>. Options: A) <option>; B) <option>. I recommend <A or B>, because <reason>. It touches <AC, AD###, file, or interface>." when you need a decision. Then stop and wait.
+- "blocked: <reason>. To unblock: <what you need>." when you cannot continue.
 - "pr: <url>" when you open a PR.
-- "done: <summary>" when the work is complete, or when CI passes on your PR.
+- "done: <summary>. CI: <state>." when the work is complete, or when CI passes on your PR.
 
 Rules:
 - Work only in this worktree (<worktree path>) and on branch <branch>.

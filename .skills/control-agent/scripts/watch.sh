@@ -1,16 +1,22 @@
 #!/usr/bin/env bash
 # Usage: watch.sh <tmux-session> [<tmux-session> ...]
-# Exits 0 with "IDLE: <session>" when one session's pane is idle and still for IDLE_SECONDS.
+# Exits 0 with one "IDLE: <session>" line for each idle session. A session is idle when its
+# pane is not busy and does not change for IDLE_SECONDS.
+# After the first idle session, it waits up to BATCH_SECONDS for others, so that workers that
+# stop together wake the boss one time, not one time each.
+# A worker that sent a question, blocked, or done report up to REPORT_GRACE_SECONDS before it
+# went still is not reported. The boss already has that report, so a second wake-up costs a turn.
 # Exits 1 with "GONE: <session>" when a session no longer exists.
 # Exits 2 with "UNKNOWN: <session>" when identity or status checks fail.
 # Boss -> registered pane -> CLI identity -> OpenCode API or legacy screen -> idle timer
+#      -> recent stop report? skip : collect -> batch window -> print all idle sessions
 set -euo pipefail
-script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")/../../assign-work/scripts" && pwd)
+source "$(dirname "${BASH_SOURCE[0]}")/worker-state.sh"
 
 POLL_SECONDS="${POLL_SECONDS:-15}"
-IDLE_SECONDS="${IDLE_SECONDS:-90}"
-# Claude Code prints "… (12s" or "… (3m" next to its spinner while a turn runs.
-BUSY_PATTERN="${BUSY_PATTERN:-…[[:space:]]*\([0-9]+[ms]|Thinking|Running tool|Generating}"
+IDLE_SECONDS="${IDLE_SECONDS:-300}"
+BATCH_SECONDS="${BATCH_SECONDS:-30}"
+REPORT_GRACE_SECONDS="${REPORT_GRACE_SECONDS:-120}"
 
 if [[ $# -eq 0 ]]; then
   echo "usage: $(basename "$0") <tmux-session> [...]" >&2
@@ -19,43 +25,62 @@ fi
 
 declare -A last_hash
 declare -A still_since
+declare -A idle
+batch_deadline=''
+
+print_idle() {
+  local session
+  for session in "$@"; do
+    [[ -z "${idle[$session]:-}" ]] || echo "IDLE: $session"
+  done
+}
+
+# reported_before_stop <session> <still-since>
+reported_before_stop() {
+  local time='' kind=''
+  read -r time kind <<<"$(last_report "$1")"
+  [[ "$time" =~ ^[0-9]+$ ]] || return 1
+  case "$kind" in
+    question | blocked | done) ;;
+    *) return 1 ;;
+  esac
+  (( $2 - time <= REPORT_GRACE_SECONDS ))
+}
 
 while true; do
   now=$(date +%s)
   for session in "$@"; do
-    if ! tmux has-session -t "=$session" 2>/dev/null; then
-      echo "GONE: $session"
-      exit 1
-    fi
-    target=$("$script_dir/worker-pane.sh" "$session") || { echo "UNKNOWN: $session (worker pane)"; exit 2; }
-    pane=$(tmux capture-pane -p -t "$target") || { echo "UNKNOWN: $session (capture)"; exit 2; }
-    agent=$(tmux show-options -qv -t "=$session:" @assign_work_agent) || { echo "UNKNOWN: $session (CLI option)"; exit 2; }
-    live_agent=$("$script_dir/worker-pane.sh" "$session" --agent) || { echo "UNKNOWN: $session (CLI process)"; exit 2; }
-    if [[ "$agent" == opencode || "$live_agent" == opencode ]]; then
-      opencode_session=$(tmux show-options -qv -t "=$session:" @assign_work_opencode_session) || { echo "UNKNOWN: $session (session option)"; exit 2; }
-      status=0
-      "$script_dir/opencode-idle.sh" "$opencode_session" || status=$?
-      case "$status" in
-        0) ;;
-        1) unset 'last_hash[$session]' 'still_since[$session]'; continue ;;
-        *) echo "UNKNOWN: $session (OpenCode identity or API)"; exit 2 ;;
-      esac
-    elif grep -qE "$BUSY_PATTERN" <<<"$pane"; then
+    [[ -z "${idle[$session]:-}" ]] || continue
+    status=0
+    read_worker "$session" || status=$?
+    case "$status" in
+      0) ;;
+      1) print_idle "$@"; echo "GONE: $session"; exit 1 ;;
+      *) print_idle "$@"; echo "UNKNOWN: $session ($worker_error)"; exit 2 ;;
+    esac
+    if [[ "$worker_busy" == true ]]; then
       unset 'last_hash[$session]' 'still_since[$session]'
       continue
     fi
 
-    hash=$(md5sum <<<"$pane" | cut -d' ' -f1)
+    hash=$(md5sum <<<"$worker_screen" | cut -d' ' -f1)
     if [[ "${last_hash[$session]:-}" != "$hash" ]]; then
       last_hash[$session]=$hash
       still_since[$session]=$now
       continue
     fi
 
-    if (( now - still_since[$session] >= IDLE_SECONDS )); then
-      echo "IDLE: $session"
-      exit 0
+    (( now - still_since[$session] >= IDLE_SECONDS )) || continue
+    if reported_before_stop "$session" "${still_since[$session]}"; then
+      continue
     fi
+    idle[$session]=1
+    [[ -n "$batch_deadline" ]] || batch_deadline=$((now + BATCH_SECONDS))
   done
+
+  if [[ -n "$batch_deadline" ]] && (( now >= batch_deadline || ${#idle[@]} == $# )); then
+    print_idle "$@"
+    exit 0
+  fi
   sleep "$POLL_SECONDS"
 done

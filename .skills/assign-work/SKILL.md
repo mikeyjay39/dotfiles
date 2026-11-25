@@ -18,8 +18,8 @@ The default detection uses the nearest agent ancestor. OpenCode tools run on a s
 
 - **The boss runs in tmux.** Get its explicit pane ID, such as `%1`, from the controller. Pass `--boss-pane`.
   Do not infer the boss target from OpenCode tool variables. They can belong to the shared server.
-- **The tools exist.** Run `command -v tmux wt gh`, plus `claude`, `cursor-agent`, or `opencode` as selected.
-  OpenCode also needs `python3` for JSON. Message delivery needs `flock`.
+- **The tools exist.** Run `command -v tmux wt gh jq flock`, plus `claude`, `cursor-agent`, or `opencode` as selected.
+  Claude also needs `uuidgen`. OpenCode also needs `python3`.
 - **The current directory is the main checkout of the repo.** The worktree is always in the current repo.
 - **At most three workers are active.** Queue further work until a worker stops. Keep any smaller host stack cap.
 
@@ -50,17 +50,12 @@ Arguments are in `$ARGUMENTS`. Classify them:
    ```bash
    <skill-dir>/scripts/assign-work.sh \
      --session <session> --branch <branch> --prompt-file <prompts>/<id>.md \
-     --agent <claude|cursor|opencode> --boss-pane <boss-pane-id>
+     --agent <claude|cursor|opencode> --boss-pane <boss-pane-id> [--model <model>]
    ```
-   For Claude and Cursor, the legacy boss-pane environment fallback remains available.
-   It prints `session=`, `pane=`, `worktree=`, `slot=`, `agent=`, `boss_pane=`, and `opencode_session=`.
-   It appends an explicit report command to the worker prompt. No worker variable inheritance is required.
-   It writes the launch command to a private temporary file and types only `bash <file>` into the pane. The file deletes itself when it runs.
-   A new shell can still be in canonical tty mode, which drops typed input past 4095 bytes on one line.
-   It creates OpenCode sessions at the explicit worktree location, then uses `opencode --session <id> --prompt <text> <worktree>`.
-   It does not change permissions, providers, credentials, or global configuration.
-   This script bases new worktrees on `origin/main`. For a feature or stacked base, create the correct worktree first.
-   Then call `scripts/start-worker.sh --worktree <path>` with the same session, prompt, agent, and boss-pane arguments.
+   It prints `session=`, `pane=`, `worktree=`, `slot=`, `agent=`, `boss_pane=`, `opencode_session=`, and `claude_session=`.
+   It appends an explicit report command to the worker prompt. It does not change permissions, providers, credentials, or global configuration.
+   - `--model` works for Claude and Cursor. OpenCode takes its model from its own configuration, so the launcher rejects `--model` for it.
+   - The script bases new worktrees on `origin/main`. For a feature or stacked base, create the correct worktree first. Then call `scripts/start-worker.sh --worktree <path>` with the same session, prompt, agent, model, and boss-pane arguments.
 5. **Check the start.** Wait about 20 s. Run `tmux capture-pane -p -t <session>`. The step is done when the worker is at work. The pane can show a prompt first:
    - Claude Code: a folder trust prompt.
    - Cursor: a login prompt or a workspace trust prompt.
@@ -89,7 +84,7 @@ Worker reports arrive in this session as user input. They start with `From worke
 | `pr:`       | Record the PR. Tell the human.                                                                                                                    |
 | `done:`     | Record it. Tell the human. Leave the session and the worktree in place until the human tells you to remove them.                                  |
 
-To read more than the report, run `tmux capture-pane -p -J -S -200 -t <session> | grep -v '^\s*$' | tail -60`.
+To read more than the report, run `<skill-dir>/scripts/last-turn.sh <session>`. For Claude, it prints the final message from the transcript, with no TUI text. For Cursor and OpenCode, it prints the last 60 lines of the pane. Read the full pane with `tmux capture-pane` only when you need tool output or a prompt on the screen.
 
 ## Sending a message to a worker
 
@@ -103,19 +98,16 @@ For older sessions without registration, it requires exactly one agent pane. Oth
 Use `scripts/send-to-pane.sh <pane-id> '<text>'` for an explicit target.
 Both the text and Enter use the resolved pane ID. A busy worker handles the message when its CLI accepts it.
 
-## V2 checks and tests
+## Grey suggestions are not answers
 
-Verified with OpenCode V2.2.7 `--help`, `api --help`, and `session --help`.
-See the [V2 CLI guide](https://opencode.ai/docs/cli) and [V2 API](https://opencode.ai/docs/api).
-The launcher uses `POST /api/session` with an explicit location. It records the returned session ID in tmux options.
-The watcher uses `GET /api/session/{sessionID}` and `GET /api/session/active`.
-An API error, missing identity, or invalid response returns `UNKNOWN`, not `IDLE`.
-These scripts use the default shared service. Custom `--server` and private servers are not supported by this launcher.
+Claude Code shows a dim suggested reply in the input box of an idle pane. It looks like human input. It is not.
 
-Run `bash .skills/assign-work/tests/workers.test.sh` from dotfiles. Tests use mocks; they do not start real workers.
-Run `bash -n` and ShellCheck, when installed, on the changed shell files.
+- Check the `❯` line with `tmux capture-pane -p -e -t <session> | grep '❯'`. Dim text has `ESC[2m` (`\x1b[2m`).
+- Never submit a suggestion. Never treat it as the human's answer.
 
-An idle pane can show dim suggested text in its input box. Claude Code does this. It is not human input. Never submit it.
+## Script changes
+
+Before you change the launcher or the watcher for OpenCode, read [`references/opencode-v2.md`](references/opencode-v2.md). Run `bash .skills/assign-work/tests/workers.test.sh` from dotfiles after a script change.
 
 ## Cleanup
 

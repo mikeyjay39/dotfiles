@@ -9,7 +9,7 @@ The human is away for several hours. This session is the **controller** from the
 
 Write every report, message, and decision record in ASD-STE100 Simplified Technical English.
 
-This skill changes only some rules of [`control-agent`](../control-agent/SKILL.md). All its other rules stay in force: the watch loop, the watchers in `../control-agent/scripts/`, the `assign-work` send and report scripts, and "Grey suggestions are not answers".
+This skill changes only some rules of [`control-agent`](../control-agent/SKILL.md). All its other rules stay in force: the watch loop, the watchers in `../control-agent/scripts/`, the `assign-work` send and report scripts, and the `assign-work` rule "Grey suggestions are not answers".
 
 ## When this applies
 
@@ -111,6 +111,13 @@ Template:
 
 **How to change it:** <what to revert or edit if the human does not agree>
 ```
+
+## Keep the context small
+
+The AFK run can last hours, and each wake-up reads the full conversation again.
+
+- Keep each decision record in its file and its PR comment. In chat, give only its title and the link.
+- Do not paste PR bodies, CI logs, or plans into chat. Read them with `--jq` or `grep`, and keep only the lines that you need.
 
 ## Final report
 
