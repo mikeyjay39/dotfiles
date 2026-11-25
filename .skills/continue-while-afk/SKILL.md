@@ -30,7 +30,7 @@ Each check must be `SUCCESS`, `SKIPPED` or `NEUTRAL`. The only other end state i
 
 - **The controller decides everything that it asked the human.** This includes acceptance criteria, product, spec, arch decisions, and plan approval. Record each such decision (see [Decision records](#decision-records)).
 - **Do not call `AskUserQuestion`.** Do not end a turn to wait for the human.
-- **Keep a watch running.** Before you end a turn, make sure one background watch runs with `run_in_background: true`. Use `watch.sh`, `watch-pr.sh`, or `gh pr checks <pr> --watch`. A turn with no watch stops the loop.
+- **Keep a watch running.** Before you end a turn, make sure one background watch runs with `run_in_background: true`. Use `watch.sh`, `watch-pr.sh`, or `gh pr checks <pr> --watch`. A turn with no watch stops the loop. The only exception is a usage pause (see [Usage limit](#usage-limit-claude-controller-only)).
 - **Approve plans yourself.** First cross-read them with [`../control-agent/references/plan-review.md`](../control-agent/references/plan-review.md).
 
 ## Hard limits
@@ -65,6 +65,7 @@ Let only 2 workers be active at the same time. More workers can use all the memo
    > From the control session: The human is away for several hours. The control session now gives all decisions, including plan approval. Ask the control session, not the human. Do not stop to wait for a human. Continue through /vs-ship until your PR is open and all CI checks pass.
 4. Answer each open question of the active workers (see [Decision records](#decision-records)). A queued worker gets the message from step 3 and its answers when it gets a slot.
 5. Start the watches.
+6. If the controller is Claude, start the usage watch (see [Usage limit](#usage-limit-claude-controller-only)).
 
 ## The loop
 
@@ -78,6 +79,60 @@ Use the watch loop of `control-agent`, with these additions:
   - The same check fails 3 times after fixes.
 
   To park it, write its state and what the human must do. Put this in a PR comment, or in `<scratchpad>/parked/<id>.md` when there is no PR. Release its slot. Continue with the other work items.
+
+## Usage limit (Claude controller only)
+
+Claude agents on one account share one 5-hour usage limit. If the limit runs out, all work stops in the middle of a step, and nothing starts it again. Use this section only when the controller runs in Claude Code (`CLAUDECODE=1`). For other controllers, skip it.
+
+`~/.claude/statusline.sh` writes the account usage to `${XDG_RUNTIME_DIR:-/tmp}/claude-rate-limits.json`. The usage watch reads this file. A poll uses no tokens.
+
+### The usage watch
+
+Start it with `run_in_background: true`, next to the other watches:
+
+```bash
+<skills-dir>/continue-while-afk/scripts/watch-usage.sh 90
+```
+
+- `USAGE: <pct>% resets_at=<epoch>` means that usage is at 90% or more. Pause the run (see below).
+- `UNKNOWN: ...` means that there is no usage data. An example is an API-key session, which has no 5-hour limit. Tell the human in the final report, and continue without the usage watch.
+
+### Pause at 90%
+
+1. Send each worker, active and queued, this message:
+   > From the control session: The session usage limit is near. Stop after your current step. Do not start new work until the control session tells you to continue.
+2. Stop every other background watch with `TaskStop`. A watch that fires during the pause spends usage.
+3. Wait until no worker is busy, for 10 minutes at most. Run this with `run_in_background: true`:
+   ```bash
+   for _ in $(seq 60); do <skills-dir>/control-agent/scripts/status.sh | grep -q $'\tbusy\t' || break; sleep 10; done
+   <skills-dir>/control-agent/scripts/status.sh
+   ```
+   Record each worker that is still busy.
+4. Write `<scratchpad>/afk-state.md`. Give:
+   - For each work item: the session, the state, active or queued, the PR, the CI state, its open questions, and if it is parked.
+   - The decision record files, and which of them are not yet on a PR.
+   - The watches to start again, and the PRs and runs that they watch.
+   - The `resets_at` time, and the number of usage pauses until now.
+5. Start the compact helper detached, with the boss pane ID:
+   ```bash
+   setsid -f <skills-dir>/continue-while-afk/scripts/compact-and-resume.sh \
+     <boss-pane-id> <resets_at> <scratchpad>/afk-state.md >><scratchpad>/usage-guard.log 2>&1
+   ```
+   It waits until your turn ends, then sends `/compact` to this pane. At the reset time, it sends the resume message to this pane.
+6. End the turn with no watch.
+
+### Resume after the usage limit
+
+The resume message starts with `From the usage guard:`. Then:
+
+1. Read `<scratchpad>/afk-state.md`.
+2. Follow [`../control-agent/references/restart.md`](../control-agent/references/restart.md).
+3. Choose the 2 active workers with the rules in [Limit: 2 active workers](#limit-2-active-workers). Send each of them this message:
+   > From the control session: The usage limit reset. Continue from the step where you stopped.
+4. Keep the other workers queued.
+5. Start the watches and the usage watch again.
+
+If the usage watch fires again at once, the reset did not occur. Read `<scratchpad>/usage-guard.log`, then pause again with the new `resets_at`.
 
 ## Decision records
 
@@ -127,4 +182,5 @@ When each work item is done or parked:
 2. Show the `control-agent` table, with two more columns: PR and CI.
 3. List each decision, with a link to its PR comment.
 4. List each parked work item, with what the human must do.
-5. If the `PushNotification` tool is available, send one line: "AFK run done: <n> PRs green, <m> parked."
+5. Give the number of usage pauses, if the controller is Claude.
+6. If the `PushNotification` tool is available, send one line: "AFK run done: <n> PRs green, <m> parked."
