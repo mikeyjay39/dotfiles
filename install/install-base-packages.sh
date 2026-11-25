@@ -35,6 +35,7 @@ yay -S --noconfirm \
 	fzf \
 	git-crypt \
 	github-cli \
+	jq \
 	inetutils \
 	lazydocker \
 	lsof \
