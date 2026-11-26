@@ -96,12 +96,17 @@ schema_file() {
   echo "$out"
 }
 
-# Runs one model step. The result event goes to <run-dir>/results/<label>.json.
+# Runs one model step. The result event goes to <run-dir>/results/<label>.json. Labels are unique in a
+# run, so a start after a crash reuses a saved result and does not pay for the step again.
 call_step() {
-  local label=$1
+  local label=$1 out="$run_dir/results/$1.json"
   shift
   mkdir -p "$run_dir/results"
-  "$script_dir/claude-step.sh" --run-dir "$run_dir" --label "$label" "$@" >"$run_dir/results/$label.json"
+  if jq -e '.is_error == false' "$out" >/dev/null 2>&1; then
+    log "$label: reuse the saved result"
+    return 0
+  fi
+  "$script_dir/claude-step.sh" --run-dir "$run_dir" --label "$label" "$@" >"$out"
 }
 
 result_of() {
@@ -134,6 +139,16 @@ default_branch() {
   echo "${ref#origin/}"
 }
 
+# The branch that the first story is based on. `start.sh --base` writes it to <run-dir>/base.
+# Without that file, it is the default branch of origin.
+root_branch() {
+  if [[ -r "$run_dir/base" ]]; then
+    echo "$(<"$run_dir/base")"
+  else
+    default_branch
+  fi
+}
+
 branch_handle() {
   local handle
   handle=$(git -C "$repo" branch --list '*/tkt-*' '*/gh-*' --format='%(refname:short)' | head -1 | cut -d/ -f1)
@@ -144,7 +159,7 @@ branch_handle() {
 # The stack is linear: a story is based on the last story before it that is done.
 base_branch_for() {
   local id=$1 other base
-  base=$(default_branch)
+  base=$(root_branch)
   for other in $(story_ids); do
     [[ "$other" != "$id" ]] || break
     [[ "$(state_get "$other" status)" != done ]] || base=$(story_field "$other" .branch)
@@ -155,7 +170,7 @@ base_branch_for() {
 base_ref_for() {
   local base
   base=$(state_get "$1" base_branch)
-  if [[ "$base" == "$(default_branch)" ]]; then echo "origin/$base"; else echo "$base"; fi
+  if [[ "$base" == "$(root_branch)" ]]; then echo "origin/$base"; else echo "$base"; fi
 }
 
 worktree_of() {
@@ -483,7 +498,7 @@ decompose() {
   local prompt="$run_dir/prompts/decompose.md" candidate errors retry_prompt="$run_dir/prompts/decompose-retry.md"
   state_top phase '"planning"'
   render_prompt decompose "$prompt" "RUN_INPUT=$(<"$run_dir/input.md")" "HANDLE=$(branch_handle)" \
-    "DEFAULT_BRANCH=$(default_branch)"
+    "BASE_BRANCH=$(root_branch)"
   local -a common=(--model "$plan_model" --cwd "$repo" --tools 'Read,Glob,Grep,Bash'
     --allow "Read,Glob,Grep,$read_only_git,Bash(gh issue view:*),Bash(gh issue list:*),Bash(gh pr list:*),Bash(gh pr view:*),Bash(ls:*)"
     --schema "$(schema_file plan)")
@@ -537,6 +552,8 @@ main() {
     command -v "$tool" >/dev/null || fail "missing tool: $tool"
   done
   gh auth status >/dev/null 2>&1 || fail 'gh is not logged in'
+  git -C "$repo" ls-remote --exit-code --heads origin "$(root_branch)" >/dev/null ||
+    fail "base branch $(root_branch) is not on origin"
   mkdir -p "$run_dir/prompts" "$run_dir/logs"
   [[ -r "$state" ]] || echo '{"phase": "starting", "stories": {}}' >"$state"
   [[ -r "$plan" ]] || decompose

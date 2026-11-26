@@ -80,7 +80,7 @@ sleep_until() {
 # Keeps the newest five-hour usage from the events of one attempt.
 record_usage() {
   local events=$1 latest
-  latest=$(jq -c 'select(.type == "rate_limit_event") | .rate_limit_info
+  latest=$(jq -R -c 'fromjson? | select(.type == "rate_limit_event") | .rate_limit_info
     | {status, utilization: (.unifiedWindows.five_hour.utilization // 0),
        resets_at: (.unifiedWindows.five_hour.resetsAt // .resetsAt // 0)}' "$events" 2>/dev/null | tail -1)
   [[ -z "$latest" ]] || printf '%s\n' "$latest" >"$usage_file"
@@ -104,6 +104,22 @@ build_command() {
   return 0
 }
 
+# The CLI can exit before it writes all of a large `result` event, so the last log line is cut off.
+# The StructuredOutput tool call before it holds the same output. Prints a result event made from the
+# last such call that the tool accepted, or nothing.
+recovered_result() {
+  local events=$1
+  jq -R -n -c --arg session "$attempt_session" '
+    [inputs | fromjson?] as $events
+    | ($events | map(select(.type == "user") | .message.content[]? | select(.type == "tool_result")
+        | {key: .tool_use_id, value: (.is_error // false)}) | from_entries) as $failed
+    | [$events[] | select(.type == "assistant") | .message.content[]?
+        | select(.type == "tool_use" and .name == "StructuredOutput" and $failed[.id] == false)]
+    | last // empty
+    | {type: "result", subtype: "success", is_error: false, session_id: $session, structured_output: .input,
+       result: "Recovered from the StructuredOutput tool call, because the result event was cut off."}' "$events"
+}
+
 # Runs one attempt. Sets `attempt_result` to the result event, or to "" when there is none.
 run_attempt() {
   local attempt=$1 input=$2 events="$run_dir/logs/$label.$1.jsonl" status
@@ -113,9 +129,14 @@ run_attempt() {
   status=${PIPESTATUS[0]}
   set -e
   record_usage "$events"
-  attempt_result=$(jq -c 'select(.type == "result")' "$events" 2>/dev/null | tail -1)
+  # `fromjson?` skips a line that is cut off, so that one bad line does not stop the script.
+  attempt_result=$(jq -R -c 'fromjson? | select(.type == "result")' "$events" | tail -1)
   # jq stops at the first match. `jq | head -1` fails with SIGPIPE on a long log, and pipefail then stops the script.
-  attempt_session=$(jq -rn 'first(inputs | select(.session_id != null) | .session_id) // empty' "$events" 2>/dev/null || true)
+  attempt_session=$(jq -R -rn 'first(inputs | fromjson? | select(.session_id != null) | .session_id) // empty' "$events")
+  if [[ -z "$attempt_result" && -n "$schema" ]]; then
+    attempt_result=$(recovered_result "$events")
+    [[ -z "$attempt_result" ]] || echo "[$label] the result event is cut off. Recovered the structured output." >&2
+  fi
   [[ $status -eq 0 || -n "$attempt_result" ]] || attempt_result=''
 }
 

@@ -22,6 +22,8 @@ Arguments are in `$ARGUMENTS`. Each one is a work item:
 
 A feature issue with sub-issues or a task list becomes many stories. If there is no argument, ask the human for the work and stop.
 
+`--base <branch>` before the work items sets the base branch, for example a feature branch. The first story is based on it, and its PR targets it. The branch must be on origin. Without `--base`, the base is the default branch of origin. A resumed run keeps its base branch.
+
 ## Steps
 
 1. **Check the preconditions.** Stop and tell the human when one fails.
@@ -30,7 +32,7 @@ A feature issue with sub-issues or a task list becomes many stories. If there is
    - `gh auth status` passes.
 2. **Start the run.** Quote each work item as one argument:
    ```bash
-   <skill-dir>/scripts/start.sh '<work item>' […]
+   <skill-dir>/scripts/start.sh [--base <branch>] '<work item>' […]
    ```
    It prints `run_dir=` and `session=`.
 3. **Report** to the human, then end the turn:
@@ -42,7 +44,7 @@ A feature issue with sub-issues or a task list becomes many stories. If there is
 ## What the run does
 
 1. **Plan (Opus).** One call reads the work items and the code. It writes stories in dependency order, with testable acceptance criteria (AC), verify commands, a proof type, and a build plan. It records each major decision. The script validates the plan.
-2. **For each story (stacked on the story before it):**
+2. **For each story (stacked on the story before it; the first story is stacked on the base branch):**
    1. Make a worktree with `wt`.
    2. **Build (Sonnet).** It writes tests first, implements, and commits.
    3. **Verify (script).** It runs the verify commands. Sonnet gets 2 fix rounds or fewer. Then the story is parked.

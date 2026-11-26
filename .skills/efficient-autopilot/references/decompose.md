@@ -26,4 +26,4 @@ You plan the work for an unattended run. Nobody can answer questions. Plan by yo
    - `plan_markdown`: the build plan. Name the files to change, the steps, the interfaces that later stories use, and the tests to write. Name existing functions to reuse, with their paths.
 6. Record the major decisions that you made in planning. Put the ids of the stories that each one affects in `applies_to`.
 
-Return only the structured output. The base branch of the first story is `{{DEFAULT_BRANCH}}`.
+Return only the structured output. The base branch of the first story is `{{BASE_BRANCH}}`.

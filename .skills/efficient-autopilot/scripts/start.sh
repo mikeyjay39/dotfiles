@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Usage: start.sh <work-item>...
+# Usage: start.sh [--base <branch>] <work-item>...
 #        start.sh --resume <run-dir>
 # Starts an efficient-autopilot run in a new tmux session, from the main checkout of the current repo.
 # A work item is "#<n>", an issue URL, or a description. The top pane runs the pipeline. The bottom
@@ -36,14 +36,30 @@ new_run_dir() {
 [[ $# -ge 1 ]] || usage
 command -v tmux >/dev/null || fail 'tmux is not installed'
 
+# The first story is based on this branch, and its PR targets it. Default: the default branch of origin.
+base=''
+if [[ "$1" == --base ]]; then
+  [[ $# -ge 3 && -n "$2" ]] || usage
+  base=$2
+  shift 2
+fi
+
 if [[ "$1" == --resume ]]; then
+  # A resumed run keeps the base branch of its first start.
+  [[ -z "$base" ]] || fail '--base and --resume cannot go together'
   [[ $# -eq 2 && -r "$2/repo" ]] || usage
   run_dir=$(cd "$2" && pwd)
 else
   repo=$(git rev-parse --show-toplevel 2>/dev/null) || fail 'run this from a git repo'
   [[ "$(git rev-parse --git-dir)" == "$(git rev-parse --git-common-dir)" ]] ||
     fail 'run this from the main checkout, not from a worktree'
+  if [[ -n "$base" ]]; then
+    git check-ref-format --branch "$base" >/dev/null 2>&1 || fail "base branch name $base is not valid"
+    git ls-remote --exit-code --heads origin "$base" >/dev/null ||
+      fail "base branch $base is not on origin. Push it first"
+  fi
   run_dir=$(new_run_dir "$repo" "$@")
+  [[ -z "$base" ]] || printf '%s\n' "$base" >"$run_dir/base"
 fi
 
 session="autopilot-$(basename "$run_dir")"

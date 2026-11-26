@@ -70,6 +70,13 @@ out="$MOCK_DIR/out/$kind.$count.json"
 structured=null
 [[ ! -f "$out" ]] || structured=$(jq -c . "$out")
 echo '{"type":"rate_limit_event","rate_limit_info":{"status":"allowed","unifiedWindows":{"five_hour":{"utilization":0.1,"resetsAt":0}}}}'
+if [[ -f "$MOCK_DIR/cut-result-once" && -n "$schema" ]]; then
+  rm "$MOCK_DIR/cut-result-once"
+  jq -nc --argjson o "$structured" '{type: "assistant", message: {content: [{type: "tool_use", id: "tu-1", name: "StructuredOutput", input: $o}]}}'
+  echo '{"type":"user","message":{"content":[{"type":"tool_result","tool_use_id":"tu-1","content":"ok"}]}}'
+  printf '{"type":"result","subtype":"success","is_error":false,"result":"cut of'
+  exit 0
+fi
 jq -nc --arg s "$session" --argjson o "$structured" \
   '{type: "result", subtype: "success", is_error: false, result: "ok", session_id: $s, structured_output: $o, total_cost_usd: 0.01, num_turns: 1}'
 MOCK
@@ -123,6 +130,11 @@ done
 path="$MOCK_DIR/wt/${branch//\//-}"
 if [[ "$create" == true ]]; then git worktree add -q -b "$branch" "$path" "$base"
 elif [[ ! -d "$path" ]]; then git worktree add -q "$path" "$branch"; fi
+MOCK
+  cat >"$tmp/bin/tmux" <<'MOCK'
+#!/usr/bin/env bash
+printf 'tmux' >>"$MOCK_DIR/log"; printf ' <%s>' "$@" >>"$MOCK_DIR/log"; printf '\n' >>"$MOCK_DIR/log"
+[[ "$1" != has-session ]]
 MOCK
   cat >"$tmp/bin/sleep" <<'MOCK'
 #!/usr/bin/env bash
@@ -278,14 +290,80 @@ grep '^claude' "$MOCK_DIR/log" | sed -n 2p | grep -q -- '<--resume> <sess-plan-1
 [[ "$(state_of gh-1 status)" == done ]] || fail 'the run did not finish after the pause'
 ok 'a usage-limit result pauses, then resumes the same session'
 
-# ---- 5. Safety: no path merges or force-pushes.
+# ---- 5. A base branch: the first story is based on it, and its PR targets it.
+setup_case base
+git -C "$MOCK_DIR/repo" switch -q -c feature/epic
+git -C "$MOCK_DIR/repo" commit -q --allow-empty -m 'feature setup'
+git -C "$MOCK_DIR/repo" push -q -u origin feature/epic
+git -C "$MOCK_DIR/repo" switch -q main
+echo feature/epic >"$run_dir/base"
+write_plan 'test -f built' none
+write_step_outputs
+run_autopilot || { cat "$MOCK_DIR/stderr"; fail 'base case exited non-zero'; }
+[[ "$(<"$MOCK_DIR/base.tester_gh-1-story-a")" == feature/epic ]] || fail 'story A PR does not target the base branch'
+[[ "$(<"$MOCK_DIR/base.tester_gh-2-story-b")" == tester/gh-1-story-a ]] || fail 'story B is not stacked on story A'
+git -C "$MOCK_DIR/repo" log --format=%s tester/gh-1-story-a | grep -qx 'feature setup' || fail 'story A does not contain the base branch commit'
+assert_contains "$run_dir/prompts/decompose.md" 'The base branch of the first story is `feature/epic`' 'decompose prompt'
+ok 'with a base branch, the first story is based on it and its PR targets it'
+
+setup_case base-missing
+echo feature/nope >"$run_dir/base"
+write_plan 'test -f built' none
+if run_autopilot; then fail 'a base branch that is not on origin did not stop the run'; fi
+assert_contains "$MOCK_DIR/stderr" 'base branch feature/nope is not on origin' 'stderr'
+[[ ! -f "$MOCK_DIR/count.plan" ]] || fail 'the model ran with a missing base branch'
+ok 'a base branch that is not on origin stops the run before any model call'
+
+setup_case start-base
+git -C "$MOCK_DIR/repo" push -q origin main:refs/heads/feature/epic
+export XDG_STATE_HOME="$MOCK_DIR/state"
+(cd "$MOCK_DIR/repo" && "$scripts/start.sh" --base feature/epic '#1') >"$MOCK_DIR/start.out" || fail 'start.sh --base exited non-zero'
+started_run=$(sed -n 's/^run_dir=//p' "$MOCK_DIR/start.out")
+[[ "$(<"$started_run/base")" == feature/epic ]] || fail 'start.sh did not write the base file'
+assert_contains "$started_run/input.md" '- #1' 'input.md'
+(cd "$MOCK_DIR/repo" && "$scripts/start.sh" --base feature/nope '#1') 2>"$MOCK_DIR/start.err" && fail 'start.sh accepted a base branch that is not on origin'
+assert_contains "$MOCK_DIR/start.err" 'base branch feature/nope is not on origin' 'start.sh stderr'
+(cd "$MOCK_DIR/repo" && "$scripts/start.sh" --base feature/epic --resume "$started_run") 2>"$MOCK_DIR/start.err" &&
+  fail 'start.sh accepted --base with --resume'
+# A new state dir, because run dirs are named by the second and this start can be in the same second.
+export XDG_STATE_HOME="$MOCK_DIR/state-no-base"
+(cd "$MOCK_DIR/repo" && "$scripts/start.sh" '#1') >"$MOCK_DIR/start.out" || fail 'start.sh with no --base exited non-zero'
+[[ ! -e "$(sed -n 's/^run_dir=//p' "$MOCK_DIR/start.out")/base" ]] || fail 'start.sh wrote a base file with no --base'
+unset XDG_STATE_HOME
+ok 'start.sh --base checks the branch on origin and writes it to the run dir'
+
+# ---- 6. A cut-off result event: recover the structured output. A saved result is reused.
+setup_case cut-result
+write_plan 'test -f built' none
+write_step_outputs
+jq '.stories |= .[0:1] | .decisions[0].applies_to = ["gh-1"]' "$MOCK_DIR/out/plan.json" >"$MOCK_DIR/out/p.tmp" && mv "$MOCK_DIR/out/p.tmp" "$MOCK_DIR/out/plan.json"
+touch "$MOCK_DIR/cut-result-once"
+run_autopilot || { cat "$MOCK_DIR/stderr"; fail 'cut-result case exited non-zero'; }
+[[ "$(<"$MOCK_DIR/count.plan")" == 1 ]] || fail 'a cut-off result event made the plan step run again'
+assert_contains "$MOCK_DIR/stderr" 'Recovered the structured output' 'stderr'
+[[ "$(state_of gh-1 status)" == done ]] || fail 'the run did not finish after a recovered result'
+ok 'a cut-off result event is recovered from the StructuredOutput tool call'
+
+setup_case reuse-result
+write_plan 'test -f built' none
+write_step_outputs
+jq '.stories |= .[0:1] | .decisions[0].applies_to = ["gh-1"]' "$MOCK_DIR/out/plan.json" >"$MOCK_DIR/out/p.tmp" && mv "$MOCK_DIR/out/p.tmp" "$MOCK_DIR/out/plan.json"
+mkdir -p "$run_dir/results"
+jq -c '{type: "result", is_error: false, session_id: "saved", structured_output: .}' "$MOCK_DIR/out/plan.json" >"$run_dir/results/decompose.json"
+run_autopilot || { cat "$MOCK_DIR/stderr"; fail 'reuse case exited non-zero'; }
+[[ ! -f "$MOCK_DIR/count.plan" ]] || fail 'a saved plan result was not reused'
+assert_contains "$MOCK_DIR/stderr" 'decompose: reuse the saved result' 'stderr'
+[[ "$(state_of gh-1 status)" == done ]] || fail 'the run did not finish with a reused plan result'
+ok 'a start after a crash reuses a saved step result'
+
+# ---- 7. Safety: no path merges or force-pushes.
 for log in "$tmp"/*/log; do
   ! grep -E '<merge>|<--force>|<-f>|<--force-with-lease>' "$log" >/dev/null || fail "unsafe command in $log"
 done
 ! grep -nE 'gh pr merge|push[^#]*(--force|-f )' "$scripts"/*.sh || fail 'a script can merge or force-push'
 ok 'no path runs gh pr merge or a force push'
 
-# ---- 6. pretty-stream formats events.
+# ---- 8. pretty-stream formats events.
 printf '%s\n' '{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Bash","input":{"command":"npm test"}}]}}' |
   "$scripts/pretty-stream.sh" build-x | grep -qF '[build-x] Bash npm test' || fail 'pretty-stream output'
 ok 'pretty-stream prints one short line per tool call'
