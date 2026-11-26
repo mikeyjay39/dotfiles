@@ -65,5 +65,6 @@
   },
   "tui": "default",
   "theme": "auto",
-  "editorMode": "vim"
+  "editorMode": "vim",
+  "remoteControlAtStartup": true
 }
