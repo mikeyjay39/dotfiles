@@ -6,6 +6,9 @@
 # run dir to continue after a stop: each story continues after its last completed step.
 set -euo pipefail
 shopt -s inherit_errexit
+# Bash 5.2 replaces `&` in a ${var//pattern/text} replacement with the match. render_prompt puts
+# plan and human text in that replacement, so `&&` in a command must stay `&&`.
+shopt -u patsub_replacement 2>/dev/null || true
 
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 skill_dir=$(dirname "$script_dir")
@@ -18,7 +21,7 @@ build_model=${AUTOPILOT_BUILD_MODEL:-sonnet}
 verify_timeout=${AUTOPILOT_VERIFY_TIMEOUT:-1800}
 max_fix_rounds=2
 max_proof_attempts=2
-steps=(worktree build verify publish proof review summary)
+steps=(worktree build verify publish proof review summary ready)
 read_only_git='Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git status:*),Bash(git branch:*)'
 
 log() {
@@ -247,6 +250,8 @@ park() {
     return
   fi
   gh pr edit "$(state_get "$id" pr_url)" --title "$title" >/dev/null
+  # A rerun can park a story whose PR is ready. A parked PR is not ready for review.
+  gh pr ready --undo "$(state_get "$id" pr_url)" >/dev/null || log "$id: WARNING: cannot set the PR back to draft"
   update_pr_body "$id"
   {
     echo "## Parked by the autopilot"
@@ -454,6 +459,14 @@ step_summary() {
   call_step "summary-$id" --model "$build_model" --cwd "$(worktree_of "$id")" --prompt-file "$prompt" \
     --tools 'Read,Write,Glob,Grep,Bash,Skill' --allow 'Read,Glob,Grep,Bash,Skill' --skills --add-dir "$scratch" ||
     log "$id: WARNING: the PR summary step failed. See $run_dir/logs/summary-$id.*.jsonl"
+}
+
+# The PR stays a draft while the run works on it. When every step is done, it is ready for human review.
+# A ready PR also lets GitHub retarget it when the branch below it is merged and deleted. GitHub
+# closes a draft PR in that case.
+step_ready() {
+  gh pr ready "$(state_get "$1" pr_url)" >/dev/null || fail "cannot mark the PR of $1 ready for review"
+  log "$1: PR is ready for review"
 }
 
 # ---------------------------------------------------------------- run

@@ -6,7 +6,8 @@
 # A work item is "#<n>", an issue URL, or a description. The top pane runs the pipeline. The bottom
 # pane shows progress.sh. Prints "run_dir=", "session=", and "window=".
 # --rerun queues a request to fix or prove a done or parked story again, with the human's instructions.
-# All runs of a repo share one tmux session, autopilot-<repo>. Each start opens a window in it.
+# All runs of a repo share one tmux session, autopilot-<repo>, with one window per run. A resume or a
+# rerun reuses the run's window. A start closes the windows of other runs that ended.
 # A rerun only queues when the pipeline of its run still runs.
 set -euo pipefail
 
@@ -54,14 +55,39 @@ queue_rerun() {
   echo "$request"
 }
 
-# True when the run's state says it works and a window of the run is still open. A run that stopped
+# Prints the pipeline pane (the first pane, whatever pane-base-index is) of the run's window, or
+# nothing when the window is gone.
+pipeline_pane() {
+  local session=$1 window=$2
+  { tmux list-panes -t "=$session:=$window" -F '#{pane_index} #{pane_id}' 2>/dev/null || true; } | awk 'NR == 1 { print $2 }'
+}
+
+# The pipeline command sets @autopilot-state to running when it starts and to ended when it stops.
+pane_state() {
+  tmux show-options -p -v -t "$1" @autopilot-state 2>/dev/null || true
+}
+
+# True when the run's state says it works and its pipeline pane still runs. A run that stopped
 # without a state update (a reboot, a killed window) does not count.
 pipeline_is_alive() {
-  local run_dir=$1 session=$2 phase
+  local run_dir=$1 session=$2 phase pane
   [[ -r "$run_dir/state.json" ]] || return 1
   phase=$(jq -r '.phase // ""' "$run_dir/state.json")
   [[ "$phase" != done && "$phase" != failed:* ]] || return 1
-  tmux list-windows -t "=$session" -F '#W' 2>/dev/null | grep -q "^$(basename "$run_dir")"
+  pane=$(pipeline_pane "$session" "$(basename "$run_dir")")
+  [[ -n "$pane" && "$(pane_state "$pane")" == running ]]
+}
+
+# Closes the windows of other runs whose pipeline ended, so the session keeps only live work.
+# Each run's summary.md keeps the result.
+close_ended_windows() {
+  local session=$1 keep=$2 window pane
+  while IFS= read -r window; do
+    [[ "$window" != "$keep" ]] || continue
+    pane=$(pipeline_pane "$session" "$window")
+    [[ -n "$pane" && "$(pane_state "$pane")" == ended ]] || continue
+    tmux kill-window -t "=$session:=$window"
+  done < <(tmux list-windows -t "=$session" -F '#W' 2>/dev/null)
 }
 
 [[ $# -ge 1 ]] || usage
@@ -100,25 +126,23 @@ else
   [[ -z "$base" ]] || printf '%s\n' "$base" >"$run_dir/base"
 fi
 
-# One tmux session per repo. Each run, resume, and rerun is a window in it, so new work never opens
-# another session.
+# One tmux session per repo and one window per run. A resume or a rerun starts the pipeline again
+# in the run's window, so new work never opens another session or window.
 session="autopilot-$(basename "$(<"$run_dir/repo")")"
 run_id=$(basename "$run_dir")
+window=$run_id
 if [[ -n "$rerun_request" ]]; then
   echo "rerun=$rerun_request"
-  window="$run_id-rerun-$(basename "$rerun_request" .json)"
   if pipeline_is_alive "$run_dir" "$session"; then
     # The running pipeline takes pending reruns after its stories. A second pipeline would race it.
     echo "run_dir=$run_dir"
     echo "session=$session"
+    echo "window=$window"
     echo 'queued: the running pipeline does the rerun after its current work'
     exit 0
   fi
 elif [[ "$resuming" == true ]]; then
-  window="$run_id-resume"
   ! pipeline_is_alive "$run_dir" "$session" || fail "the pipeline of $run_id still runs in tmux session $session"
-else
-  window=$run_id
 fi
 
 printf -v pipeline '%q ' "$script_dir/autopilot.sh" "$run_dir"
@@ -129,14 +153,20 @@ if command -v systemd-inhibit >/dev/null && systemd-inhibit --list >/dev/null 2>
     --why='Autopilot run in progress' "$script_dir/autopilot.sh" "$run_dir"
 fi
 printf -v progress '%q ' watch -n 10 "$script_dir/progress.sh" "$run_dir"
-pipeline+="; echo; echo 'Run ended. Summary: $run_dir/summary.md. Press Enter to close.'; read -r"
+mark='tmux set-option -p -t "$TMUX_PANE" @autopilot-state'
+pipeline="$mark running; $pipeline; $mark ended; echo; echo 'Run ended. Summary: $run_dir/summary.md. The next start of this run uses this pane.'; read -r"
 
-if tmux has-session -t "=$session" 2>/dev/null; then
-  window_id=$(tmux new-window -d -P -F '#{window_id}' -t "=$session:" -n "$window" -c "$(<"$run_dir/repo")" "$pipeline")
+pane=$(pipeline_pane "$session" "$window")
+if [[ -n "$pane" ]]; then
+  tmux respawn-pane -k -t "$pane" -c "$(<"$run_dir/repo")" "$pipeline"
+elif tmux has-session -t "=$session" 2>/dev/null; then
+  pane=$(tmux new-window -d -P -F '#{pane_id}' -t "=$session:" -n "$window" -c "$(<"$run_dir/repo")" "$pipeline")
 else
-  window_id=$(tmux new-session -d -P -F '#{window_id}' -s "$session" -n "$window" -c "$(<"$run_dir/repo")" "$pipeline")
+  pane=$(tmux new-session -d -P -F '#{pane_id}' -s "$session" -n "$window" -c "$(<"$run_dir/repo")" "$pipeline")
 fi
-tmux split-window -d -v -l 14 -t "$window_id" -c "$run_dir" "$progress"
+[[ "$(tmux list-panes -t "$pane" -F x | wc -l)" -ge 2 ]] ||
+  tmux split-window -d -v -l 14 -t "$pane" -c "$run_dir" "$progress"
+close_ended_windows "$session" "$window"
 
 echo "run_dir=$run_dir"
 echo "session=$session"

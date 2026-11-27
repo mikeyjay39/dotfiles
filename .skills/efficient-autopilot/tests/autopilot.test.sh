@@ -108,6 +108,9 @@ case "$1 $2" in
   "pr edit")
     shift 3
     if [[ "${1:-}" == --body-file ]]; then cp "$2" "$MOCK_DIR/body.edit.$(date +%s%N).md"; fi ;;
+  "pr ready")
+    shift 2
+    echo "$*" >>"$MOCK_DIR/ready" ;;
   "pr comment")
     shift 3
     n=$(( $(find "$MOCK_DIR" -maxdepth 1 -name 'comment.*.md' | wc -l) + 1 ))
@@ -133,14 +136,31 @@ elif [[ ! -d "$path" ]]; then git worktree add -q "$path" "$branch"; fi
 MOCK
   cat >"$tmp/bin/tmux" <<'MOCK'
 #!/usr/bin/env bash
+# Windows are lines in tmux-windows. The pipeline pane of window <w> is %<w>, and its
+# @autopilot-state is in tmux-state/<w>. A split window has the file tmux-split/<w>.
 printf 'tmux' >>"$MOCK_DIR/log"; printf ' <%s>' "$@" >>"$MOCK_DIR/log"; printf '\n' >>"$MOCK_DIR/log"
-case "$1" in
+mkdir -p "$MOCK_DIR/tmux-state" "$MOCK_DIR/tmux-split"
+target='' name=''
+cmd=$1; shift
+while [[ $# -gt 0 ]]; do
+  case "$1" in -t) target=$2; shift ;; -n) name=$2; shift ;; esac
+  shift
+done
+window=${target##*:=}; window=${window#%}
+case "$cmd" in
   has-session) [[ -f "$MOCK_DIR/tmux-session" ]] ;;
   list-windows) cat "$MOCK_DIR/tmux-windows" 2>/dev/null || true ;;
+  list-panes)
+    grep -qxF "$window" "$MOCK_DIR/tmux-windows" 2>/dev/null || exit 1
+    echo "1 %$window"
+    [[ ! -f "$MOCK_DIR/tmux-split/$window" ]] || echo "2 %$window-progress" ;;
+  show-options) cat "$MOCK_DIR/tmux-state/$window" 2>/dev/null || true ;;
+  split-window) touch "$MOCK_DIR/tmux-split/$window" ;;
+  kill-window) grep -vxF "$window" "$MOCK_DIR/tmux-windows" >"$MOCK_DIR/tmux-windows.tmp"; mv "$MOCK_DIR/tmux-windows.tmp" "$MOCK_DIR/tmux-windows" ;;
   new-session | new-window)
     touch "$MOCK_DIR/tmux-session"
-    while [[ $# -gt 0 ]]; do [[ "$1" != -n ]] || echo "$2" >>"$MOCK_DIR/tmux-windows"; shift; done
-    echo "@$(wc -l <"$MOCK_DIR/tmux-windows")" ;;
+    echo "$name" >>"$MOCK_DIR/tmux-windows"
+    echo "%$name" ;;
 esac
 MOCK
   cat >"$tmp/bin/sleep" <<'MOCK'
@@ -252,6 +272,9 @@ grep '^claude' "$MOCK_DIR/log" | grep -- '"verdict"' | grep -q -- '--resume' && 
 ok 'fix and proof steps resume the build session, and the review starts fresh'
 
 assert_contains "$run_dir/summary.md" '| `gh-1` | done |' 'summary.md'
+[[ "$(grep -cvx -- '--undo.*' "$MOCK_DIR/ready")" == 2 ]] || fail 'the two done PRs are not marked ready'
+grep '^gh' "$MOCK_DIR/log" | grep -v '<repo> <view>' | tail -1 | grep -q '<pr> <ready>' || fail 'ready is not the last GitHub call of the run'
+ok 'each done story PR is marked ready for review as the last step'
 "$scripts/progress.sh" "$run_dir" >"$MOCK_DIR/progress"
 assert_contains "$MOCK_DIR/progress" 'gh-2' 'progress'
 assert_contains "$MOCK_DIR/progress" 'phase: done' 'progress'
@@ -282,6 +305,7 @@ run_autopilot || { cat "$MOCK_DIR/stderr"; fail 'park case exited non-zero'; }
 [[ "$(<"$MOCK_DIR/count.fix")" == 2 ]] || fail 'verify failure did not give two fix rounds'
 grep -q '<create>.*<\[PARKED\] Story A>' "$MOCK_DIR/log" || fail 'parked story has no [PARKED] PR'
 [[ ! -f "$MOCK_DIR/count.review" ]] || fail 'a parked story was reviewed'
+[[ ! -f "$MOCK_DIR/ready" ]] || fail 'a parked story PR was marked ready'
 ok 'a verify failure gets two fix rounds, then parks the story and skips its dependent'
 
 # ---- 4. A usage-limit result pauses, then resumes the same step.
@@ -335,14 +359,16 @@ assert_contains "$MOCK_DIR/start.err" 'base branch feature/nope is not on origin
 grep -q '^tmux <new-session>.*<autopilot-repo>' "$MOCK_DIR/log" || fail 'the first run did not open the repo session'
 : >"$MOCK_DIR/log"
 # A new state dir, because run dirs are named by the second and this start can be in the same second.
+# For the same reason, close the first window: a window of the same name would be reused.
 export XDG_STATE_HOME="$MOCK_DIR/state-no-base"
+: >"$MOCK_DIR/tmux-windows"; rm -f "$MOCK_DIR"/tmux-split/*
 (cd "$MOCK_DIR/repo" && "$scripts/start.sh" '#1') >"$MOCK_DIR/start.out" || fail 'start.sh with no --base exited non-zero'
 [[ ! -e "$(sed -n 's/^run_dir=//p' "$MOCK_DIR/start.out")/base" ]] || fail 'start.sh wrote a base file with no --base'
 unset XDG_STATE_HOME
 ok 'start.sh --base checks the branch on origin and writes it to the run dir'
 grep -q '^tmux <new-session>' "$MOCK_DIR/log" && fail 'a second run opened a new tmux session'
 grep -q '^tmux <new-window>.*<=autopilot-repo:>' "$MOCK_DIR/log" || fail 'a second run did not open a window in the repo session'
-grep -q '^tmux <split-window>.*<@2>' "$MOCK_DIR/log" || fail 'the progress pane is not in the new window'
+grep -q '^tmux <split-window>.*<%[0-9-]*>' "$MOCK_DIR/log" || fail 'the progress pane is not in the new window'
 ok 'all runs of a repo share one tmux session, one window per run'
 
 # ---- 6. A cut-off result event: recover the structured output. A saved result is reused.
@@ -386,12 +412,12 @@ ok 'start.sh --rerun rejects an unknown story, an unknown step, and empty instru
 
 touch "$MOCK_DIR/tmux-session"
 : >"$MOCK_DIR/log"
-(cd "$MOCK_DIR/repo" && "$scripts/start.sh" --rerun "$run_dir" gh-2 fix,proof 'Allow ONE live call to the API.') \
+(cd "$MOCK_DIR/repo" && "$scripts/start.sh" --rerun "$run_dir" gh-2 fix,proof 'Allow ONE live call to the API. Run `a && b`.') \
   >"$MOCK_DIR/start.out" || fail 'start.sh --rerun exited non-zero'
-grep -q '^tmux <new-window>.*<=autopilot-repo:>.*<run-rerun-1>' "$MOCK_DIR/log" || fail 'the rerun did not open a window in the existing session'
+grep -q '^tmux <new-window>.*<=autopilot-repo:>.*<-n> <run>' "$MOCK_DIR/log" || fail 'the rerun did not open the run window in the existing session'
 grep -q '^tmux <new-session>' "$MOCK_DIR/log" && fail 'the rerun opened a new session'
 [[ "$(jq -r .status "$run_dir/reruns/1.json")" == pending ]] || fail 'the rerun request is not pending'
-ok 'start.sh --rerun queues the request and opens a window in the existing tmux session'
+ok 'start.sh --rerun queues the request and opens the run window in the existing tmux session'
 
 fix_before=$(cat "$MOCK_DIR/count.fix" 2>/dev/null || echo 0) proof_before=$(<"$MOCK_DIR/count.proof")
 run_autopilot || { cat "$MOCK_DIR/stderr"; fail 'the rerun exited non-zero'; }
@@ -400,6 +426,8 @@ run_autopilot || { cat "$MOCK_DIR/stderr"; fail 'the rerun exited non-zero'; }
 [[ "$(jq -r .status "$run_dir/reruns/1.json")" == done ]] || fail 'the rerun is not done'
 assert_contains "$run_dir/prompts/rerun-1-fix-gh-2.md" 'Allow ONE live call to the API.' 'fix prompt'
 assert_contains "$run_dir/prompts/rerun-1-proof-gh-2.md" 'Allow ONE live call to the API.' 'proof prompt'
+assert_contains "$run_dir/prompts/rerun-1-fix-gh-2.md" 'Run `a && b`.' 'fix prompt keeps &&'
+assert_not_contains "$run_dir/prompts/rerun-1-fix-gh-2.md" '{{PROBLEMS}}' 'fix prompt has no template text'
 grep '^claude' "$MOCK_DIR/log" | grep -- '"evidence"' | tail -1 | grep -q -- '<--resume> <sess-' || fail 'the rerun proof did not resume the worker session'
 grep -l 'Rerun 1, requested by the human' "$MOCK_DIR"/comment.*.md | xargs grep -qF 'gh-2-rerun-1/shot.png?raw=true' ||
   fail 'the rerun proof comment has no image in its own folder'
@@ -425,20 +453,38 @@ run_autopilot || { cat "$MOCK_DIR/stderr"; fail 'the failed rerun proof exited n
 ok 'a failed rerun proof is reported, with no fix round and no park'
 
 jq '.phase = "story gh-2"' "$run_dir/state.json" >"$run_dir/state.tmp" && mv "$run_dir/state.tmp" "$run_dir/state.json"
+echo running >"$MOCK_DIR/tmux-state/run"
 : >"$MOCK_DIR/log"
 (cd "$MOCK_DIR/repo" && "$scripts/start.sh" --rerun "$run_dir" gh-1 proof 'Again.') >"$MOCK_DIR/start.out"
 assert_contains "$MOCK_DIR/start.out" 'queued: the running pipeline does the rerun' 'start.sh output'
-grep -q '^tmux <new-window>' "$MOCK_DIR/log" && fail 'a rerun started a second pipeline while one runs'
+grep -qE '^tmux <(new-window|respawn-pane)>' "$MOCK_DIR/log" && fail 'a rerun started a second pipeline while one runs'
 (cd "$MOCK_DIR/repo" && "$scripts/start.sh" --resume "$run_dir") 2>"$MOCK_DIR/start.err" && fail 'resume started a second pipeline'
 mv "$MOCK_DIR/tmux-windows" "$MOCK_DIR/tmux-windows.saved"
 (cd "$MOCK_DIR/repo" && "$scripts/start.sh" --rerun "$run_dir" gh-1 proof 'After a reboot.') >"$MOCK_DIR/start.out"
 assert_not_contains "$MOCK_DIR/start.out" 'queued' 'start.sh output'
-grep -q '^tmux <new-window>.*<run-rerun-4>' "$MOCK_DIR/log" || fail 'a rerun waited for a pipeline whose window is gone'
+grep -q '^tmux <new-window>.*<-n> <run>' "$MOCK_DIR/log" || fail 'a rerun waited for a pipeline whose window is gone'
 mv "$MOCK_DIR/tmux-windows.saved" "$MOCK_DIR/tmux-windows"
+echo ended >"$MOCK_DIR/tmux-state/run"
+: >"$MOCK_DIR/log"
+(cd "$MOCK_DIR/repo" && "$scripts/start.sh" --rerun "$run_dir" gh-1 proof 'Pipeline ended.') >"$MOCK_DIR/start.out"
+assert_not_contains "$MOCK_DIR/start.out" 'queued' 'start.sh output'
+grep -q '^tmux <respawn-pane>.*<-k>.*<%run>' "$MOCK_DIR/log" || fail 'a rerun did not reuse the ended pipeline pane'
+grep -qE '^tmux <(new-window|new-session)>' "$MOCK_DIR/log" && fail 'a rerun opened a window while the run window exists'
+ok 'while the pipeline runs, a rerun only queues; after it ends, a start reuses the run window'
+
+printf '%s\n' old-ended old-running old-unknown >>"$MOCK_DIR/tmux-windows"
+echo ended >"$MOCK_DIR/tmux-state/old-ended"
+echo running >"$MOCK_DIR/tmux-state/old-running"
 jq '.phase = "done"' "$run_dir/state.json" >"$run_dir/state.tmp" && mv "$run_dir/state.tmp" "$run_dir/state.json"
+: >"$MOCK_DIR/log"
 (cd "$MOCK_DIR/repo" && "$scripts/start.sh" --resume "$run_dir") >/dev/null || fail 'resume of a done run with a session failed'
-grep -q '^tmux <new-window>.*<run-resume>' "$MOCK_DIR/log" || fail 'resume did not reuse the existing session'
-ok 'while the pipeline runs, a rerun only queues; with no window or after the run, a start opens a window'
+grep -q '^tmux <respawn-pane>.*<%run>' "$MOCK_DIR/log" || fail 'resume did not reuse the run window'
+grep -qE '^tmux <(new-window|new-session)>' "$MOCK_DIR/log" && fail 'resume opened a window'
+grep -q '^tmux <split-window>' "$MOCK_DIR/log" && fail 'resume added a second progress pane'
+grep -qx old-ended "$MOCK_DIR/tmux-windows" && fail 'an ended window of another run is still open'
+grep -qx old-running "$MOCK_DIR/tmux-windows" || fail 'a start closed a running window'
+grep -qx old-unknown "$MOCK_DIR/tmux-windows" || fail 'a start closed a window with no state'
+ok 'a start closes the ended windows of other runs and keeps the others'
 
 # ---- 8. Safety: no path merges or force-pushes.
 for log in "$tmp"/*/log; do
