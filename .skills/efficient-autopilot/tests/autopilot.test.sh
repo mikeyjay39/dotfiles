@@ -134,7 +134,7 @@ MOCK
   cat >"$tmp/bin/tmux" <<'MOCK'
 #!/usr/bin/env bash
 printf 'tmux' >>"$MOCK_DIR/log"; printf ' <%s>' "$@" >>"$MOCK_DIR/log"; printf '\n' >>"$MOCK_DIR/log"
-[[ "$1" != has-session ]]
+[[ "$1" != has-session || -f "$MOCK_DIR/tmux-session" ]]
 MOCK
   cat >"$tmp/bin/sleep" <<'MOCK'
 #!/usr/bin/env bash
@@ -356,14 +356,80 @@ assert_contains "$MOCK_DIR/stderr" 'decompose: reuse the saved result' 'stderr'
 [[ "$(state_of gh-1 status)" == done ]] || fail 'the run did not finish with a reused plan result'
 ok 'a start after a crash reuses a saved step result'
 
-# ---- 7. Safety: no path merges or force-pushes.
+# ---- 7. A rerun: the human asks for a fix and a proof of a done story, in the same run and session.
+setup_case rerun
+write_plan 'test -f built' ui
+write_step_outputs
+run_autopilot || { cat "$MOCK_DIR/stderr"; fail 'rerun base run exited non-zero'; }
+(cd "$MOCK_DIR/repo" && "$scripts/start.sh" --rerun "$run_dir" gh-9 proof 'x') 2>"$MOCK_DIR/start.err" &&
+  fail 'start.sh accepted a story that is not in the plan'
+assert_contains "$MOCK_DIR/start.err" 'story gh-9 is not in the plan' 'start.sh stderr'
+(cd "$MOCK_DIR/repo" && "$scripts/start.sh" --rerun "$run_dir" gh-2 review 'x') 2>"$MOCK_DIR/start.err" &&
+  fail 'start.sh accepted an unknown rerun step'
+(cd "$MOCK_DIR/repo" && "$scripts/start.sh" --rerun "$run_dir" gh-2 proof ' ') 2>"$MOCK_DIR/start.err" &&
+  fail 'start.sh accepted empty instructions'
+[[ ! -d "$run_dir/reruns" ]] || fail 'a rejected rerun wrote a request'
+ok 'start.sh --rerun rejects an unknown story, an unknown step, and empty instructions'
+
+touch "$MOCK_DIR/tmux-session"
+: >"$MOCK_DIR/log"
+(cd "$MOCK_DIR/repo" && "$scripts/start.sh" --rerun "$run_dir" gh-2 fix,proof 'Allow ONE live call to the API.') \
+  >"$MOCK_DIR/start.out" || fail 'start.sh --rerun exited non-zero'
+grep -q '^tmux <new-window>.*<rerun-1>' "$MOCK_DIR/log" || fail 'the rerun did not open a window in the existing session'
+grep -q '^tmux <new-session>' "$MOCK_DIR/log" && fail 'the rerun opened a new session'
+[[ "$(jq -r .status "$run_dir/reruns/1.json")" == pending ]] || fail 'the rerun request is not pending'
+ok 'start.sh --rerun queues the request and opens a window in the existing tmux session'
+
+fix_before=$(cat "$MOCK_DIR/count.fix" 2>/dev/null || echo 0) proof_before=$(<"$MOCK_DIR/count.proof")
+run_autopilot || { cat "$MOCK_DIR/stderr"; fail 'the rerun exited non-zero'; }
+[[ "$(<"$MOCK_DIR/count.fix")" == $((fix_before + 1)) ]] || fail 'the rerun did not run one fix'
+[[ "$(<"$MOCK_DIR/count.proof")" == $((proof_before + 1)) ]] || fail 'the rerun did not run one proof'
+[[ "$(jq -r .status "$run_dir/reruns/1.json")" == done ]] || fail 'the rerun is not done'
+assert_contains "$run_dir/prompts/rerun-1-fix-gh-2.md" 'Allow ONE live call to the API.' 'fix prompt'
+assert_contains "$run_dir/prompts/rerun-1-proof-gh-2.md" 'Allow ONE live call to the API.' 'proof prompt'
+grep '^claude' "$MOCK_DIR/log" | grep -- '"evidence"' | tail -1 | grep -q -- '<--resume> <sess-' || fail 'the rerun proof did not resume the worker session'
+grep -l 'Rerun 1, requested by the human' "$MOCK_DIR"/comment.*.md | xargs grep -qF 'gh-2-rerun-1/shot.png?raw=true' ||
+  fail 'the rerun proof comment has no image in its own folder'
+grep -l 'Fixes that the human asked for' "$MOCK_DIR"/comment.*.md >/dev/null || fail 'no rerun fix reply'
+git -C "$MOCK_DIR/origin.git" ls-tree --name-only autopilot-proof/run | grep -qx gh-2 || fail 'the rerun removed the first proof screenshots'
+[[ "$(state_of gh-2 proof_url)" == "$(grep -l 'Rerun 1' "$MOCK_DIR"/comment.*.md | tail -1 | sed 's/.*comment\.\([0-9]*\)\.md/https:\/\/github.com\/owner\/repo\/pull\/1#issuecomment-\1/')" ]] ||
+  fail 'the PR body does not link the rerun proof'
+assert_contains "$run_dir/summary.md" '| 1 | `gh-2` | fix, proof | done |' 'summary.md'
+ok 'a rerun fixes, verifies, pushes, and proves the story in the same session, and summary.md lists it'
+
+calls_before=$(grep -c '^claude' "$MOCK_DIR/log")
+run_autopilot || fail 'a start after the rerun exited non-zero'
+[[ "$(grep -c '^claude' "$MOCK_DIR/log")" == "$calls_before" ]] || fail 'a done rerun ran again'
+ok 'a done rerun does not run again'
+
+jq '.status = "fail"' "$MOCK_DIR/out/proof.json" >"$MOCK_DIR/out/proof.$((proof_before + 2)).json"
+fix_before=$(<"$MOCK_DIR/count.fix")
+(cd "$MOCK_DIR/repo" && "$scripts/start.sh" --rerun "$run_dir" gh-2 proof 'Prove it again.') >/dev/null
+run_autopilot || { cat "$MOCK_DIR/stderr"; fail 'the failed rerun proof exited non-zero'; }
+[[ "$(jq -r .status "$run_dir/reruns/2.json")" == 'proof failed' ]] || fail 'a failed rerun proof is not reported'
+[[ "$(<"$MOCK_DIR/count.fix")" == "$fix_before" ]] || fail 'a failed rerun proof started a fix round'
+[[ "$(state_of gh-2 status)" == done ]] || fail 'a failed rerun proof changed the story status'
+ok 'a failed rerun proof is reported, with no fix round and no park'
+
+jq '.phase = "story gh-2"' "$run_dir/state.json" >"$run_dir/state.tmp" && mv "$run_dir/state.tmp" "$run_dir/state.json"
+: >"$MOCK_DIR/log"
+(cd "$MOCK_DIR/repo" && "$scripts/start.sh" --rerun "$run_dir" gh-1 proof 'Again.') >"$MOCK_DIR/start.out"
+assert_contains "$MOCK_DIR/start.out" 'queued: the running pipeline does the rerun' 'start.sh output'
+grep -q '^tmux <new-window>' "$MOCK_DIR/log" && fail 'a rerun started a second pipeline while one runs'
+(cd "$MOCK_DIR/repo" && "$scripts/start.sh" --resume "$run_dir") 2>"$MOCK_DIR/start.err" && fail 'resume started a second pipeline'
+jq '.phase = "done"' "$run_dir/state.json" >"$run_dir/state.tmp" && mv "$run_dir/state.tmp" "$run_dir/state.json"
+(cd "$MOCK_DIR/repo" && "$scripts/start.sh" --resume "$run_dir") >/dev/null || fail 'resume of a done run with a session failed'
+grep -q '^tmux <new-window>.*<resume>' "$MOCK_DIR/log" || fail 'resume did not reuse the existing session'
+ok 'while the pipeline runs, a rerun only queues; after it, --resume reuses the session'
+
+# ---- 8. Safety: no path merges or force-pushes.
 for log in "$tmp"/*/log; do
   ! grep -E '<merge>|<--force>|<-f>|<--force-with-lease>' "$log" >/dev/null || fail "unsafe command in $log"
 done
 ! grep -nE 'gh pr merge|push[^#]*(--force|-f )' "$scripts"/*.sh || fail 'a script can merge or force-push'
 ok 'no path runs gh pr merge or a force push'
 
-# ---- 8. pretty-stream formats events.
+# ---- 9. pretty-stream formats events.
 printf '%s\n' '{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Bash","input":{"command":"npm test"}}]}}' |
   "$scripts/pretty-stream.sh" build-x | grep -qF '[build-x] Bash npm test' || fail 'pretty-stream output'
 ok 'pretty-stream prints one short line per tool call'

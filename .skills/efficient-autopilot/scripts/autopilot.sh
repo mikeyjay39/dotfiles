@@ -204,6 +204,8 @@ pr_comment() {
 
 # Stores screenshots on an orphan branch, because `gh` cannot attach images to a comment.
 # Prints the base URL of the story's folder on that branch.
+# The id is also the folder name on the branch. A rerun gives "<story>-rerun-<n>", so that it keeps
+# the screenshots of the first proof.
 publish_screenshots() {
   local id=$1 proof_dir=$2 proof_json=$3 ref="refs/heads/autopilot-proof/$(basename "$run_dir")"
   local entries='' path sha story_tree top_tree parent commit nwo
@@ -284,12 +286,14 @@ run_verify() {
   return "$failed"
 }
 
+# Args: story id, problems, and an optional step label. A rerun gives its own label, so that the
+# label stays the same when a crashed rerun starts again and the saved result is reused.
 fix_round() {
   local id=$1 problems=$2 round label prompt
   round=$(state_get "$id" fix_rounds)
   round=$((${round:-0} + 1))
   state_set "$id" fix_rounds "$round"
-  label="fix-$id-$round"
+  label=${3:-fix-$id-$round}
   prompt="$run_dir/prompts/$label.md"
   render_prompt fix "$prompt" "STORY_ID=$id" "PROBLEMS=$problems"
   call_step "$label" --model "$build_model" --cwd "$(worktree_of "$id")" --prompt-file "$prompt" \
@@ -478,6 +482,100 @@ process_story() {
   state_set "$id" status '"done"'
 }
 
+# ---------------------------------------------------------------- reruns
+
+# `start.sh --rerun` writes a request to <run-dir>/reruns/<n>.json. The run does the requests in
+# order, after the stories. A request can come while the run works on the stories.
+next_pending_rerun() {
+  local request
+  for request in $(ls "$run_dir"/reruns/*.json 2>/dev/null | sort -V); do
+    [[ "$(jq -r .status "$request")" != pending ]] || { echo "$request"; return; }
+  done
+}
+
+set_rerun_field() {
+  local request=$1 key=$2 value=$3
+  jq --arg k "$key" --argjson v "$value" '.[$k] = $v' "$request" >"$request.tmp"
+  mv "$request.tmp" "$request"
+}
+
+human_instructions() {
+  printf 'The human gives these instructions after the run. They apply to this step only. Where they allow more than the hard limits, they win:\n\n%s\n' "$1"
+}
+
+# Fixes the story as the human asks, then verifies, pushes, and replies on the PR.
+rerun_fix() {
+  local id=$1 n=$2 instructions=$3 worktree before comment
+  worktree=$(worktree_of "$id")
+  before=$(git -C "$worktree" rev-parse --short HEAD)
+  fix_round "$id" "$(human_instructions "$instructions")" "rerun-$n-fix-$id"
+  verify_with_fixes "$id"
+  is_parked "$id" && return
+  push_story "$id"
+  comment="$run_dir/results/rerun-$n-fix-$id.md"
+  result_of "rerun-$n-fix-$id" >"$comment.json"
+  {
+    printf '_Rerun %s, requested by the human._\n\n' "$n"
+    "$script_dir/render.sh" fix-reply "$comment.json" "$before..$(git -C "$worktree" rev-parse --short HEAD)" |
+      sed '1s/Fixes for the automated review/Fixes that the human asked for/'
+  } >"$comment"
+  pr_comment "$id" "$comment" >/dev/null
+  update_pr_body "$id"
+}
+
+# Proves the story again with the human's instructions. A failure is reported, not fixed: the human decides.
+rerun_proof() {
+  local id=$1 n=$2 instructions=$3 label="rerun-$2-proof-$1" folder="$1-rerun-$2"
+  local proof_dir="$run_dir/proof/$folder" prompt="$run_dir/prompts/rerun-$2-proof-$1.md"
+  local worktree proof_json comment url base_url=''
+  worktree=$(worktree_of "$id")
+  mkdir -p "$proof_dir"
+  render_prompt proof "$prompt" "STORY_ID=$id" "PROOF=$(story_field "$id" .proof)" \
+    "PROOF_COMMANDS=$(bullets "$id" .proof_commands)" "AC=$(bullets "$id" .acceptance_criteria)" \
+    "PROOF_DIR=$proof_dir"
+  printf '\n## Instructions from the human\n\n%s' "$(human_instructions "$instructions")" >>"$prompt"
+  call_step "$label" --model "$build_model" --cwd "$worktree" --prompt-file "$prompt" \
+    --tools 'Read,Write,Glob,Grep,Bash' --allow 'Read,Glob,Grep,Bash' --schema "$(schema_file proof)" \
+    --resume "$(state_get "$id" session_id)" --add-dir "$proof_dir"
+  if [[ -n "$(git -C "$worktree" status --porcelain)" ]]; then
+    git -C "$worktree" stash push -q -u -m "autopilot: changes made during rerun $n proof of $id"
+  fi
+  proof_json="$run_dir/results/$label.proof.json"
+  result_of "$label" | jq '.screenshots |= map(.path |= split("/")[-1])' >"$proof_json"
+  if [[ "$(jq '.screenshots | length' "$proof_json")" -gt 0 ]]; then
+    base_url=$(publish_screenshots "$folder" "$proof_dir" "$proof_json" || true)
+  fi
+  comment="$run_dir/results/$label.md"
+  {
+    printf '_Rerun %s, requested by the human._\n\n' "$n"
+    "$script_dir/render.sh" proof-comment "$proof_json" "$base_url"
+  } >"$comment"
+  url=$(pr_comment "$id" "$comment")
+  state_set "$id" proof_url "$(json_string "$url")"
+  update_pr_body "$id"
+}
+
+run_rerun() {
+  local request=$1 id n instructions step result=done
+  id=$(jq -r .story "$request")
+  n=$(jq -r .n "$request")
+  instructions=$(jq -r .instructions "$request")
+  state_top phase "\"rerun $n of $id\""
+  log "$id: rerun $n: $(jq -r '.steps | join(", ")' "$request")"
+  for step in $(jq -r '.steps[]' "$request"); do
+    case "$step" in
+      fix)
+        rerun_fix "$id" "$n" "$instructions"
+        if is_parked "$id"; then result=parked; break; fi ;;
+      proof)
+        rerun_proof "$id" "$n" "$instructions"
+        [[ "$(jq -r .status "$run_dir/results/rerun-$n-proof-$id.proof.json")" != fail ]] || result='proof failed' ;;
+    esac
+  done
+  set_rerun_field "$request" status "$(json_string "$result")"
+  log "$id: rerun $n: $result"
+}
+
 # Prints the errors in a candidate plan, one per line. No output means the plan is valid.
 plan_errors() {
   local candidate=$1 branch
@@ -535,10 +633,22 @@ write_summary() {
       printf '| `%s` | %s | %s | %s | %s |\n' "$id" "$(state_get "$id" status)" "$(state_get "$id" pr_url)" \
         "$(jq 'length' "$run_dir/decisions/$id.json" 2>/dev/null || echo 0)" "$(state_get "$id" note)"
     done
+    write_rerun_table
     echo
     echo "Usage pauses: $pauses. Cost at API prices: \$$cost (a subscription pays from its usage limit)."
   } >"$out"
   cat "$out" >&2
+}
+
+write_rerun_table() {
+  compgen -G "$run_dir/reruns/*.json" >/dev/null || return 0
+  echo
+  echo "Reruns requested by the human:"
+  echo
+  echo "| Rerun | Story | Steps | Result | Instructions |"
+  echo "| --- | --- | --- | --- | --- |"
+  ls "$run_dir"/reruns/*.json | sort -V | xargs cat | jq -rs '.[]
+    | "| \(.n) | `\(.story)` | \(.steps | join(", ")) | \(.status) | \(.instructions | gsub("\n"; " ") | gsub("\\|"; "\\|") | .[0:120]) |"'
 }
 
 notify_done() {
@@ -559,6 +669,10 @@ main() {
   [[ -r "$plan" ]] || decompose
   for id in $(story_ids); do
     process_story "$id"
+  done
+  local request
+  while request=$(next_pending_rerun) && [[ -n "$request" ]]; do
+    run_rerun "$request"
   done
   state_top phase '"done"'
   write_summary

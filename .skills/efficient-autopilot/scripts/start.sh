@@ -1,15 +1,18 @@
 #!/usr/bin/env bash
 # Usage: start.sh [--base <branch>] <work-item>...
 #        start.sh --resume <run-dir>
+#        start.sh --rerun <run-dir> <story-id> <fix|proof|fix,proof> <instructions>
 # Starts an efficient-autopilot run in a new tmux session, from the main checkout of the current repo.
 # A work item is "#<n>", an issue URL, or a description. The top pane runs the pipeline. The bottom
 # pane shows progress.sh. Prints "run_dir=" and "session=".
+# --rerun queues a request to fix or prove a done or parked story again, with the human's instructions.
+# It reuses the run's tmux session: a new window, or only the queue when the pipeline still runs.
 set -euo pipefail
 
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 usage() {
-  sed -n '2,3p' "$0" | sed 's/^# //' >&2
+  sed -n '2,4p' "$0" | sed 's/^# //' >&2
   exit 2
 }
 
@@ -33,6 +36,29 @@ new_run_dir() {
   echo "$run_dir"
 }
 
+# Writes <run-dir>/reruns/<n>.json. Prints the request file.
+queue_rerun() {
+  local run_dir=$1 id=$2 steps=$3 instructions=$4 status n request
+  [[ -r "$run_dir/plan.json" && -r "$run_dir/state.json" ]] || fail "$run_dir has no plan. Only a planned run can rerun a story"
+  jq -e --arg id "$id" '.stories | any(.id == $id)' "$run_dir/plan.json" >/dev/null || fail "story $id is not in the plan"
+  status=$(jq -r --arg id "$id" '.stories[$id].status // "queued"' "$run_dir/state.json")
+  [[ "$status" == done || "$status" == parked ]] || fail "story $id is $status. Only a done or parked story can rerun"
+  [[ "$steps" =~ ^(fix|proof|fix,proof)$ ]] || fail "steps must be fix, proof, or fix,proof, not $steps"
+  [[ -n "${instructions// /}" ]] || fail 'give the instructions for the rerun'
+  mkdir -p "$run_dir/reruns"
+  n=$(($(find "$run_dir/reruns" -name '*.json' | wc -l) + 1))
+  request="$run_dir/reruns/$n.json"
+  jq -n --argjson n "$n" --arg id "$id" --arg steps "$steps" --arg text "$instructions" --arg at "$(date -Is)" \
+    '{n: $n, story: $id, steps: ($steps | split(",")), instructions: $text, status: "pending", requested_at: $at}' >"$request"
+  echo "$request"
+}
+
+pipeline_is_running() {
+  local phase
+  phase=$(jq -r '.phase // ""' "$1/state.json")
+  [[ "$phase" != done && "$phase" != failed:* ]]
+}
+
 [[ $# -ge 1 ]] || usage
 command -v tmux >/dev/null || fail 'tmux is not installed'
 
@@ -44,11 +70,18 @@ if [[ "$1" == --base ]]; then
   shift 2
 fi
 
-if [[ "$1" == --resume ]]; then
+rerun_request='' resuming=false
+if [[ "$1" == --rerun ]]; then
+  [[ -z "$base" ]] || fail '--base and --rerun cannot go together'
+  [[ $# -eq 5 && -r "$2/repo" ]] || usage
+  run_dir=$(cd "$2" && pwd)
+  rerun_request=$(queue_rerun "$run_dir" "$3" "$4" "$5")
+elif [[ "$1" == --resume ]]; then
   # A resumed run keeps the base branch of its first start.
   [[ -z "$base" ]] || fail '--base and --resume cannot go together'
   [[ $# -eq 2 && -r "$2/repo" ]] || usage
   run_dir=$(cd "$2" && pwd)
+  resuming=true
 else
   repo=$(git rev-parse --show-toplevel 2>/dev/null) || fail 'run this from a git repo'
   [[ "$(git rev-parse --git-dir)" == "$(git rev-parse --git-common-dir)" ]] ||
@@ -63,7 +96,21 @@ else
 fi
 
 session="autopilot-$(basename "$run_dir")"
-! tmux has-session -t "=$session" 2>/dev/null || fail "tmux session $session already exists"
+session_exists=false
+! tmux has-session -t "=$session" 2>/dev/null || session_exists=true
+if [[ -n "$rerun_request" ]]; then
+  echo "rerun=$rerun_request"
+  if [[ "$session_exists" == true ]] && pipeline_is_running "$run_dir"; then
+    # The running pipeline takes pending reruns after its stories. A second pipeline would race it.
+    echo "run_dir=$run_dir"
+    echo "session=$session"
+    echo 'queued: the running pipeline does the rerun after its current work'
+    exit 0
+  fi
+elif [[ "$session_exists" == true ]]; then
+  [[ "$resuming" == true && -r "$run_dir/state.json" ]] && ! pipeline_is_running "$run_dir" ||
+    fail "tmux session $session already exists"
+fi
 
 printf -v pipeline '%q ' "$script_dir/autopilot.sh" "$run_dir"
 # Keep the machine awake during the run. systemd-inhibit is absent on some hosts, and fails
@@ -74,8 +121,16 @@ if command -v systemd-inhibit >/dev/null && systemd-inhibit --list >/dev/null 2>
 fi
 printf -v progress '%q ' watch -n 10 "$script_dir/progress.sh" "$run_dir"
 
-tmux new-session -d -s "$session" -c "$(<"$run_dir/repo")" \
-  "$pipeline; echo; echo 'Run ended. Summary: $run_dir/summary.md. Press Enter to close.'; read -r"
+pipeline+="; echo; echo 'Run ended. Summary: $run_dir/summary.md. Press Enter to close.'; read -r"
+if [[ "$session_exists" == true ]]; then
+  window=resume
+  [[ -z "$rerun_request" ]] || window="rerun-$(basename "$rerun_request" .json)"
+  tmux new-window -t "=$session:" -n "$window" -c "$(<"$run_dir/repo")" "$pipeline"
+  echo "run_dir=$run_dir"
+  echo "session=$session"
+  exit 0
+fi
+tmux new-session -d -s "$session" -c "$(<"$run_dir/repo")" "$pipeline"
 tmux split-window -v -l 14 -t "$session" -c "$run_dir" "$progress"
 # Select the pane above the new progress pane. A fixed index fails when tmux base-index is not 0.
 tmux select-pane -t "$session" -U
