@@ -1,5 +1,7 @@
 # Mikey Jay's Dotfiles
 
+Tmux agent state, OpenCode V2 lifecycle integration, and mock tests: [`.config/tmux/README.md`](.config/tmux/README.md).
+
 ## Installation
 
 ```bash
