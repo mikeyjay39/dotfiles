@@ -4,5 +4,8 @@
 [core]
 	editor = vim
 	sshCommand = ssh -i ~/.ssh/id_ed25519
+	excludesFile = ~/.config/git/ignore
 [credential]
 	helper = store
+[init]
+	defaultBranch = main
