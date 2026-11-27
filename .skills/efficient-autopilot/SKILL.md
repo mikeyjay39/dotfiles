@@ -6,7 +6,7 @@ argument-hint: '<#n | issue-url | "description"> […]'
 
 # Efficient Autopilot
 
-This skill only starts the run. The run itself is `scripts/autopilot.sh`, in its own tmux session. Do not plan, read the issues, or watch the run in this session. That costs tokens and the script does it.
+This skill only starts the run. The run itself is `scripts/autopilot.sh`, in a tmux window. All runs of a repo share one tmux session, `autopilot-<repo>`. Never open another tmux session for new work: `start.sh` adds a window to the existing session. Do not plan, read the issues, or watch the run in this session. That costs tokens and the script does it.
 
 Write every report to the human in ASD-STE100 Simplified Technical English.
 
@@ -34,12 +34,12 @@ A feature issue with sub-issues or a task list becomes many stories. If there is
    ```bash
    <skill-dir>/scripts/start.sh [--base <branch>] '<work item>' […]
    ```
-   It prints `run_dir=` and `session=`.
+   It prints `run_dir=`, `session=`, and `window=`.
 3. **Report** to the human, then end the turn:
-   - Watch the run: `tmux attach -t <session>`. Detach with `Ctrl-b d`. Watching uses no tokens.
+   - Watch the run: `tmux attach -t <session>`, then select the window `<window>`. Detach with `Ctrl-b d`. Watching uses no tokens.
    - The top pane shows each tool call. The bottom pane shows each story's state and the 5-hour usage.
    - The run state is in `<run_dir>`. The result is in `<run_dir>/summary.md`.
-   - To continue after a stop or a reboot: `<skill-dir>/scripts/start.sh --resume <run_dir>`. When the run's tmux session is still open and no pipeline runs, it opens a new window there.
+   - To continue after a stop or a reboot: `<skill-dir>/scripts/start.sh --resume <run_dir>`. It opens a `<run-id>-resume` window. It stops when the run's pipeline still works in its window.
 
 ## Rerun a story
 
@@ -52,7 +52,7 @@ When the human asks for more work on a done or parked story of an existing run, 
 - `fix`: the worker resumes its own session and changes the code as the instructions say. The script verifies (2 fix rounds or fewer, then park), pushes, and replies on the PR.
 - `proof`: the worker resumes its session and proves the story again. The screenshots go to a new `<story>-rerun-<n>` folder on the proof branch, and the PR body links the new proof comment. A failed proof is reported, not fixed. The human decides.
 - The instructions apply to that step only. Where they allow more than the hard limits (for example, one live call to a paid API), they win. Tell the worker where to find a secret. Never put a secret value in the instructions.
-- The rerun reuses the run's tmux session, in a new window. When the pipeline still runs, the request waits in the queue, and the pipeline does it after its stories.
+- The rerun opens a `<run-id>-rerun-<n>` window in the repo session. When the run's pipeline still works, the request waits in the queue, and the pipeline does it after its stories.
 - Each request is in `<run_dir>/reruns/<n>.json`. `summary.md` lists each rerun and its result.
 
 ## What the run does
